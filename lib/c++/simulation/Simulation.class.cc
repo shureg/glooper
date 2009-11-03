@@ -1,0 +1,142 @@
+// =====================================================================================
+// 
+//       Filename:  Simulation.class.cc
+// 
+//    Description:  
+// 
+//        Version:  1.0
+//        Created:  13/10/09 14:04:42
+//       Revision:  none
+//       Compiler:  g++
+// 
+//         Author:  Alexander Kabanov (aak), alexander.kabanov@gmail.com
+//        Company:  
+// 
+// =====================================================================================
+
+#include "simulation/Simulation.class.h"
+#include "process/Process.class.h"
+#include <fstream>
+#include <sstream>
+#include "boost/bind.hpp"
+
+using namespace GLOOPER_TEST;
+using namespace std;
+using XML_SERIALISATION::XmlSerialisableObject;
+
+unsigned long Simulation::external_instance_counter(const char* filename) const
+{
+   unsigned long tmp;
+
+   ifstream ifs(filename);
+
+   ifs >> tmp;
+
+   ifs.close();
+
+   ofstream ofs(filename);
+
+   ofs << ++tmp;
+
+   ofs.close();
+
+   return tmp;
+}
+
+void Simulation::db_insert_slot(const XmlSerialisableObject& so)
+{
+   ostringstream oss;
+
+   oss << so.xml_description();
+
+   dbi.insert(oss.str(),current_context);
+}
+
+Simulation::Simulation(const boost::shared_ptr<Process>& _process,
+      const std::string& _comment,
+      const SednaDBInterface& _dbi,
+      const char* external_counter_filename): 
+   SimulationObject(external_instance_counter(external_counter_filename)),
+   comment(_comment), process(_process), dbi(_dbi),
+   batch_ctr(0), run_ctr(0), step_ctr(0)
+{
+   dbi.open_connection();
+
+   SimulationObject::db_signal().connect( 
+	 boost::bind(&Simulation::db_insert_slot,this,_1) );
+
+   current_context = dbi.default_context();
+
+   SimulationObject::db_signal()(*this);
+}
+
+void Simulation::simulate()
+{
+   string simulation_context = 
+      dbi.default_context() + 
+      (boost::format("/Simulation[id=%d]") % id).str();
+   
+   current_context = simulation_context;
+
+   process->simulation_config();
+
+   batch_ctr = 0;
+
+   while( !end_simulation() )
+   {
+      XmlField batch("Batch");
+      batch.add_field("id",batch_ctr++);
+
+      dbi.insert((const string) batch,simulation_context);
+
+      string batch_context = simulation_context +
+	 (boost::format("/Batch[id=%d]") % (batch_ctr-1)).str();
+
+      current_context = batch_context;
+
+      process->batch_config();
+
+      run_ctr = 0;
+
+      while( !end_batch() )
+      {
+	 XmlField run("Run");
+	 run.add_field("id",run_ctr++);
+
+	 dbi.insert((const string) run, batch_context);
+
+	 string run_context = batch_context +
+	    (boost::format("/Run[id=%d]") % (run_ctr-1)).str();
+
+	 current_context = run_context;
+
+	 process->run_config();
+
+	 step_ctr = 0;
+
+	 while( !end_run() )
+	 {
+	    XmlField step("Step");
+	    step.add_field("id",step_ctr++);
+
+	    dbi.insert((const string) step, run_context);
+
+	    string step_context = run_context + 
+	       (boost::format("/Step[id=%d]") % (step_ctr-1)).str();
+
+	    current_context = step_context;
+
+	    process->evolve();
+	 }
+      }
+   }
+}
+
+XmlField Simulation::xml_description() const
+{
+   XmlField tmp("Simulation");
+   tmp.add_field("id",id);
+   tmp.add_field("comment",comment);
+
+   return tmp;
+}

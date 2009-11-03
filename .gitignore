@@ -1,0 +1,10 @@
+*.o
+*.so
+*.a
+*.swp
+*~
+*.d
+install
+*.swo
+cmd/c++/test/*
+!cmd/c++/test/test.cxx
