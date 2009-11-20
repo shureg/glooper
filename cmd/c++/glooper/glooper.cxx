@@ -35,7 +35,13 @@ int main(int argc, char** argv)
 {
    try
    {
-      FileCallbackLog F("test.log","glooper_test",TRACE);
+      if(argc < 3) throw "glooper: Must provide at least 2 command-line arguments";
+
+      unsigned long simid = atol(argv[1]);
+
+      if(simid==0) throw "glooper: A zero value for simulation_id has been provided or no conversion could be performed";
+
+      FileCallbackLog F(argv[2],"glooper",TRACE);
 
       SednaDBInterface dbi("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData");
 
@@ -61,7 +67,7 @@ int main(int argc, char** argv)
 
       boost::progress_timer* t = new boost::progress_timer(oss);
 
-      StandardFSSimulation sim(ap,"test",dbi,"/home/shureg/Projects/glooper/etc/simid",1,1,20);
+      StandardFSSimulation sim(ap,"full_cycle_test",dbi,simid,1,1,20);
 
       sim.simulate();
 
@@ -71,25 +77,25 @@ int main(int argc, char** argv)
    }
    catch(const char* c)
    {
-      cout << "An exception has been caught: " << c << endl;
+      cerr << "glooper: An exception has been caught: " << c << endl;
 
       return EXIT_FAILURE;
    }
    catch(const string& s)
    {
-      cout << "An exception has been caught: " << s << endl;
+      cerr << "glooper: An exception has been caught: " << s << endl;
 
       return EXIT_FAILURE;
    }
    catch(const std::exception& e)
    {
-      cout << "An exception has been caught: " << e.what() << endl;
+      cerr << "glooper: An exception has been caught: " << e.what() << endl;
 
       return EXIT_FAILURE;
    }
    catch(...)
    {
-      cout << "An unspecified exception has been caught: log file may contain more details" << endl;
+      cerr << "glooper: An unspecified exception has been caught: log file may contain more details" << endl;
 
       return EXIT_FAILURE;
    }

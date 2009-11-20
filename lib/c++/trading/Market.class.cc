@@ -41,13 +41,16 @@ const bool Market::is_crossing_limit_order(const Order& r) const
 
 void Market::process_order(Order& r)
 {
+   //register incoming order
+   SimulationObject::db_signal()(r);
+
    // A trade may occur
    if( r.is_market() xor is_crossing_limit_order(r) )
    {
       // Connecting trade-recording function slot to the potential
       // trade-emitting signal
       boost::signals::connection tr = 
-	 r.get_owner_signal().connect(
+	 r.get_trade_registration_signal().connect(
 	    boost::bind(
 	       &Market::record_trade,this,_1) 
 	    );
@@ -155,11 +158,6 @@ void Market::add_limit_order(Order& r,
 	    "Market: adding a limit order to the market: %d (%d) @ %f\n")
 	 % r.get_quantity() % r.is_bid() % r.get_price() ); 
 
-   boost::signals::connection agt_c =
-      ord_sig->connect(
-	    boost::bind( &Agent::add_order,r.get_owner(),_1)
-	    );
-
    if(r.is_bid())
    {
       if(left_over)
@@ -174,18 +172,29 @@ void Market::add_limit_order(Order& r,
       else
 	 ask_orders.insert(r);
    }
+}
 
-   LOG(TRACE,
-	 boost::format("Market: Preparing to invoke the order "\
-	    "registration signal\n"));
-   
-   (*ord_sig)(&r);
+void Market::pull_agent_orders(const Agent& agt)
+{
+   set<Order,buyers_pick> new_ask_orders;
 
-   LOG(TRACE,
-	 boost::format("Preparing to disconnect the order "\
-	    "registration signal\n"));
+   for( set<Order,buyers_pick>::const_iterator
+	 i = ask_orders.begin(); i != ask_orders.end(); ++i )
+      if( !(i->is_owner(agt)) )
+	 new_ask_orders.insert(new_ask_orders.end(), *i );
 
-   agt_c.disconnect();
+   ask_orders.clear();
+   ask_orders = new_ask_orders;
+
+   set<Order,sellers_pick> new_bid_orders;
+
+   for( set<Order,sellers_pick>::const_iterator
+	 i = bid_orders.begin(); i != bid_orders.end(); ++i )
+      if( !(i->is_owner(agt)) )
+	 new_bid_orders.insert(new_bid_orders.end(), *i );
+
+   bid_orders.clear();
+   bid_orders = new_bid_orders;
 }
 
 const set<Order,buyers_pick>& Market::get_ask_orders() const
@@ -216,10 +225,9 @@ const Order* Market::best_order(bool _bid) const
    }
 }
 
-void Market::record_trade(const Order& r)
+void Market::record_trade(const Trade& tr)
 {
-   trades.push_back(Trade(r.get_quantity(),r.get_price()));
-   SimulationObject::db_signal()(trades.back());
+   trades.push_back(tr);
 }
 
 double Market::mark_to_market(bool _bid) const
@@ -299,30 +307,38 @@ XmlField Market::xml_description() const
 
    if(!ask_orders.empty())
    {
-      tmp.add_field("Offers");
+      XmlField offs("Offers");
 
       depth_ctr=0;
 
       for(set<Order,buyers_pick>::const_iterator
 	    i = ask_orders.begin();i!=ask_orders.end();++i)
       {
-	 tmp["Offers"].add_field("depth",depth_ctr++);
-	 tmp["Offers"].add_field(i->xml_description());
+	 XmlField lo("LimitOrder");
+	 lo.add_field("depth",depth_ctr++);
+	 lo.add_field(i->xml_description());
+	 offs.add_field(lo);
       }
+
+      tmp.add_field(offs);
    }
    
    if(!bid_orders.empty())
    {
-      tmp.add_field("Bids");
+      XmlField bids("Bids");
 
       depth_ctr=0;
 
       for(set<Order,sellers_pick>::const_iterator
 	    i = bid_orders.begin();i!=bid_orders.end();++i)
       {
-	 tmp["Bids"].add_field("depth",depth_ctr++);
-	 tmp["Bids"].add_field(i->xml_description());
+	 XmlField lo("LimitOrder");
+	 lo.add_field("depth",depth_ctr++);
+	 lo.add_field(i->xml_description());
+	 bids.add_field(lo);
       }
+
+      tmp.add_field(bids);
    }
 
    return tmp;

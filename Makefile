@@ -51,7 +51,7 @@ lib:
 	$(MAKE) --directory=$(PROJECT_LIB_PATH)
 
 cmd:
-	$(MAKE) --directory=$(PROJECT_CMD_PTH)
+	$(MAKE) --directory=$(PROJECT_CMD_PATH)
 
 clean:
 	$(MAKE) --directory=$(PROJECT_LIB_PATH) clean

@@ -20,13 +20,17 @@ using namespace GLOOPER_TEST;
 
 unsigned long Trade::instance_ctr(0);
 
-Trade::Trade(unsigned long q_,double p_): SimulationObject(++instance_ctr),
-   q(q_), p(p_) {}
+Trade::Trade(unsigned long q_,double p_, 
+      unsigned long active_id_, unsigned long passive_id_): 
+   SimulationObject(++instance_ctr),
+   q(q_), p(p_), active_id(active_id_), passive_id(passive_id_) {}
 
 XmlField Trade::xml_description() const
 {
    XmlField tmp("Trade");
    tmp.add_field("quantity",q);
    tmp.add_field("price",p);
+   tmp.add_field("active_id",active_id);
+   tmp.add_field("passive_id",passive_id);
    return tmp;
 }

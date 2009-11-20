@@ -1,3 +1,10 @@
+#defining 'escaped' space and comma, so that $( ) evaluates to a space and $(,) evaluates to a comma
+, := ,
+space :=
+space +=
+$(space) :=
+$(space) +=
+
 -include lib.config.mk
 
 DY_LIB_NAME = lib$(LIB_NAME_STEM).so
@@ -27,7 +34,15 @@ LIB_WARNING_FLAGS = $(foreach W,$(LIB_WARNINGS),-W$W)
 
 LIB_DEFINES += $(PROJECT_DEFINES)
 
-LIB_DEFINE_FLAGS =$(foreach D,$(LIB_DEFINES),-D$D=$($D))
+LIB_VERSION = $(if $(LIB_VERSION_FILE),`cat $(LIB_VERSION_FILE)`,)
+#LIB_VERSION_NUMBERS = $(subst .,$( ),$(LIB_VERSION))
+
+#DY_LIB_SO_SUFFIX = $(if $(LIB_VERSION),.$(word 1,$(LIB_VERSION_NUMBERS)),)
+#DY_LIB_FULL_SUFFIX = $(if $(LIB_VERSION),.$(LIB_VERSION),)
+#DY_LIB_SO_NAME = lib$(LIB_NAME_STEM).so$(DY_LIB_SO_SUFFIX)
+#DY_LIB_FULL_NAME = $(DY_LIB_NAME)$(DY_LIB_FULL_SUFFIX)
+
+LIB_DEFINE_FLAGS = $(foreach D,$(LIB_DEFINES),-D$D=$($D))
 
 ifeq "$(MAKECMDGOALS)" "install"
    ifndef INSTALL_PREFIX
@@ -38,10 +53,12 @@ endif
 lib: $(DY_LIB_NAME) $(ST_LIB_NAME)
 
 $(DY_LIB_NAME): $(LIB_OBJECTS)
-	g++ -shared -Wl,-soname,$@ -o $@ $(LIB_DEP_FLAGS) $(LIB_DEP_PATH_FLAGS) $^
+	g++ -shared -Wl,-soname,$(DY_LIB_NAME) -o $(DY_LIB_NAME) $(LIB_DEP_FLAGS) $(LIB_DEP_PATH_FLAGS) $^
+
 
 $(ST_LIB_NAME): $(LIB_OBJECTS)
 	ar -rv $@ $^
+
 
 clean:
 	@rm -rfv $(DY_LIB_NAME)
@@ -57,7 +74,9 @@ install: lib
 
 %$(LIB_OBJ_SUFFIX): %$(LIB_SRC_SUFFIX)
 
+
 %$(LIB_OBJ_SUFFIX): %$(LIB_SRC_SUFFIX)
+	@$(if $(LIB_VERSION_FILE),/usr/bin/env python version_increment.py $(LIB_VERSION_FILE) $(LIB_VERSION_HEADER_FILE),)
 	$(call make_depend,$<,$@,$*$(LIB_SRC_DEP_SUFFIX),$(LIB_INCLUDE_FLAGS))
 	g++ -c -g -fPIC $(LIB_WARNING_FLAGS) $(LIB_INCLUDE_FLAGS) $(LIB_DEFINE_FLAGS) -o $@ $<
 

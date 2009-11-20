@@ -42,8 +42,6 @@ namespace GLOOPER_TEST
 
       void position_update(const Order&);
 
-      void add_order(Order*);
-
       bool can_trade();
 
    protected:
@@ -85,8 +83,6 @@ namespace GLOOPER_TEST
       Position get_order_quantity(double) const;
 
       void check_liquidity();
-
-      std::list<Order*> own_orders;
 
       void reset_orders();
 

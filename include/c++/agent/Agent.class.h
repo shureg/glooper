@@ -42,8 +42,6 @@ namespace GLOOPER_TEST
 
       virtual void position_update(const Order&) = 0;
 
-      virtual void add_order(Order*) = 0;
-
       virtual bool can_trade() = 0;
 
       Agent* clone() const;

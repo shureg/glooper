@@ -33,10 +33,15 @@ Order::Order(Agent& _owner,
    owner(_owner),
    price(_price), quantity(_quantity), bid(_bid),
    market(false), order_time(_order_time),
-   owner_signal(new trade_signal)
+   owner_signal(new trade_signal),
+   trade_registration_signal(new detailed_trade_signal)
 {
    owner_connection = owner_signal->connect(
-	 boost::bind( &Agent::position_update,&owner,_1 )
+	 boost::bind( &Agent::position_update, &owner ,_1 )
+	 );
+
+   trade_registration_connection = trade_registration_signal->connect(
+	 boost::bind( &Order::record_trade, this, _1 )
 	 );
 }
 
@@ -47,16 +52,22 @@ Order::Order(Agent& _owner,
    owner(_owner),
    price(-1.), quantity(_quantity), bid(_bid),
    market(true), order_time(_order_time),
-   owner_signal(new trade_signal)
+   owner_signal(new trade_signal),
+   trade_registration_signal(new detailed_trade_signal)
 {
    owner_connection = owner_signal->connect(
 	 boost::bind( &Agent::position_update,&owner,_1 )
+	 );
+
+   trade_registration_connection = trade_registration_signal->connect(
+	 boost::bind( &Order::record_trade, this, _1 )
 	 );
 }
 
 Order::~Order()
 {
    owner_connection.disconnect();
+   trade_registration_connection.disconnect();
 }
 
 tribool Order::is_better_for_buyer(const Order& r) const
@@ -85,7 +96,18 @@ void Order::match(const Order& r) const
 	    );
       execute(mutual_quantity,r.get_price(),order_time);
       r.execute(mutual_quantity,r.get_price(),order_time);
+      Trade tmp(mutual_quantity, r.get_price(),
+	    owner.get_id(), r.get_owner()->get_id());
+      (*trade_registration_signal)(tmp);
    }
+}
+
+void Order::record_trade(const Trade& tr) const
+{
+   LOG(TRACE, boost::format("Preparing to record a trade for %d units @ %.2f\n"
+	    ) % tr.q % tr.p
+	 );
+   SimulationObject::db_signal()(tr);
 }
 
 void Order::execute(
@@ -141,20 +163,25 @@ const unsigned long Order::get_order_time() const
    return order_time;
 }
 
-Agent* Order::get_owner()
+Agent* Order::get_owner() const
 {
    return &owner;
 }
 
+bool Order::is_owner(const Agent& _owner) const
+{
+   return &_owner == &owner;
+}
 
-trade_signal& Order::get_owner_signal()
+
+trade_signal& Order::get_owner_signal() const
 {
    return *owner_signal;
 }
 
-unsigned long Order::get_id() const
+detailed_trade_signal& Order::get_trade_registration_signal() const
 {
-   return id;
+   return *trade_registration_signal;
 }
 
 void Order::check_bid() const
@@ -172,6 +199,7 @@ XmlField Order::xml_description() const
    tmp.add_field("is_bid",bid);
    tmp.add_field("is_market",market);
    tmp.add_field("order_time",order_time);
+   tmp.add_field("owner_id",owner.get_id());
 
    return tmp;
 }

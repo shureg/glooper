@@ -20,6 +20,7 @@
 #include "boost/shared_ptr.hpp"
 #include "core/SimulationObject.class.h"
 #include "db/SednaDBInterface.class.h"
+#include "boost/timer.hpp"
 
 namespace GLOOPER_TEST
 {
@@ -31,6 +32,11 @@ namespace GLOOPER_TEST
 
       Simulation(const boost::shared_ptr<Process>&,
 	    const std::string&, const SednaDBInterface&, const char*);
+
+      Simulation(const boost::shared_ptr<Process>&,
+	    const std::string&, const SednaDBInterface&, unsigned long);
+
+      ~Simulation();
 
       XmlField xml_description() const;
 
@@ -59,6 +65,12 @@ namespace GLOOPER_TEST
       unsigned long external_instance_counter(const char*) const;
 
       std::string current_context;
+
+      unsigned long registration_timer;
+
+      boost::timer* simulation_timer;
+
+      void simulation_cleanup();
 
       void db_insert_slot(const XML_SERIALISATION::XmlSerialisableObject&);
    };

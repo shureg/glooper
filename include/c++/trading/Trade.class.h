@@ -25,13 +25,18 @@ namespace GLOOPER_TEST
    {
    public:
 
-      Trade(unsigned long, double);
+      Trade(unsigned long, double, 
+	    unsigned long, unsigned long);
 
       XmlField xml_description() const;
 
       unsigned long q;
 
       double p;
+
+      unsigned long active_id;
+
+      unsigned long passive_id; 
 
    protected:
 

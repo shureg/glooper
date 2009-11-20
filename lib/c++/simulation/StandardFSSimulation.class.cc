@@ -29,6 +29,16 @@ StandardFSSimulation::StandardFSSimulation(
    N_steps(_N_steps)
 {}
 
+StandardFSSimulation::StandardFSSimulation(
+      const boost::shared_ptr<Process>& _process,
+      const string& _comment,
+      const SednaDBInterface& _dbi, unsigned long _id,
+      unsigned long _N_batches, unsigned long _N_runs,
+      unsigned long _N_steps):
+   StandardSimulation(_process,_comment,_dbi,_id,_N_batches,_N_runs),
+   N_steps(_N_steps)
+{}
+
 const bool StandardFSSimulation::end_run() const
 {
    return ( step_ctr >= N_steps );

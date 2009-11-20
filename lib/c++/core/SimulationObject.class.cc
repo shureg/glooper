@@ -26,3 +26,8 @@ boost::signal<void (const XmlSerialisableObject&) >& SimulationObject::db_signal
 
 SimulationObject::SimulationObject(unsigned long _id): id(_id)
 {}
+
+unsigned long SimulationObject::get_id() const
+{
+   return id;
+}

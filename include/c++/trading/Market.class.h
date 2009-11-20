@@ -59,6 +59,8 @@ namespace GLOOPER_TEST
       unsigned long raise_cash(const double&) const;
 
       double tick_adjusted_price(double) const;
+
+      void pull_agent_orders(const Agent&);
       
       XmlField xml_description() const;
 
@@ -74,7 +76,7 @@ namespace GLOOPER_TEST
 
       std::list<Trade> trades;
 
-      void record_trade(const Order&);
+      void record_trade(const Trade&);
 
       double init_price;
 

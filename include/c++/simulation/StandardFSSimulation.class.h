@@ -32,6 +32,12 @@ namespace GLOOPER_TEST
 	    unsigned long, unsigned long,
 	    unsigned long);
 
+      StandardFSSimulation(const boost::shared_ptr<Process>&,
+	    const std::string&, 
+	    const SednaDBInterface&, unsigned long,
+	    unsigned long, unsigned long,
+	    unsigned long);
+
       const bool end_run() const;
 
       XmlField xml_description() const;

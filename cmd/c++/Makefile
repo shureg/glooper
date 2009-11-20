@@ -16,7 +16,8 @@ EXEC_LIB_FLAGS = $(foreach l,$(EXEC_LIBS),-l$l)
 EXEC_LIB_PATH_FLAGS = $(foreach p,$(EXEC_LIB_PATHS),-L$p)
 EXEC_RPATH_FLAGS = $(subst $( ),$(,),$(foreach p,$(PROJECT_LIB_PATH),-rpath=$p))
 
-all: $(EXEC_TARGETS)
+.PHONY: cmd
+cmd: $(EXEC_TARGETS)
 
 clean:
 	for f in $(EXEC_TARGETS); \

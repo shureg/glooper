@@ -22,6 +22,7 @@
 #include "callback_log/LOG.h"
 #include <stdexcept>
 #include "core/SimulationObject.class.h"
+#include "trading/Trade.class.h"
 
 using boost::logic::tribool;
 
@@ -31,6 +32,9 @@ namespace GLOOPER_TEST
 
    typedef boost::signal< void (const Order&) > \
 	      trade_signal;
+
+   typedef boost::signal< void (const Trade&) > \
+	      detailed_trade_signal;
 
    class Agent;
 
@@ -64,9 +68,13 @@ namespace GLOOPER_TEST
 
       const unsigned long get_order_time() const;
 
-      Agent* get_owner();
+      Agent* get_owner() const;
 
-      trade_signal& get_owner_signal();
+      bool is_owner(const Agent&) const;
+
+      trade_signal& get_owner_signal() const;
+
+      detailed_trade_signal& get_trade_registration_signal() const;
 
       void check_bid() const;
 
@@ -77,8 +85,6 @@ namespace GLOOPER_TEST
       const bool is_acceptable(const Order&) const;
 
       const bool is_cleared() const;
-
-      unsigned long get_id() const;
 
       XmlField xml_description() const;
 
@@ -99,9 +105,15 @@ namespace GLOOPER_TEST
       //! A pointer to a trade-processing signal constructed elsewhere
       boost::shared_ptr<trade_signal> owner_signal;
 
+      boost::shared_ptr<detailed_trade_signal> trade_registration_signal;
+
       boost::signals::connection owner_connection;
 
+      boost::signals::connection trade_registration_connection;
+
       Agent& owner;
+
+      void record_trade(const Trade&) const;
 
    private:
 

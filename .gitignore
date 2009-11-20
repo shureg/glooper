@@ -5,6 +5,11 @@
 *~
 *.d
 install
+log
+data
+tmp
 *.swo
 cmd/c++/test/*
 !cmd/c++/test/test.cxx
+cmd/c++/glooper/*
+!cmd/c++/glooper/glooper.cxx

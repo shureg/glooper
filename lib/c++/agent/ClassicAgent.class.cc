@@ -41,7 +41,6 @@ ClassicAgent::ClassicAgent(double _belief, double _p_min, double _f_min,
 
 ClassicAgent::~ClassicAgent()
 {
-   if(!own_orders.empty()) reset_orders();
 }
 
 bool ClassicAgent::will_revise(double new_belief)
@@ -288,36 +287,26 @@ void ClassicAgent::place_order()
 		     "calculated to be zero\n"
 		     ) % id
 		  );
+	 else
+	 {
+	    LOG(TRACE,boost::format("Agent %d: Preparing to execute a passive order "\
+		     "for %.0f units at %.2f\n")
+		  % id % dq % p_ord
+		  );
+	    Order pass(*this, p_ord, dq.q, (bool) dq.is_long, 
+		  (*timer)() );
 
-	 LOG(TRACE,boost::format("Agent %d: Preparing to execute a passive order "\
-		  "for %.0f units at %.2f\n")
-	       % id % dq % p_ord
-	       );
-	 Order pass(*this, p_ord, dq.q, (bool) dq.is_long, 
-	       (*timer)() );
-
-	 spot_mkt->process_order(pass);
+	    spot_mkt->process_order(pass);
+	 }
       }
    }
 
    SimulationObject::db_signal()(*this);
 }
 
-void ClassicAgent::add_order(Order* r)
-{
-   LOG(TRACE,boost::format("Agent %d: adding limit order (%d) for %d units @ %.3f "\
-	    "to the list of own orders\n")
-	 % id % r->is_bid() % r->get_quantity() % r->get_price()
-	 );
-   own_orders.push_back(r);
-}
-
 void ClassicAgent::reset_orders()
 {
-   for(list<Order*>::iterator
-	 i = own_orders.begin(); i !=  own_orders.end(); ++i)
-      spot_mkt->remove_order(**i);
-   own_orders.clear();
+   spot_mkt->pull_agent_orders(*this);
    LOG(TRACE, boost::format("Agent %d: own orders have been reset\n") % id);
 }
 
@@ -410,15 +399,9 @@ XmlField ClassicAgent::xml_description() const
    tmp.add_field("minimum_belief_adjustment_proportion",f_min);
 
    tmp.add_field("maximum_bid-ask_spread",bas_max);
-   
-   if(!own_orders.empty())
-   {
-      tmp.add_field("Orders");
-      for(list<Order*>::const_iterator
-	    i = own_orders.begin(); i!=own_orders.end(); ++i)
-	 tmp["Orders"].add_field("id",(*i)->get_id());
-   }
 
+   tmp.add_field("is_bankrupt",is_bankrupt);
+   
    return tmp;
 }
 

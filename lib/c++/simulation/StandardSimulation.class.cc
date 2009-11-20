@@ -28,6 +28,15 @@ StandardSimulation::StandardSimulation(
    N_batches(_N_batches), N_runs(_N_runs)
 {}
 
+StandardSimulation::StandardSimulation(
+      const boost::shared_ptr<Process>& _process,
+      const std::string& _comment,
+      const SednaDBInterface& _dbi, unsigned long _id,
+      unsigned long _N_batches, unsigned long _N_runs):
+   Simulation(_process,_comment,_dbi,_id), 
+   N_batches(_N_batches), N_runs(_N_runs)
+{}
+
 const bool StandardSimulation::end_simulation() const
 {
    return ( batch_ctr >= N_batches );

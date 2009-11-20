@@ -7,7 +7,7 @@ PROJECT_INCLUDE_PATH := $(CURDIR)/include/c++
 
 PROJECT_LIB_PATH := $(CURDIR)/lib/c++
 
-PROJECT_CMD_PTH := $(CURDIR)/cmd/c++
+PROJECT_CMD_PATH := $(CURDIR)/cmd/c++
 
 BOOST_INCLUDE_PATH = /usr/local/include/boost-1_39
 

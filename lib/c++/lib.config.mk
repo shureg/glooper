@@ -17,3 +17,7 @@ BOOST_INCLUDE_PATH ?= /usr/local/include/boost-1_39
 LIB_INCLUDE_PATHS += $(BOOST_INCLUDE_PATH) $(SEDNA_C_PATH)
 
 LIB_WARNINGS = all overloaded-virtual
+
+LIB_VERSION_FILE = glooper.version
+
+LIB_VERSION_HEADER_FILE = $(PROJECT_INCLUDE_PATH)/core/version.h

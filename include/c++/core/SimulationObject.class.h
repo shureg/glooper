@@ -34,6 +34,8 @@ namespace GLOOPER_TEST
       static boost::signal <void (const XmlSerialisableObject&) >& 
 	 db_signal();
 
+      unsigned long get_id() const;
+
    protected:
 
       unsigned long id;
