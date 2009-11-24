@@ -126,6 +126,8 @@ void Simulation::simulate()
 
       current_context = batch_context;
 
+      LOG(INFO,boost::format("Beginning batch %d\n") % (batch_ctr-1) );
+      
       process->batch_config();
 
       run_ctr = 0;
@@ -141,6 +143,8 @@ void Simulation::simulate()
 	    (boost::format("/Run[id=%d]") % (run_ctr-1)).str();
 
 	 current_context = run_context;
+
+	 LOG(INFO,boost::format("Beginning run %d\n") % (run_ctr-1) );
 
 	 process->run_config();
 
@@ -162,7 +166,11 @@ void Simulation::simulate()
 
 	    process->evolve();
 	 }
+
+	 LOG(INFO,boost::format("Ending run %d\n") % (run_ctr-1) );
       }
+
+      LOG(INFO,boost::format("Ending batch %d\n") % (batch_ctr-1) );
    }
 
    current_context = simulation_context;

@@ -11,7 +11,7 @@ PROJECT_CMD_PATH := $(CURDIR)/cmd/c++
 
 BOOST_INCLUDE_PATH = /usr/local/include/boost-1_39
 
-SEDNA_C_PATH = /usr/local/opt/sedna/driver/c
+SEDNA_C_PATH = /simulation_data/sedna/driver/c
 
 export BOOST_INCLUDE_PATH
 

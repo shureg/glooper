@@ -81,13 +81,18 @@ void AgentPopulation::batch_config() {}
 
 void AgentPopulation::run_config()
 {
+   turn_timer = 0;
+
    population.clear();
 
    for(boost::ptr_vector<Agent>::iterator
 	 i  = initial_population.begin();
 	 i != initial_population.end();
 	 ++i)
+   {
+      i->get_market()->reset();
       population.push_back( (*i).clone() );
+   }
 }
 
 void AgentPopulation::evolve()

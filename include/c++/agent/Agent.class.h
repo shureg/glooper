@@ -44,6 +44,8 @@ namespace GLOOPER_TEST
 
       virtual bool can_trade() = 0;
 
+      boost::shared_ptr<Market> get_market() const;
+
       Agent* clone() const;
 
    protected:

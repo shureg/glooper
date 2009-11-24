@@ -9,8 +9,8 @@ logging.addLevelName(10,"TRACE")
 
 gl_logger = logging.getLogger("glooper_launcher")
 
-glooper_bin_path = "/home/shureg/Projects/glooper/cmd/c++/glooper"
-log_path ="/home/shureg/Projects/glooper/log/test"
+glooper_bin_path = "/simulation_data/glooper/cmd/c++/glooper"
+log_path ="/simulation_data/data/log"
 post_processing_script = "simulation_post_processing.py"
 
 if len(sys.argv) < 4:

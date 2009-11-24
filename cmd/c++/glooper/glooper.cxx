@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
       boost::progress_timer* t = new boost::progress_timer(oss);
 
-      StandardFSSimulation sim(ap,"full_cycle_test",dbi,simid,1,1,20);
+      StandardFSSimulation sim(ap,"mutiple run test",dbi,simid,1,1,30);
 
       sim.simulate();
 

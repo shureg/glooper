@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-project_path = "/home/shureg/Projects/glooper"
+project_path = "/simulation_data/glooper"
 
 import sys
 
@@ -44,7 +44,7 @@ except sax_top_node_handler_class.SAXExceptionWithData,inst:
    csv_file.write(reduce(lambda x,y: x+','+y, inst.data)+'\n')
    csv_file.close()
    gl_logger.info("Preparing to process xml row data in %s with xslt template %s and write csv data to %s" % ( xml_filename,xslt_transform_filename,csv_filename ) )
-   os.system("xsltproc %s %s >> %s" % (xslt_transform_filename,xml_filename,csv_filename) )
+   os.system("xsltproc -o %s %s %s" % (csv_filename,xslt_transform_filename,xml_filename) )
 except xml.sax.SAXException,se:
    logging.log("EXCEPTION",se.getMessage())
 
