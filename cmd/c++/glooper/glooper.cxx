@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 
       if(simid==0) throw "glooper: A zero value for simulation_id has been provided or no conversion could be performed";
 
-      FileCallbackLog F(argv[2],"glooper",TRACE);
+      FileCallbackLog F(argv[2],"glooper",INFO);
 
       SednaDBInterface dbi("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData");
 
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 
       boost::shared_ptr<Market> mkt(new Market);
 
-      boost::shared_ptr<ClassicAgentGenerator> ag(new ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,20));
+      boost::shared_ptr<ClassicAgentGenerator> ag(new ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,1000));
 
       boost::shared_ptr<UniformGenerator> info(new UniformGenerator);
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
       boost::progress_timer* t = new boost::progress_timer(oss);
 
-      StandardFSSimulation sim(ap,"4.4.0 initial test",dbi,simid,1,1,30);
+      StandardFSSimulation sim(ap,"factor increase test - 1000 agents (x10)",dbi,simid,1,1,100);
 
       sim.simulate();
 

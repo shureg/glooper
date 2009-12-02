@@ -29,7 +29,7 @@ clean:
 	   done
 
 %.o: %.cxx
-	g++ -c -g -fPIC $(EXEC_INCLUDE_FLAGS) -o $@ $<
+	g++ -c -g -O2 -fPIC $(EXEC_INCLUDE_FLAGS) -o $@ $<
 
 %: %.o
 	g++ -Wl,$(EXEC_RPATH_FLAGS) $(EXEC_LIB_FLAGS) $(EXEC_LIB_PATH_FLAGS) -o $@ $<

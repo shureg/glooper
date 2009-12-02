@@ -27,9 +27,17 @@ namespace GLOOPER_TEST
    public:
 
       SednaDBInterface(const std::string&, 
-	    const std::string&, const std::string&, const std::string& = "");
+	    const std::string&, const std::string&,
+	    const std::string& = "",
+	    const bool = true);
 
       void open_connection();
+
+      void set_autocommit(const bool);
+
+      void begin_transaction();
+
+      void commit_transaction();
 
       void close_connection();
 

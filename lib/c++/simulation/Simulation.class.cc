@@ -87,6 +87,8 @@ Simulation::Simulation(const boost::shared_ptr<Process>& _process,
 {
    dbi.open_connection();
 
+   dbi.set_autocommit(true);
+
    SimulationObject::db_signal().connect( 
 	 boost::bind(&Simulation::db_insert_slot,this,_1) );
 
@@ -102,6 +104,8 @@ Simulation::~Simulation()
 
 void Simulation::simulate()
 {
+   dbi.set_autocommit(true);
+
    simulation_timer = new boost::timer;
 
    string simulation_context = 
@@ -152,6 +156,10 @@ void Simulation::simulate()
 
 	 registration_timer = 0;
 
+	 dbi.set_autocommit(false);
+
+	 dbi.begin_transaction();
+
 	 while( !end_run() )
 	 {
 	    XmlField step("Step");
@@ -165,7 +173,12 @@ void Simulation::simulate()
 	    current_context = step_context;
 
 	    process->evolve();
+
 	 }
+
+	 dbi.commit_transaction();
+
+	 dbi.set_autocommit(true);
 
 	 LOG(INFO,boost::format("Ending run %d\n") % (run_ctr-1) );
       }
