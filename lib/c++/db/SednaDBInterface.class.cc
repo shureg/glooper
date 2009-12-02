@@ -22,14 +22,16 @@ using namespace std;
 using namespace CALLBACK_LOG;
 
 SednaDBInterface::SednaDBInterface(const string& _db_name, 
-      const string& _db_user, const string& _db_user_pwd, const string&
-      _default_root_node):
+      const string& _db_user, const string& _db_user_pwd,
+      const string& _default_root_node,
+      const bool auto_commit_on):
    db_name(_db_name),
    db_user(_db_user), db_user_pwd(_db_user_pwd),
    default_root_node(_default_root_node)
 {
    struct SednaConnection tmp = SEDNA_CONNECTION_INITIALIZER;
    conn = tmp;
+   set_autocommit(auto_commit_on);
 }
 
 void SednaDBInterface::open_connection()
@@ -41,6 +43,53 @@ void SednaDBInterface::open_connection()
       LOG(EXCEPTION,boost::format("Connection to Sedna DB %s for user %s "\
 	       "could not be opened, with exit code %d and error message: %s\n")
 	    % db_name % db_user % result % SEgetLastErrorMsg(&conn));
+}
+
+void SednaDBInterface::set_autocommit(const bool on)
+{
+   int value;
+
+   if( on )
+      value = SEDNA_AUTOCOMMIT_ON;
+   else
+      value = SEDNA_AUTOCOMMIT_OFF;
+
+   int result = SEsetConnectionAttr(
+	 &conn, SEDNA_ATTR_AUTOCOMMIT, (void*)&value, sizeof(int));
+
+   if(result < 0)
+      LOG(EXCEPTION, boost::format("Attribute SEDNA_ATTR_AUTOCOMMIT "\
+	       "for user %(db_user)s on Sedna DB %(db_name)s "\
+	       "could not be set to value %(value)d (%(on)d) "\
+	       "with exit code %(result)d "\
+	       "and error message %s\n") % SEgetLastErrorMsg(&conn)
+	    );
+}
+
+void SednaDBInterface::begin_transaction()
+{
+   int result = SEbegin(&conn);
+
+   if(result < 0)
+      LOG(EXCEPTION, boost::format(
+	       "Could not begin transaction session for database "\
+	       "%(db_name)s "\
+	       "user %(db_user)s with exit code %(result)d and "\
+	       "error message %s\n") % SEgetLastErrorMsg(&conn)
+	    );
+}
+
+void SednaDBInterface::commit_transaction()
+{
+   int result = SEcommit(&conn);
+
+   if(result < 0)
+      LOG(EXCEPTION, boost::format(
+	       "Could not commit transaction session for database "\
+	       "%(db_name)s "\
+	       "user %(db_user)s with exit code %(result)d and "\
+	       "error message %s\n") % SEgetLastErrorMsg(&conn)
+	    );
 }
 
 void SednaDBInterface::close_connection()

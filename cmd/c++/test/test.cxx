@@ -21,7 +21,7 @@
 #include "rng/generator/inverse_cdf/ParetoGenerator.class.h"
 #include "agent/ClassicAgentGenerator.class.h"
 #include "callback_log/FileCallbackLog.class.h"
-#include "boost/progress.hpp"
+#include "boost/timer.hpp"
 
 #include <exception>
 #include <iostream>
@@ -59,15 +59,13 @@ int main(int argc, char** argv)
 
       ostringstream oss;
 
-      boost::progress_timer* t = new boost::progress_timer(oss);
+      boost::timer t;
 
-      StandardFSSimulation sim(ap,"test",dbi,"/home/shureg/Projects/glooper/etc/simid",1,1,20);
+      StandardFSSimulation sim(ap,"test",dbi,"/home/shureg/Projects/glooper/etc/simid",1,1,100);
 
       sim.simulate();
 
-      delete t;
-
-      LOG( INFO, boost::format("Simulation executed in %s\n") % oss.str() );
+      LOG( INFO, boost::format("Simulation executed in %f\n") % t.elapsed() );
    }
    catch(const char* c)
    {

@@ -61,6 +61,8 @@ namespace GLOOPER_TEST
       double tick_adjusted_price(double) const;
 
       void pull_agent_orders(const Agent&);
+
+      void reset();
       
       XmlField xml_description() const;
 

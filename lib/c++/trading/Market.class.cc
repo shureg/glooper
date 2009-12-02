@@ -297,6 +297,13 @@ double Market::tick_adjusted_price(double p) const
    return std::floor(0.5+(p/minimum_tick))*minimum_tick;
 }
 
+void Market::reset()
+{
+   trades.clear();
+   bid_orders.clear();
+   ask_orders.clear();
+}
+
 XmlField Market::xml_description() const
 {
    XmlField tmp("Market");

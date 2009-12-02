@@ -35,6 +35,11 @@ Agent* Agent::clone() const
    return real_clone();
 }
 
+boost::shared_ptr<Market> Agent::get_market() const
+{
+   return spot_mkt;
+}
+
 XmlField Agent::xml_description() const
 {
    XmlField tmp("Agent");
