@@ -308,7 +308,7 @@ XmlField Market::xml_description() const
 {
    XmlField tmp("Market");
    
-   tmp.add_field("init_price",init_price);
+   tmp("init_price") = init_price;
 
    unsigned long depth_ctr;
 

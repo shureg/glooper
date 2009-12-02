@@ -28,6 +28,7 @@ Trade::Trade(unsigned long q_,double p_,
 XmlField Trade::xml_description() const
 {
    XmlField tmp("Trade");
+   tmp("id") = id;
    tmp.add_field("quantity",q);
    tmp.add_field("price",p);
    tmp.add_field("active_id",active_id);

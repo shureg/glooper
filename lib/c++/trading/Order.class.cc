@@ -97,7 +97,7 @@ void Order::match(const Order& r) const
       execute(mutual_quantity,r.get_price(),order_time);
       r.execute(mutual_quantity,r.get_price(),order_time);
       Trade tmp(mutual_quantity, r.get_price(),
-	    owner.get_id(), r.get_owner()->get_id());
+	    get_id(), r.get_id());
       (*trade_registration_signal)(tmp);
    }
 }
@@ -193,7 +193,7 @@ void Order::check_ask() const
 XmlField Order::xml_description() const
 {
    XmlField tmp("Order");
-   tmp.add_field("id",id);
+   tmp("id") = id;
    tmp.add_field("price",price);
    tmp.add_field("quantity",quantity);
    tmp.add_field("is_bid",bid);

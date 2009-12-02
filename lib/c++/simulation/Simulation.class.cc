@@ -110,7 +110,7 @@ void Simulation::simulate()
 
    string simulation_context = 
       dbi.default_context() + 
-      (boost::format("/Simulation[id=%d]") % id).str();
+      (boost::format("/Simulation[@id=%d]") % id).str();
    
    current_context = simulation_context;
 
@@ -121,16 +121,17 @@ void Simulation::simulate()
    while( !end_simulation() )
    {
       XmlField batch("Batch");
-      batch.add_field("id",batch_ctr++);
+      batch("id") = batch_ctr;
+      batch("context_id") = (boost::format("%1.%2") % id % batch_ctr).str();
 
       dbi.insert((const string) batch,simulation_context);
 
       string batch_context = simulation_context +
-	 (boost::format("/Batch[id=%d]") % (batch_ctr-1)).str();
+	 (boost::format("/Batch[@id=%d]") % batch_ctr).str();
 
       current_context = batch_context;
 
-      LOG(INFO,boost::format("Beginning batch %d\n") % (batch_ctr-1) );
+      LOG(INFO,boost::format("Beginning batch %d\n") % batch_ctr );
       
       process->batch_config();
 
@@ -139,16 +140,18 @@ void Simulation::simulate()
       while( !end_batch() )
       {
 	 XmlField run("Run");
-	 run.add_field("id",run_ctr++);
+	 run("id") = run_ctr;
+	 run("context_id") = 
+	    (boost::format("%1.%2.%3") % id % batch_ctr % run_ctr).str();
 
 	 dbi.insert((const string) run, batch_context);
 
 	 string run_context = batch_context +
-	    (boost::format("/Run[id=%d]") % (run_ctr-1)).str();
+	    (boost::format("/Run[@id=%d]") % run_ctr).str();
 
 	 current_context = run_context;
 
-	 LOG(INFO,boost::format("Beginning run %d\n") % (run_ctr-1) );
+	 LOG(INFO,boost::format("Beginning run %d\n") % run_ctr );
 
 	 process->run_config();
 
@@ -163,27 +166,37 @@ void Simulation::simulate()
 	 while( !end_run() )
 	 {
 	    XmlField step("Step");
-	    step.add_field("id",step_ctr++);
+	    step("id") = step_ctr;
+	    step("context_id") = 
+	       (boost::format("%1.%2.%3.%4") 
+	       % id % batch_ctr % run_ctr % step_ctr).str()  
 
 	    dbi.insert((const string) step, run_context);
 
-	    string step_context = run_context + 
-	       (boost::format("/Step[id=%d]") % (step_ctr-1)).str();
+	    string step_context = 
+	       (boost::format("index-scan(\"step\"),\"%1\",\"EQ\"") 
+		% (const string) step("context_id")
+		  ).str();
 
 	    current_context = step_context;
 
 	    process->evolve();
 
+	    ++step_ctr;
 	 }
 
 	 dbi.commit_transaction();
 
 	 dbi.set_autocommit(true);
 
-	 LOG(INFO,boost::format("Ending run %d\n") % (run_ctr-1) );
+	 LOG(INFO,boost::format("Ending run %d\n") % run_ctr );
+
+	 ++run_ctr;
       }
 
-      LOG(INFO,boost::format("Ending batch %d\n") % (batch_ctr-1) );
+      LOG(INFO,boost::format("Ending batch %d\n") % batch_ctr );
+
+      ++batch_ctr;
    }
 
    current_context = simulation_context;
@@ -200,9 +213,9 @@ void Simulation::simulation_cleanup()
 XmlField Simulation::xml_description() const
 {
    XmlField tmp("Simulation");
-   tmp.add_field("id",id);
-   tmp.add_field("comment",comment);
-   tmp.add_field("library_version",LIB_VERSION_STR);
+   tmp("id") = id;
+   tmp("comment") = comment;
+   tmp("library_version") = LIB_VERSION_STR;
 
    return tmp;
 }

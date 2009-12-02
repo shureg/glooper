@@ -43,7 +43,7 @@ boost::shared_ptr<Market> Agent::get_market() const
 XmlField Agent::xml_description() const
 {
    XmlField tmp("Agent");
-   tmp.add_field("id",id);
+   tmp("id")=id;
    tmp.add_field("belief",belief);
    tmp.add_field("timer", (*ro_timer)() );
 
