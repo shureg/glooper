@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
       boost::timer t;
 
-      StandardFSSimulation sim(ap,"test",dbi,"/home/shureg/Projects/glooper/etc/simid",1,1,100);
+      StandardFSSimulation sim(ap,"test",dbi,"/simulation_data/glooper/etc/simid",1,1,30);
 
       sim.simulate();
 

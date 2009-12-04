@@ -18,7 +18,7 @@
 #include "agent/Agent.class.h"
 #include "callback_log/LOG.h"
 #include "xml_serialisation/XmlWrap.class.h"
-#include "xml_serialisation/XmlFieldWrap.class.h"
+#include "xml_serialisation/XmlSingleValue.class.hpp"
 #include "boost/bind.hpp"
 
 #include <fstream>
@@ -29,7 +29,7 @@ using namespace GLOOPER_TEST;
 
 using XML_SERIALISATION::XmlWrap;
 using XML_SERIALISATION::XmlContainerWrap;
-using XML_SERIALISATION::XmlFieldWrap;
+using XML_SERIALISATION::XmlSingleValue;
 using CALLBACK_LOG::LOG;
 
 AgentPopulation::AgentPopulation(
@@ -108,12 +108,10 @@ void AgentPopulation::evolve()
    SimulationObject::db_signal()(sp);
 
    last_info = (*info_generator)();
+
+   XmlSingleValue iv("Information","value",last_info,true);
    
-   XmlField iv("information_value",last_info);
-
-   XmlFieldWrap inf("Information",iv);
-
-   SimulationObject::db_signal()(inf);
+   SimulationObject::db_signal()(iv);
 
    LOG(TRACE,boost::format(
 	    "Using information value %f\n") % last_info);

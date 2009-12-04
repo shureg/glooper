@@ -50,7 +50,7 @@ void Simulation::db_insert_slot(const XmlSerialisableObject& so)
 
    XmlField tmp = so.xml_description();
 
-   tmp.add_field("registration_timer",++registration_timer);
+   tmp("registration_timer") = ++registration_timer;
 
    oss << tmp;
 
@@ -122,7 +122,7 @@ void Simulation::simulate()
    {
       XmlField batch("Batch");
       batch("id") = batch_ctr;
-      batch("context_id") = (boost::format("%1.%2") % id % batch_ctr).str();
+      batch("context_id") = (boost::format("%d.%d") % id % batch_ctr).str();
 
       dbi.insert((const string) batch,simulation_context);
 
@@ -142,7 +142,7 @@ void Simulation::simulate()
 	 XmlField run("Run");
 	 run("id") = run_ctr;
 	 run("context_id") = 
-	    (boost::format("%1.%2.%3") % id % batch_ctr % run_ctr).str();
+	    (boost::format("%d.%d.%d") % id % batch_ctr % run_ctr).str();
 
 	 dbi.insert((const string) run, batch_context);
 
@@ -168,13 +168,14 @@ void Simulation::simulate()
 	    XmlField step("Step");
 	    step("id") = step_ctr;
 	    step("context_id") = 
-	       (boost::format("%1.%2.%3.%4") 
-	       % id % batch_ctr % run_ctr % step_ctr).str()  
+	       (boost::format("%d.%d.%d.%d") 
+	       % id % batch_ctr % run_ctr % step_ctr).str(); 
 
 	    dbi.insert((const string) step, run_context);
 
 	    string step_context = 
-	       (boost::format("index-scan(\"step\"),\"%1\",\"EQ\"") 
+	       (boost::format(
+	       "index-scan(\"step_context\",\"%s\",\"EQ\")") 
 		% (const string) step("context_id")
 		  ).str();
 

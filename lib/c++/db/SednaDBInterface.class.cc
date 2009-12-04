@@ -59,10 +59,12 @@ void SednaDBInterface::set_autocommit(const bool on)
 
    if(result < 0)
       LOG(EXCEPTION, boost::format("Attribute SEDNA_ATTR_AUTOCOMMIT "\
-	       "for user %(db_user)s on Sedna DB %(db_name)s "\
-	       "could not be set to value %(value)d (%(on)d) "\
-	       "with exit code %(result)d "\
-	       "and error message %s\n") % SEgetLastErrorMsg(&conn)
+	       "for user %s on Sedna DB %s "\
+	       "could not be set to value %d (%d) "\
+	       "with exit code %d "\
+	       "and error message %s\n") 
+	    % db_user % db_name % value % (int)on % result
+	    % SEgetLastErrorMsg(&conn)
 	    );
 }
 
@@ -73,9 +75,10 @@ void SednaDBInterface::begin_transaction()
    if(result < 0)
       LOG(EXCEPTION, boost::format(
 	       "Could not begin transaction session for database "\
-	       "%(db_name)s "\
-	       "user %(db_user)s with exit code %(result)d and "\
-	       "error message %s\n") % SEgetLastErrorMsg(&conn)
+	       "%s "\
+	       "user %s with exit code %d and "\
+	       "error message %s\n") 
+	    % db_name % db_user % result % SEgetLastErrorMsg(&conn)
 	    );
 }
 
@@ -86,9 +89,10 @@ void SednaDBInterface::commit_transaction()
    if(result < 0)
       LOG(EXCEPTION, boost::format(
 	       "Could not commit transaction session for database "\
-	       "%(db_name)s "\
-	       "user %(db_user)s with exit code %(result)d and "\
-	       "error message %s\n") % SEgetLastErrorMsg(&conn)
+	       "%s "\
+	       "user %s with exit code %d and "\
+	       "error message %s\n") 
+	    % db_name % db_user % result % SEgetLastErrorMsg(&conn)
 	    );
 }
 
