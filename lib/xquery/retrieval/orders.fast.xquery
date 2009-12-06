@@ -1,11 +1,9 @@
-(string-join( ( "simulation_id","batch_id","run_id","step_id", "order_id", "price", "quantity", "bid", "market", "order_time", "owner_id", "registration_timer"), ','),
+(fn:string-join( ( "simulation_id","batch_id","run_id","step_id", "registration_timer", "order_id", "price", "quantity", "bid", "market", "order_time", "owner_id"), ','),
 let $sim_id := $1
-for $bt in doc("SimulationDB")/SimulationData/Simulation[id=$sim_id]/Batch
-   let $bt_id := $bt/id
-   for $rn in $bt/Run
-      let $rn_id := $rn/id
-      for $st in $rn/Step
-	 let $st_id := $st/id
-	 for $ord in $st/Order
-	    return string-join( ( string($sim_id), data($bt_id), data($rn_id), data($st_id), data($ord/*) ), ',' )
-	    )
+for $st in fn:doc("SimulationDB")/SimulationData/Simulation[@id=$sim_id]/Batch/Run/Step
+   let $st_cid := $st/@context_id
+   let $id_seq := fn:tokenize($st_cid,'\.')
+   for $ord in $st/Order
+      stable order by $st/xs:integer(@id) ascending
+      return fn:string-join( ( data($id_seq), data($ord/@registration_timer), data($ord/@id), data($ord/*) ), ',' )
+      )

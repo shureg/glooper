@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 
       boost::shared_ptr<Market> mkt(new Market);
 
-      boost::shared_ptr<ClassicAgentGenerator> ag(new ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,1000));
+      boost::shared_ptr<ClassicAgentGenerator> ag(new ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,100));
 
       boost::shared_ptr<UniformGenerator> info(new UniformGenerator);
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
       boost::progress_timer* t = new boost::progress_timer(oss);
 
-      StandardFSSimulation sim(ap,"factor increase test - 1000 agents (x10)",dbi,simid,1,1,100);
+      StandardFSSimulation sim(ap,"test - index inserts",dbi,simid,1,100,100);
 
       sim.simulate();
 
