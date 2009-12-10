@@ -72,6 +72,8 @@ namespace GLOOPER_TEST
 
       void simulation_cleanup();
 
+      void add_registration_data(XML_SERIALISATION::XmlField&);
+
       void db_insert_slot(const XML_SERIALISATION::XmlSerialisableObject&);
    };
 }

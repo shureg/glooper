@@ -309,43 +309,34 @@ XmlField Market::xml_description() const
    XmlField tmp("Market");
    
    tmp("init_price") = init_price;
+   tmp("minimum_tick") = minimum_tick;
 
    unsigned long depth_ctr;
 
    if(!ask_orders.empty())
    {
-      XmlField offs("Offers");
-
       depth_ctr=0;
 
       for(set<Order,buyers_pick>::const_iterator
 	    i = ask_orders.begin();i!=ask_orders.end();++i)
       {
-	 XmlField lo("LimitOrder");
-	 lo.add_field("depth",depth_ctr++);
-	 lo.add_field(i->xml_description());
-	 offs.add_field(lo);
+	 XmlField lo = i->xml_description();
+	 lo("depth") = depth_ctr++;
+	 tmp.add_field(lo);
       }
-
-      tmp.add_field(offs);
    }
    
    if(!bid_orders.empty())
    {
-      XmlField bids("Bids");
-
       depth_ctr=0;
 
       for(set<Order,sellers_pick>::const_iterator
 	    i = bid_orders.begin();i!=bid_orders.end();++i)
       {
-	 XmlField lo("LimitOrder");
-	 lo.add_field("depth",depth_ctr++);
-	 lo.add_field(i->xml_description());
-	 bids.add_field(lo);
+	 XmlField lo = i->xml_description();
+	 lo("depth") = depth_ctr++;
+	 tmp.add_field(lo);
       }
-
-      tmp.add_field(bids);
    }
 
    return tmp;

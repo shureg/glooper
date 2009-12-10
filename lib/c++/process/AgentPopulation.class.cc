@@ -17,18 +17,18 @@
 #include "process/AgentPopulation.class.h"
 #include "agent/Agent.class.h"
 #include "callback_log/LOG.h"
-#include "xml_serialisation/XmlWrap.class.h"
 #include "xml_serialisation/XmlSingleValue.class.hpp"
 #include "boost/bind.hpp"
+#include "boost/function.hpp"
 
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
 using namespace GLOOPER_TEST;
 
 using XML_SERIALISATION::XmlWrap;
-using XML_SERIALISATION::XmlContainerWrap;
 using XML_SERIALISATION::XmlSingleValue;
 using CALLBACK_LOG::LOG;
 
@@ -73,10 +73,11 @@ void AgentPopulation::simulation_config()
 
    SimulationObject::db_signal()(*agt_gen);
 
-   XmlContainerWrap ip = agent_population_description(
-	 "Initial_Agent_Population", initial_population);
+   list<XmlWrap> ip = agent_population_description(
+	 "initial", initial_population);
 
-   SimulationObject::db_signal()(ip);
+   db_container_signal(ip);
+
 }
 
 void AgentPopulation::batch_config() {}
@@ -102,11 +103,6 @@ void AgentPopulation::evolve()
    LOG(INFO,boost::format(
 	    "Beginning turn %d\n") % turn_timer);
 
-   XmlContainerWrap sp = agent_population_description("Agent_Population_before",
-	 population);
-
-   SimulationObject::db_signal()(sp);
-
    last_info = (*info_generator)();
 
    XmlSingleValue iv("Information","value",last_info,true);
@@ -124,10 +120,10 @@ void AgentPopulation::evolve()
 	 i->place_order();
    }
 
-   XmlContainerWrap ep = agent_population_description("Agent_Population_after",
-	 population);
+   list<XmlWrap> ep = 
+      agent_population_description("end_turn",population);
 
-   SimulationObject::db_signal()(ep);
+   db_container_signal(ep);
 
    LOG(INFO,boost::format(
 	    "Ending turn %d\n") % turn_timer);
@@ -136,13 +132,17 @@ void AgentPopulation::evolve()
 
 }
 
-XmlContainerWrap AgentPopulation::agent_population_description
+list<XmlWrap> AgentPopulation::agent_population_description
    (const std::string& _label,
       const boost::ptr_vector<Agent>& _population) const
 {
-   XmlContainerWrap tmp(_label);
+   list<XmlField> tmp;
    for(boost::ptr_vector<Agent>::const_iterator
 	 i = _population.begin(); i != _population.end(); ++i)
-      tmp.add_item(*i);
+   {
+      XmlField fld = i->xml_description();
+      fld("snapshot_type") = _label;
+      tmp.push_back( XmlWrap(tmp) );
+   }
    return tmp;
 }

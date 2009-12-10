@@ -52,5 +52,7 @@ for attr in data_attrs:
    gl_logger.info("Creating a simulation-id-specific version of the xquery script %s at %s" % (attr["xquery_source"], attr["xquery_local"]))
    os.system("sed \'s/$1/%d/g\' %s > %s" % (sim_id, attr["xquery_source"], attr["xquery_local"]))
    gl_logger.info("Preparing to execute the query %s abd write the results to csv file %s" % (attr["xquery_local"], attr["csvfile"]))
+   os.system("se_sm SimulationDB")
    os.system("se_term -file %s -output %s SimulationDB" % (attr["xquery_local"], attr["csvfile"]))
+   os.system("se_smsd SimulationDB")
 
