@@ -46,7 +46,7 @@ Order::Order(Agent& _owner,
 
    if( quantity==0 ) LOG(EXCEPTION, 
 	 boost::format("Limit order %d (%d) @ %.2f- zero quantity requested\n") 
-	 % id % (int) is_bid % price );
+	 % id % (int) bid % price );
 }
 
 Order::Order(Agent& _owner,
