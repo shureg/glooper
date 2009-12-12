@@ -388,22 +388,22 @@ XmlField ClassicAgent::xml_description() const
 {
    XmlField tmp = Agent::xml_description();
 
-   tmp.add_field("type","ClassicAgent");
+   tmp("type") = "ClassicAgent";
    
-   tmp.add_field("wealth",wealth);
+   tmp("wealth") = wealth;
 
-   tmp.add_field("position",(double) pos);
+   tmp("position") = (double) pos;
 
-   tmp.add_field("desired_investment_proportion",
-	 desired_investment_proportion());
+   tmp("desired_investment_proportion") =
+      desired_investment_proportion();
 
-   tmp.add_field("minimum_revision_probability",p_min);
+   tmp("minimum_revision_probability") = p_min;
 
-   tmp.add_field("minimum_belief_adjustment_proportion",f_min);
+   tmp("minimum_belief_adjustment_proportion") = f_min;
 
-   tmp.add_field("maximum_bid-ask_spread",bas_max);
+   tmp("maximum_bid-ask_spread") = bas_max;
 
-   tmp.add_field("is_bankrupt",is_bankrupt);
+   tmp("is_bankrupt") = is_bankrupt;
    
    return tmp;
 }

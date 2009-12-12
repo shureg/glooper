@@ -23,7 +23,7 @@
 #include <string>
 #include <list>
 #include "process/Process.class.h"
-#include "xml_serialisation/XmlWrap.class.h"
+#include "xml_serialisation/XmlContainerWrap.class.h"
 
 #include "agent/AgentGenerator.class.h"
 
@@ -67,7 +67,7 @@ namespace GLOOPER_TEST
 
       unsigned long turn_timer;
 
-      std::list<XML_SERIALISATION::XmlWrap> agent_population_description
+      XML_SERIALISATION::XmlContainerWrap agent_population_description
 	 (const std::string&,
 	    const boost::ptr_vector<Agent>&) const;
 

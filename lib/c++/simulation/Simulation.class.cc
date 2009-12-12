@@ -168,8 +168,10 @@ void Simulation::simulate()
 
 void Simulation::simulation_cleanup()
 {
-   XmlField te( "simulation_time", simulation_timer->elapsed() );
-   dbi.insert((const string) te, current_context);
+   string te_attr = (boost::format("attribute %s {%f}") 
+      % "simulation_time" % ( simulation_timer->elapsed() )
+      ).str();
+   dbi.insert(te_attr, current_context);
 }
 
 void Simulation::add_registration_data(XmlField& xml)

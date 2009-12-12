@@ -29,9 +29,9 @@ XmlField Trade::xml_description() const
 {
    XmlField tmp("Trade");
    tmp("id") = id;
-   tmp.add_field("quantity",q);
-   tmp.add_field("price",p);
-   tmp.add_field("active_id",active_id);
-   tmp.add_field("passive_id",passive_id);
+   tmp("quantity") = q;
+   tmp("price") = p;
+   tmp("active_id") = active_id;
+   tmp("passive_id") = passive_id;
    return tmp;
 }

@@ -18,6 +18,7 @@
 #include "agent/Agent.class.h"
 #include "callback_log/LOG.h"
 #include "xml_serialisation/XmlSingleValue.class.hpp"
+#include "xml_serialisation/XmlWrap.class.h"
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
 
@@ -29,6 +30,7 @@ using namespace std;
 using namespace GLOOPER_TEST;
 
 using XML_SERIALISATION::XmlWrap;
+using XML_SERIALISATION::XmlContainerWrap;
 using XML_SERIALISATION::XmlSingleValue;
 using CALLBACK_LOG::LOG;
 
@@ -73,11 +75,10 @@ void AgentPopulation::simulation_config()
 
    SimulationObject::db_signal()(*agt_gen);
 
-   list<XmlWrap> ip = agent_population_description(
-	 "initial", initial_population);
+   XmlContainerWrap ip = agent_population_description(
+	 "Initial.Agent.Population", initial_population);
 
-   db_container_signal(ip);
-
+   SimulationObject::db_signal()(ip);
 }
 
 void AgentPopulation::batch_config() {}
@@ -120,10 +121,11 @@ void AgentPopulation::evolve()
 	 i->place_order();
    }
 
-   list<XmlWrap> ep = 
-      agent_population_description("end_turn",population);
+   XmlContainerWrap ep = 
+      agent_population_description(
+	    "Step.End.Agent.Population",population);
 
-   db_container_signal(ep);
+   SimulationObject::db_signal()(ep);
 
    LOG(INFO,boost::format(
 	    "Ending turn %d\n") % turn_timer);
@@ -132,17 +134,15 @@ void AgentPopulation::evolve()
 
 }
 
-list<XmlWrap> AgentPopulation::agent_population_description
+XmlContainerWrap AgentPopulation::agent_population_description
    (const std::string& _label,
       const boost::ptr_vector<Agent>& _population) const
 {
-   list<XmlField> tmp;
+   XmlContainerWrap tmp(_label);
    for(boost::ptr_vector<Agent>::const_iterator
 	 i = _population.begin(); i != _population.end(); ++i)
    {
-      XmlField fld = i->xml_description();
-      fld("snapshot_type") = _label;
-      tmp.push_back( XmlWrap(tmp) );
+      tmp.add_item( *i );
    }
    return tmp;
 }

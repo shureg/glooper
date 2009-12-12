@@ -36,7 +36,7 @@ namespace GLOOPER_TEST
       static boost::signal <void (const XmlSerialisableObject&) >& 
 	 db_signal();
 
-      template<class CONT> db_container_signal(const CONT&);
+      template<class CONT> void db_container_signal(const CONT&);
 
       unsigned long get_id() const;
 
@@ -47,7 +47,7 @@ namespace GLOOPER_TEST
    };
 
    template<class CONT> 
-      inline SimulationObject::db_container_signal(const CONT& _cont)
+      inline void SimulationObject::db_container_signal(const CONT& _cont)
       {
 	 using boost::bind;
 
