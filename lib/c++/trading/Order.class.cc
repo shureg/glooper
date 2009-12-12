@@ -43,6 +43,10 @@ Order::Order(Agent& _owner,
    trade_registration_connection = trade_registration_signal->connect(
 	 boost::bind( &Order::record_trade, this, _1 )
 	 );
+
+   if( quantity==0 ) LOG(EXCEPTION, 
+	 boost::format("Limit order %d (%d) @ %.2f- zero quantity requested\n") 
+	 % id % (int) bid % price );
 }
 
 Order::Order(Agent& _owner,

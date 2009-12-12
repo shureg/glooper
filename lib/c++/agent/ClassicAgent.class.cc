@@ -260,12 +260,15 @@ void ClassicAgent::place_order()
 	       }
 	       else
 	       {
-		  LOG(TRACE, boost::format("Agent %d: active order has not been fully "\
-			   "executed, sending the remainder to the market: "\
-			   "(%d) %.0f @ %.3f\n")
-			% id % act.is_bid() % act.get_quantity() % act.get_price()
-			);
-		  spot_mkt->process_order(act);
+		  if(act.get_quantity() != 0)
+		  {
+		     LOG(TRACE, boost::format("Agent %d: active order has not been fully "\
+			      "executed, sending the remainder to the market: "\
+			      "(%d) %.0f @ %.3f\n")
+			   % id % act.is_bid() % act.get_quantity() % act.get_price()
+			   );
+		     spot_mkt->process_order(act);
+		  }
 		  stop = true;
 	       }
 	    }
