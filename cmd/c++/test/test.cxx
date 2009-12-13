@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 
       boost::shared_ptr<Market> mkt(new Market);
 
-      boost::shared_ptr<ClassicAgentGenerator> ag(new ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,20));
+      boost::shared_ptr<ClassicAgentGenerator> ag(new ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,100));
 
       boost::shared_ptr<UniformGenerator> info(new UniformGenerator);
 
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
       boost::timer t;
 
-      StandardFSSimulation sim(ap,"test",dbi,"/simulation_data/glooper/etc/simid",1,1,30);
+      StandardFSSimulation sim(ap,"test",dbi,"simid",1,1,100);
 
       sim.simulate();
 
