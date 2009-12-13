@@ -50,7 +50,7 @@ void Simulation::db_insert_slot(const XmlSerialisableObject& so)
 
    XmlField tmp = so.xml_description();
 
-   add_registration_data(tmp);
+   tmp("registration_timer") = ++registration_timer;
 
    oss << tmp;
 
@@ -120,6 +120,17 @@ void Simulation::simulate()
 
    while( !end_simulation() )
    {
+      XmlField batch("Batch");
+      batch("id") = batch_ctr;
+      batch("context_id") = (boost::format("%d.%d") % id % batch_ctr).str();
+
+      dbi.insert((const string) batch,simulation_context);
+
+      string batch_context = simulation_context +
+	 (boost::format("/Batch[@id=%d]") % batch_ctr).str();
+
+      current_context = batch_context;
+
       LOG(INFO,boost::format("Beginning batch %d\n") % batch_ctr );
       
       process->batch_config();
@@ -128,6 +139,18 @@ void Simulation::simulate()
 
       while( !end_batch() )
       {
+	 XmlField run("Run");
+	 run("id") = run_ctr;
+	 run("context_id") = 
+	    (boost::format("%d.%d.%d") % id % batch_ctr % run_ctr).str();
+
+	 dbi.insert((const string) run, batch_context);
+
+	 string run_context = batch_context +
+	    (boost::format("/Run[@id=%d]") % run_ctr).str();
+
+	 current_context = run_context;
+
 	 LOG(INFO,boost::format("Beginning run %d\n") % run_ctr );
 
 	 process->run_config();
@@ -142,6 +165,22 @@ void Simulation::simulate()
 
 	 while( !end_run() )
 	 {
+	    XmlField step("Step");
+	    step("id") = step_ctr;
+	    step("context_id") = 
+	       (boost::format("%d.%d.%d.%d") 
+	       % id % batch_ctr % run_ctr % step_ctr).str(); 
+
+	    dbi.insert((const string) step, run_context);
+
+	    string step_context = 
+	       (boost::format(
+	       "index-scan(\"step_context\",\"%s\",\"EQ\")") 
+		% (const string) step("context_id")
+		  ).str();
+
+	    current_context = step_context;
+
 	    process->evolve();
 
 	    ++step_ctr;
@@ -168,19 +207,10 @@ void Simulation::simulate()
 
 void Simulation::simulation_cleanup()
 {
-   string te_attr = (boost::format("attribute %s {%f}") 
-      % "simulation_time" % ( simulation_timer->elapsed() )
-      ).str();
-   dbi.insert(te_attr, current_context);
-}
-
-void Simulation::add_registration_data(XmlField& xml)
-{
-   xml("simulation_id") = id;
-   xml("batch_id") = batch_ctr;
-   xml("run_id") = run_ctr;
-   xml("step_id") = step_ctr;
-   xml("registration_timer") = ++registration_timer;
+   string attr_fmt = (boost::format("attribute %s {%f}")
+      % "simulation_time" % ( simulation_timer->elapsed() ))
+      .str();
+   dbi.insert(attr_fmt, current_context);
 }
 
 XmlField Simulation::xml_description() const

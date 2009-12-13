@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 {
    try
    {
-      FileCallbackLog F("test.log","glooper_test",TRACE);
+      FileCallbackLog F("test.log","glooper_test",INFO);
 
       SednaDBInterface dbi("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData");
 
