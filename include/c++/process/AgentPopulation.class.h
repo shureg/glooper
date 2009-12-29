@@ -21,6 +21,7 @@
 #include "boost/shared_ptr.hpp"
 #include "boost/ptr_container/ptr_vector.hpp"
 #include <string>
+#include <list>
 #include "process/Process.class.h"
 #include "xml_serialisation/XmlContainerWrap.class.h"
 

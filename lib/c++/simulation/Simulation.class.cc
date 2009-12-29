@@ -207,8 +207,10 @@ void Simulation::simulate()
 
 void Simulation::simulation_cleanup()
 {
-   XmlField te( "simulation_time", simulation_timer->elapsed() );
-   dbi.insert((const string) te, current_context);
+   string attr_fmt = (boost::format("attribute %s {%f}")
+      % "simulation_time" % ( simulation_timer->elapsed() ))
+      .str();
+   dbi.insert(attr_fmt, current_context);
 }
 
 XmlField Simulation::xml_description() const

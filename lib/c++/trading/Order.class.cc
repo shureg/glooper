@@ -198,12 +198,12 @@ XmlField Order::xml_description() const
 {
    XmlField tmp("Order");
    tmp("id") = id;
-   tmp.add_field("price",price);
-   tmp.add_field("quantity",quantity);
-   tmp.add_field("is_bid",bid);
-   tmp.add_field("is_market",market);
-   tmp.add_field("order_time",order_time);
-   tmp.add_field("owner_id",owner.get_id());
+   tmp("price") = price;
+   tmp("quantity") = quantity;
+   tmp("is_bid") = bid;
+   tmp("is_market") = market;
+   tmp("order_time") = order_time;
+   tmp("owner_id") = owner.get_id();
 
    return tmp;
 }
