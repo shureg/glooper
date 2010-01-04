@@ -1,56 +1,69 @@
 #!/usr/bin/env python
-import sys
-import os
-import os.path
-import logging
 
-#changing the logging level DEBUG label to TRACE to be consistent with the C++ part of the project
-logging.addLevelName(10,"TRACE")
+try:
 
-gl_logger = logging.getLogger("glooper_launcher")
+   execfile("glooper_cfg.py")
 
-glooper_bin_path = "/simulation_data/glooper/cmd/c++/glooper"
-log_path ="/simulation_data/data/log"
-post_processing_script = "simulation_post_processing.py"
+   import os
 
-if len(sys.argv) < 4:
-   sys.stderr.write("usage: [python] glooper_launcher.py {executable_file} {simulation_id_tracking_file} {version_number_file}\n")
-   sys.exit()
+#Run the simulation
 
-glooper_executable = os.path.join(glooper_bin_path,str(sys.argv[1]))
-simid_filename = str(sys.argv[2])
-version_filename = str(sys.argv[3])
+   cbl.log(cbl.INFO,"Beginning simulation %d\n" % simid)
 
-assert os.path.exists(glooper_executable), "File %s does not exist" % glooper_executable
-assert os.path.exists(simid_filename), "File %s does not exist" % simid_filename
-assert os.path.exists(version_filename), "File %s does not exist" % version_filename
+   sim.simulate()
 
-simid_file = open(simid_filename,'r')
-simid = int( simid_file.readline() )
-simid_file.close()
+#Simulation data post-processing
 
-simid += 1
+   cbl.log(cbl.INFO,"Simulation complete, beginning post-processing")
 
-simid_file = open(simid_filename, 'w')
-simid_file.write(str(simid))
-simid_file.close()
+   root_datadir = os.path.join(DATA_PATH,VERSION_STRING,str(sim_id))
+   csv_datadir = os.path.join(DATA_PATH,VERSION_STRING,str(sim_id),"csv")
 
-version_file = open(version_filename, 'r')
-version_string = str(version_file.readline())
-version_file.close()
+   os.system("mkdir -pv %s" % root_datadir)
+   os.system("mkdir -pv %s" % csv_datadir)
 
-log_filename = os.path.join(log_path,version_string,str(simid),"sim.%d.log" % simid )
-os.system("mkdir -pv %s" % os.path.join(log_path,version_string,str(simid)))
+   query_labels = ["agt","trd","inf","ord","lob"]
 
-gl_logger.setLevel(logging.DEBUG)
-gl_handler = logging.FileHandler(log_filename)
-gl_formatter = logging.Formatter("%(asctime)s | <%(name)s> - %(levelname)s: %(message)s")
-gl_handler.setFormatter(gl_formatter)
-gl_logger.addHandler(gl_handler)
+   for ql in query_labels:
+      os.system("mkdir -pv %s" % os.path.join(DATA_PATH,VERSION_STRING,str(sim_id),"csv",ql))
 
-gl_logger.info("Preparing to start simulation %d" % simid)
-os.system( "%s %d %s" % ( glooper_executable, simid, log_filename) )
+   conn = None
 
-gl_logger.info("Simulation %d completed, starting post-processing of simulation data" % simid)
-os.system( "env python %s %d %s %s" % ( post_processing_script, simid, log_filename, version_string ) )
-gl_logger.info("Post-processing for simulation %d complete - exiting" % simid)
+   batch_run_structure = sim.get_batch_run_structure()
+
+   nb = len(batch_run_structure)
+
+   sys.path.append(XQUERY_LIB_PATH)
+
+   import simdb_xquery
+
+   # Connect to the SimulationDB database which is located on localhost
+   conn = sedna.SednaConnection('localhost', 'SimulationDB','SYSTEM','MANAGER')
+   cbl.log(cbl.INFO,"Connection to SimulationDB has been successfully established\n")
+
+   # Transaction must be started before executing a query
+   conn.beginTransaction()
+   
+   # Execute query ...
+   for b_id in xrange(nb):
+      for r_id in xrange(batch_run_structure[b_id]):
+	 for ql in query_labels:
+	    xq_dict = {"xq_label": ql, "xpath_root": 'doc("SimulationDB")/SimulationData', "sim_id": simid, "bat_id": b_id, "run_id": r_id}
+	    cbl.log(cbl.INFO,"Starting xquery with string label simdb.xquery.%(xq_label)s for batch %(bat_id)d, run id %(run_id)d\n" % xq_dict)
+	    conn.execute(eval("simdb_xquery.%(xq_label)s_xq" % xq_dict) % xq_dict)
+	    outfilename = os.path.join(csv_datadir,ql,"%(xq_label)s.%(sim_id)d.%(bat_id)d.%(run_id)d.csv" % xq_dict)
+	    outfile = open(outfilename,'w') 
+	    for res in conn.resultSequence():
+	       outfile.write(res)
+
+   # Commit transaction after executing a query
+   conn.endTransaction('commit')
+   
+   # Check connection status and close it
+   if conn != None and conn.status() == 'ok':
+      conn.close()
+
+   cbl.log(cbl.INFO,"Simulation %d post-processing complete\n" % simid)
+
+except sedna.SednaException, ex:
+   cbl.log(cbl.EXCEPTION,"SednaException caught in Python: %s\n" % str(ex))

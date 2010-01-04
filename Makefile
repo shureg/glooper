@@ -6,6 +6,7 @@ HEADER_STEMS = $(patsubst $(PROJECT_INCLUDE_PATH)/%,%,$(HEADER_FILES))
 
 export PROJECT_INCLUDE_PATH
 export PROJECT_LIB_PATH
+export PROJECT_WRAP_PATH
 
 ifeq "$(PROJECT_CONFIGURATION_TYPE)" "release" 
    INSTALL_PREFIX = /usr/local
@@ -46,9 +47,12 @@ install:
 test: install
 	$(MAKE) --directory=$(TEST_DIR)
 
-.PHONY: lib cmd
+.PHONY: lib cmd wrap
 lib:
 	$(MAKE) --directory=$(PROJECT_LIB_PATH)
+
+wrap:
+	$(MAKE) --directory=$(PROJECT_LIB_PATH) $@
 
 cmd:
 	$(MAKE) --directory=$(PROJECT_CMD_PATH)

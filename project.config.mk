@@ -13,6 +13,8 @@ BOOST_INCLUDE_PATH = /usr/local/include/boost-1_39
 
 SEDNA_C_PATH = /simulation_data/sedna/driver/c
 
+PROJECT_WRAP_PATH = $(CURDIR)/swig
+
 export BOOST_INCLUDE_PATH
 
 export SEDNA_C_PATH

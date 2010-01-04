@@ -21,6 +21,7 @@
 #include "core/SimulationObject.class.h"
 #include "db/SednaDBInterface.class.h"
 #include "boost/timer.hpp"
+#include <vector>
 
 namespace GLOOPER_TEST
 {
@@ -47,6 +48,8 @@ namespace GLOOPER_TEST
       virtual const bool end_batch() const = 0;
 
       virtual const bool end_run() const = 0;
+
+      const std::vector<unsigned long>& get_batch_run_structure() const;
 
    protected:
 
@@ -75,6 +78,8 @@ namespace GLOOPER_TEST
       void add_registration_data(XML_SERIALISATION::XmlField&);
 
       void db_insert_slot(const XML_SERIALISATION::XmlSerialisableObject&);
+
+      std::vector<unsigned long> batch_run_structure;
    };
 }
 

@@ -13,3 +13,4 @@ cmd/c++/test/*
 !cmd/c++/test/test.cxx
 cmd/c++/glooper/*
 !cmd/c++/glooper/glooper.cxx
+swig/output

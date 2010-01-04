@@ -197,12 +197,19 @@ void Simulation::simulate()
 
       LOG(INFO,boost::format("Ending batch %d\n") % batch_ctr );
 
+      batch_run_structure.push_back(run_ctr);
+
       ++batch_ctr;
    }
 
    current_context = simulation_context;
 
    simulation_cleanup();
+}
+
+const vector<unsigned long>& get_batch_run_structure() const
+{
+   return batch_run_structure;
 }
 
 void Simulation::simulation_cleanup()
