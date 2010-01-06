@@ -63,9 +63,9 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 N_agents = 20
 
-N_batches = 1
+N_batches = 2
 
-N_runs = 1
+N_runs = 2
 
 N_steps = 30
 

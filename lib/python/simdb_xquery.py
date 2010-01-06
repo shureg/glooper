@@ -1,3 +1,5 @@
+inf_label_dict = {}
+
 inf_xq = (
 """
 (fn:string-join( ( "simulation_id","batch_id","run_id","step_id","registration_timer","information_value" ), ',' ),
@@ -9,6 +11,8 @@ for $st in %(xpath_root)s/Simulation[@id=%(sim_id)d]/Batch[@id=%(bat_id)d]/Run[@
       return fn:string-join( ( data($id_seq), data($inf/@registration_timer), data($inf/@value) ), ',' )
       )
 """)
+
+trd_label_dict = {}
 
 trd_xq = (
 """
@@ -24,6 +28,8 @@ for $st in %(xpath_root)s/Simulation[@id=%(sim_id)d]/Batch[@id=%(bat_id)d]/Run[@
 """
 )
 
+ord_label_dict = {}
+
 ord_xq = (
 """
 (fn:string-join( ( "simulation_id","batch_id","run_id","step_id", "registration_timer", "order_id", 
@@ -38,6 +44,8 @@ for $st in %(xpath_root)s/Simulation[@id=%(sim_id)d]/Batch[@id=%(bat_id)d]/Run[@
       )
 """
 )
+
+lob_label_dict = {}
 
 lob_xq = (
 """
@@ -55,23 +63,43 @@ for $st in %(xpath_root)s/Simulation[@id=%(sim_id)d]/Batch[@id=%(bat_id)d]/Run[@
 """
 )
 
+agt_labels = [
+      ('belief','@belief'),
+      ('timer','@timer'),
+      ('wealth','@wealth'),
+      ('position','@position'),
+      ('type','@type'),
+      ('des_inv_prop','@desired_investment_proportion'),
+      ('min_rev_prob','@minimum_revision_probability'),
+      ('min_bel_adj_prop','@minimum_belief_adjustment_proportion'),
+      ('max_bid_ask','@maximum_bid-ask_spread'),
+      ('bankrupt','@is_bankrupt')
+      ]
+
+agt_csv_labels = ', '.join( map( lambda x: '"%s"' % x[0],agt_labels ) )
+agt_xpath_labels = ', '.join( map( lambda x: "data($agt/%s)" % x[1],agt_labels ) )
+
+agt_label_dict = {'agt_csv': agt_csv_labels, 'agt_xpath': agt_xpath_labels}
+
 agt_xq = (
 """
-(fn:string-join( ( "simulation_id","batch_id","run_id","step_id", "registration_timer",
-   "agent_id", "belief", "timer", "type", "wealth", "position", "des_inv_prop", "min_rev_prob", "min_bel_adj_prop", "max_bid_ask", 
-   "bankrupt", "snapshot_type" ), ',' ),
+(fn:string-join( ( "simulation_id", "batch_id", "run_id", "step_id", "registration_timer", 
+                    "agent_id", %(agt_csv)s, "snapshot_type" ), ',' ),
 for $st in %(xpath_root)s/Simulation[@id=%(sim_id)d]/Batch[@id=%(bat_id)d]/Run[@id=%(run_id)d]/Step
    let $st_cid := $st/@context_id
    let $id_seq := fn:tokenize($st_cid,'\.')
-   let $rt_1 := $st/Agent_Population_after/@registration_timer
+   let $rt_1 := $st/Step.End.Agent.Population/@registration_timer
    stable order by $st/xs:integer(@id) ascending
    return (
    for $agt in $st/Agent
-      return fn:string-join( ( data($id_seq), data($agt/@registration_timer), data($agt/@id), data($agt/*), "mid_turn" ), ',' ),
-   for $agt in $st/Agent_Population_after/Agent
-      return fn:string-join( ( data($id_seq), data($rt_1), data($agt/@id), data($agt/*), "end_turn" ), ',' )
+      return fn:string-join( ( data($id_seq), data($agt/@registration_timer), data($agt/@id), %(agt_xpath)s, "mid_turn" ), ',' ),
+   for $agt in $st/Step.End.Agent.Population/Agent
+      return fn:string-join( ( data($id_seq), data($rt_1), data($agt/@id), %(agt_xpath)s, "end_turn" ), ',' )
       )
    )
 """
 )
 
+def get_xquery(ext_dict):
+   ext_dict.update( eval("%(xq_label)s_label_dict" % ext_dict) )
+   return eval("%(xq_label)s_xq" % ext_dict) % ext_dict
