@@ -6,6 +6,19 @@
 
 %template(vector_ul) std::vector<unsigned long>;
 
+%exception
+{
+   try
+   {
+      $action
+   }
+   catch(const char* c)
+   {
+      PyErr_SetString(PyExc_Exception,c);
+      return NULL;
+   }
+}
+
 %inline
 %{
    typedef boost::shared_ptr< RNG::TypedRandomGenerator<double> > bsp_TRGd;
