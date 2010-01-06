@@ -8,7 +8,7 @@ LIB_SRC_DEP_SUFFIX ?= .d
 
 LOCAL_LIB_DEPS = rng callback_log xml_serialisation
 
-LIB_EXT_DEPS ?= $(LOCAL_LIB_DEPS) sedna
+LIB_EXT_DEPS ?= $(LOCAL_LIB_DEPS) sedna lua
 
 LIB_EXT_DEP_PATHS ?= $(SEDNA_C_PATH) $(LOCAL_LIB_DIRS)
 

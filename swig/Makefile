@@ -31,7 +31,7 @@ TARGET_LANGS := python
 INTERFACE_SOURCES = $(foreach l,$(TARGET_LANGS),$(OUTPUT_PATH)/$(MODULE).$l.swig_wrap.cc)
 INTERFACE_DEPS = $(patsubst %.cc,%.swd,$(INTERFACE_SOURCES))
 
-LIB_EXT_DEPS = $(LIB_NAME_STEM) sedna
+LIB_EXT_DEPS = $(LIB_NAME_STEM) sedna lua
 LIB_EXT_DEP_PATHS = $(PROJECT_LIB_PATH)
 
 .PHONY: swigclean wrap swiginstall

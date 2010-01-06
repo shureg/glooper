@@ -14,3 +14,4 @@ cmd/c++/test/*
 cmd/c++/glooper/*
 !cmd/c++/glooper/glooper.cxx
 swig/output
+*.pyc

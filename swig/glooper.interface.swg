@@ -28,6 +28,7 @@ namespace GLOOPER_TEST
 {
    class SednaDBInterface
    {
+   public:
       SednaDBInterface(const std::string&, 
 	    const std::string&, const std::string&,
 	    const std::string& = "",
@@ -62,6 +63,7 @@ namespace GLOOPER_TEST
 
    class StandardFSSimulation: public StandardSimulation
    {
+   public:
 
       StandardFSSimulation(const boost::shared_ptr<GLOOPER_TEST::Process>&,
 	    const std::string&, 

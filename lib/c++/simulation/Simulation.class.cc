@@ -207,7 +207,7 @@ void Simulation::simulate()
    simulation_cleanup();
 }
 
-const vector<unsigned long>& get_batch_run_structure() const
+const vector<unsigned long>& Simulation::get_batch_run_structure() const
 {
    return batch_run_structure;
 }

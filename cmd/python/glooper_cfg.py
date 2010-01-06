@@ -35,26 +35,27 @@ assert os.path.exists(DATA_PATH), "Post-processing data path %s does not exist" 
 
 #Simid increment
 
-simid_file = open(simid_filename,'r')
+simid_file = open(SIMID_FILENAME,'r')
 simid = int( simid_file.readline() )
 simid_file.close()
 
 simid += 1
 
-simid_file = open(simid_filename, 'w')
+simid_file = open(SIMID_FILENAME, 'w')
 simid_file.write(str(simid))
 simid_file.close()
 
 #Version string
 
-version_file = open(version_filename, 'r')
+version_file = open(VERSION_FILENAME, 'r')
 version_string = str(version_file.readline())
 version_file.close()
 
 #Log initialisation
 
-log_filename = os.path.join(log_path,version_string,str(simid),"sim.%d.log" % simid )
+log_filename = os.path.join(LOG_PATH,version_string,str(simid),"sim.%d.log" % simid )
 os.system("mkdir -pv %s" % os.path.join(LOG_PATH,version_string,str(simid)))
+os.system("ln -sf %s %s" % ( log_filename,os.path.join(LOG_PATH,"current_log") ) )
 
 F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
@@ -78,7 +79,7 @@ wealth = rng.ParetoGenerator(10000,1.4)
 
 f_min = rng.UniformGenerator(0.05,0.1)
 
-p_min = rng.UniformGenerator(0,05,0.1)
+p_min = rng.UniformGenerator(0.05,0.1)
 
 bas_max = rng.UniformGenerator(0.001,0.01)
 
