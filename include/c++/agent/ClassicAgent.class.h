@@ -44,11 +44,11 @@ namespace GLOOPER_TEST
 
       bool can_trade();
 
+      void update_belief(double);
+
    protected:
 
       RNG::UniformGenerator U;
-
-      void update_belief(double);
 
       bool will_revise(double);
 
