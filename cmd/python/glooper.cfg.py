@@ -6,13 +6,15 @@ PROJECT_ROOT = "/simulation_data"
 
 LOG_PATH = "/simulation_data/data/log"
 
-SIMID_FILENAME = "simid"
-
 VERSION_FILENAME = "glooper.version"
 
 XQUERY_LIB_PATH = "/simulation_data/glooper/lib/python"
 
 DATA_PATH = "/simulation_data/data/db"
+
+#Base simid (if no simulation id is found in the database, numbering stats with this value)
+
+BASE_SIMID = 1000
 
 #Module imports
 
@@ -28,22 +30,24 @@ import callback_log_python_swig_wrap as cbl
 #Existence checks
 
 assert os.path.exists(LOG_PATH), "Log path %s does not exist" % LOG_PATH
-assert os.path.exists(SIMID_FILENAME), "Simid file %s does not exist" % SIMID_FILENAME
 assert os.path.exists(VERSION_FILENAME), "Version file %s does not exist" % VERSION_FILENAME
 assert os.path.exists(XQUERY_LIB_PATH), "Python xquery module path %s does not exist" % XQUERY_LIB_PATH
 assert os.path.exists(DATA_PATH), "Post-processing data path %s does not exist" % DATA_PATH
 
-#Simid increment
+#Simid retrieval
+conn = sedna.SednaConnection('localhost', 'SimulationDB','SYSTEM','MANAGER')
+conn.beginTransaction()
 
-simid_file = open(SIMID_FILENAME,'r')
-simid = int( simid_file.readline() )
-simid_file.close()
+conn.execute ('data( max( doc("SimulationDB")/SimulationData/Simulation/@id ) )')
 
-simid += 1
+ids = map( lambda x: x, conn.resultSequence() )
+if len(ids) == 0:
+   simid = BASE_SIMID
+else:
+   simid = long(ids[0]) + 1
 
-simid_file = open(SIMID_FILENAME, 'w')
-simid_file.write(str(simid))
-simid_file.close()
+conn.endTransaction('commit')
+conn.close()
 
 #Version string
 
@@ -61,15 +65,15 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 #Simulation-related objects creation
 
-N_agents = 20
+N_agents = 100
 
-N_batches = 2
+N_batches = 1
 
-N_runs = 2
+N_runs = 1
 
-N_steps = 30
+N_steps = 100
 
-sim_comment = "python test"
+sim_comment = "python full test"
 
 dbi = glooper.SednaDBInterface("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData")
 

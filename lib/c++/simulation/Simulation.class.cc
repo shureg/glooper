@@ -159,10 +159,6 @@ void Simulation::simulate()
 
 	 registration_timer = 0;
 
-	 dbi.set_autocommit(false);
-
-	 dbi.begin_transaction();
-
 	 while( !end_run() )
 	 {
 	    XmlField step("Step");
@@ -181,14 +177,18 @@ void Simulation::simulate()
 
 	    current_context = step_context;
 
+	    dbi.set_autocommit(false);
+
+	    dbi.begin_transaction();
+
 	    process->evolve();
+
+	    dbi.commit_transaction();
+
+	    dbi.set_autocommit(true);
 
 	    ++step_ctr;
 	 }
-
-	 dbi.commit_transaction();
-
-	 dbi.set_autocommit(true);
 
 	 LOG(INFO,boost::format("Ending run %d\n") % run_ctr );
 

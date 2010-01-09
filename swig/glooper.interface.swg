@@ -33,7 +33,9 @@ namespace GLOOPER_TEST
 	    const std::string&, const std::string&,
 	    const std::string& = "",
 	    const bool = true);
-   };
+      
+      void set_autocommit(const bool);
+};
 
    class Market: public SimulationObject
    {
