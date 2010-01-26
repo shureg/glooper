@@ -17,9 +17,11 @@
 #include "trading/Market.class.h"
 #include "boost/bind.hpp"
 #include "agent/Agent.class.h"
+#include "xml_serialisation/XmlSingleValue.class.hpp"
 
 using namespace GLOOPER_TEST;
 using namespace std;
+using namespace XML_SERIALISATION;
 
 Market::Market(): SimulationObject(0), init_price(100.), minimum_tick(0.01),
    ord_sig(new order_reg_signal)
@@ -182,6 +184,8 @@ void Market::pull_agent_orders(const Agent& agt)
 	 i = ask_orders.begin(); i != ask_orders.end(); ++i )
       if( !(i->is_owner(agt)) )
 	 new_ask_orders.insert(new_ask_orders.end(), *i );
+      else
+	 SimulationObject::db_signal()(XmlSingleValue("Cancelled.Order","id",i->get_id(),true));
 
    ask_orders.clear();
    ask_orders = new_ask_orders;
@@ -192,6 +196,8 @@ void Market::pull_agent_orders(const Agent& agt)
 	 i = bid_orders.begin(); i != bid_orders.end(); ++i )
       if( !(i->is_owner(agt)) )
 	 new_bid_orders.insert(new_bid_orders.end(), *i );
+      else
+	 SimulationObject::db_signal()(XmlSingleValue("Cancelled.Order","id",i->get_id(),true));
 
    bid_orders.clear();
    bid_orders = new_bid_orders;
