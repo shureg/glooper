@@ -90,6 +90,8 @@ namespace GLOOPER_TEST
 
       bool is_bankrupt;
 
+      RNG::UniformGenerator spread_gen;
+
       Agent* real_clone() const;
       
    };

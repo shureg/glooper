@@ -30,7 +30,7 @@ ClassicAgent::ClassicAgent(double _belief, double _p_min, double _f_min,
       boost::shared_ptr<timer_signal> _timer, 
       boost::shared_ptr<timer_signal> _ro_timer):
    Agent(_belief,_spot_mkt,_timer,_ro_timer), p_min(_p_min), f_min(_f_min),
-   wealth(_wealth), bas_max(_bas_max), is_bankrupt(false)
+   wealth(_wealth), bas_max(_bas_max), is_bankrupt(false), spread_gen( RNG::UniformGenerator(_bas_max/10.,_bas_max) )
 {
    LOG(TRACE,
 	 boost::format("Agent %d created, preparing to save the initial state\n")
@@ -315,9 +315,7 @@ void ClassicAgent::reset_orders()
 
 double ClassicAgent::spread_fraction() const
 {
-   RNG::UniformGenerator U(bas_max/10.,bas_max);
-
-   return U();
+   return spread_gen();
 }
 
 double ClassicAgent::mark_to_market() const

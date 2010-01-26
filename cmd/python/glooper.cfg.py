@@ -20,6 +20,7 @@ BASE_SIMID = 1000
 
 import sys
 import os.path
+import subprocess
 
 sys.path.append( os.path.join(PROJECT_ROOT,"glooper/swig/output") )
 
@@ -35,19 +36,12 @@ assert os.path.exists(XQUERY_LIB_PATH), "Python xquery module path %s does not e
 assert os.path.exists(DATA_PATH), "Post-processing data path %s does not exist" % DATA_PATH
 
 #Simid retrieval
-conn = sedna.SednaConnection('localhost', 'SimulationDB','SYSTEM','MANAGER')
-conn.beginTransaction()
-
-conn.execute ('data( max( doc("SimulationDB")/SimulationData/Simulation/@id ) )')
-
-ids = map( lambda x: x, conn.resultSequence() )
-if len(ids) == 0:
-   simid = BASE_SIMID
+q_res = subprocess.Popen(['se_term','-query','max(doc("SimulationDB")/SimulationData/Simulation/@id)','SimulationDB'],stdout = subprocess.PIPE)
+simid_str = q_res.communicate()[0].rstrip('\n')
+if simid_str.isdigit():
+   simid = int(simid_str) + 1
 else:
-   simid = long(ids[0]) + 1
-
-conn.endTransaction('commit')
-conn.close()
+   simid = BASE_SIMID
 
 #Version string
 
@@ -69,17 +63,19 @@ N_agents = 100
 
 N_batches = 1
 
-N_runs = 1
+N_runs = 100
 
 N_steps = 100
 
-sim_comment = "python full test"
+sim_comment = "uniform wealth"
+
+post_process = True
 
 dbi = glooper.SednaDBInterface("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData")
 
 belief = rng.UniformGenerator()
 
-wealth = rng.ParetoGenerator(10000,1.4)
+wealth = rng.UniformGenerator(10000,100000)
 
 f_min = rng.UniformGenerator(0.05,0.1)
 
