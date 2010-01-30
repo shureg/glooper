@@ -210,7 +210,7 @@ void ClassicAgent::place_order()
 
       bool bid = (bool) order_status;
 
-      if( is_active() )
+      if( is_active() && (spot_mkt->best_order( bid ) != 0) )
       {
 	 double mtm = spot_mkt->mark_to_market( bid );
 

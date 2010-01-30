@@ -67,7 +67,7 @@ N_runs = 100
 
 N_steps = 100
 
-sim_comment = "uniform wealth"
+sim_comment = "proper wealth test - uniform"
 
 post_process = True
 
@@ -75,7 +75,7 @@ dbi = glooper.SednaDBInterface("SimulationDB","Bender Rodriguez","bmsma_DTAH1","
 
 belief = rng.UniformGenerator()
 
-wealth = rng.UniformGenerator(10000,100000)
+wealth = rng.UniformGenerator(10000,60000)
 
 f_min = rng.UniformGenerator(0.05,0.1)
 

@@ -39,6 +39,14 @@ try:
 
       nb = len(batch_run_structure)
 
+      brs_vector_filename = os.path.join(DATA_PATH,version_string,str(simid),"brs.vector")
+
+      brs_vector_file = open(brs_vector_filename,'w')
+
+      brs_vector_file.write( '\n'.join( map(lambda z: str(z), batch_run_structure)) )
+
+      brs_vector_file.close()
+
       sys.path.append(XQUERY_LIB_PATH)
 
       import simdb_xquery
