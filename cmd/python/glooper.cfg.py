@@ -67,7 +67,7 @@ N_runs = 100
 
 N_steps = 100
 
-sim_comment = "proper wealth test - uniform"
+sim_comment = "spread_test"
 
 post_process = True
 
@@ -81,7 +81,7 @@ f_min = rng.UniformGenerator(0.05,0.1)
 
 p_min = rng.UniformGenerator(0.05,0.1)
 
-bas_max = rng.UniformGenerator(0.001,0.01)
+bas_max = rng.UniformGenerator(0.00001,0.0001)
 
 mkt = glooper.Market()
 

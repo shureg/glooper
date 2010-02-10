@@ -304,7 +304,15 @@ void ClassicAgent::place_order()
       }
    }
 
+   LOG(TRACE, boost::format("Market: beginning the agent %d object db "\
+	    "registration\n") % id
+	 );
+
    SimulationObject::db_signal()(*this);
+   
+   LOG(TRACE, boost::format("Market: ending the agent %d object db "\
+	    "registration\n") % id
+	 );
 }
 
 void ClassicAgent::reset_orders()

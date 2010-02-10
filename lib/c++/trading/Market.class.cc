@@ -150,7 +150,16 @@ void Market::process_order(Order& r)
 	 % q_a % p_a % q_b % p_b
 	 );
 
+   LOG(TRACE, boost::format("Market: beginning the market object db "\
+	    "registration\n")
+	 );
+
    SimulationObject::db_signal()(*this);
+   
+   LOG(TRACE, boost::format("Market: ending the market object db "\
+	    "registration\n")
+	 );
+
 }
 
 void Market::add_limit_order(Order& r, 
