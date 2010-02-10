@@ -6,8 +6,8 @@ SWIG_SHARED_PTR_DERIVED(bspMarket,GLOOPER_TEST::SimulationObject,GLOOPER_TEST::M
 
 SWIG_SHARED_PTR_DERIVED(bspAgentGenerator, GLOOPER_TEST::SimulationObject, GLOOPER_TEST::AgentGenerator)
 
-SWIG_SHARED_PTR_DERIVED(bspClassicAgentGenerator, GLOOPER_TEST::AgentGenerator,
-   GLOOPER_TEST::ClassicAgentGenerator)
+SWIG_SHARED_PTR_DERIVED(bspLuaAgentGenerator, GLOOPER_TEST::AgentGenerator,
+   GLOOPER_TEST::LuaAgentGenerator)
 
 SWIG_SHARED_PTR(bspProcess, GLOOPER_TEST::Process)
 

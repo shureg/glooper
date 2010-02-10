@@ -60,8 +60,6 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 #Simulation-related objects creation
 
-N_agents = 20
-
 N_batches = 1
 
 N_runs = 1
@@ -72,22 +70,12 @@ sim_comment = "python test"
 
 dbi = glooper.SednaDBInterface("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData")
 
-belief = rng.UniformGenerator()
-
-wealth = rng.ParetoGenerator(10000,1.4)
-
-f_min = rng.UniformGenerator(0.05,0.1)
-
-p_min = rng.UniformGenerator(0,05,0.1)
-
-bas_max = rng.UniformGenerator(0.001,0.01)
-
 mkt = glooper.Market()
-
-agt_gen = glooper.ClassicAgentGenerator(belief,wealth,f_min,p_min,bas_max,mkt,N_agents)
 
 info = rng.UniformGenerator()
 
-agt_pop = glooper.AgentPopulation(info,agt_gen)
+agt_gen = glooper.LuaAgentGenerator("agent.cfg.lua")
+
+agt_pop = glooper.AgentPopulation(info,agt_gen,mkt)
 
 sim = glooper.StandardFSSimulation(agt_pop,sim_comment,dbi,simid,N_batches,N_runs,N_steps)

@@ -34,7 +34,7 @@ export CONFIG_PREFIX
 export PROJECT_CONFIGURATION_TYPE
 export INSTALL_PREFIX
 
-all: lib cmd
+all: lib
 
 .PHONY: install
 install:
@@ -53,9 +53,6 @@ lib:
 
 wrap:
 	$(MAKE) --directory=$(PROJECT_LIB_PATH) $@
-
-cmd:
-	$(MAKE) --directory=$(PROJECT_CMD_PATH)
 
 clean:
 	$(MAKE) --directory=$(PROJECT_LIB_PATH) clean

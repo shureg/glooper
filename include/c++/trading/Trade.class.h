@@ -38,6 +38,8 @@ namespace GLOOPER_TEST
 
       unsigned long passive_id; 
 
+      static void reset_instance_ctr();
+
    protected:
 
       static unsigned long instance_ctr;

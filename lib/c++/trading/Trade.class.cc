@@ -18,7 +18,12 @@
 
 using namespace GLOOPER_TEST;
 
-unsigned long Trade::instance_ctr(0);
+unsigned long Trade::instance_ctr(0ul);
+
+void Trade::reset_instance_ctr()
+{
+   Trade::instance_ctr = 0ul;
+}
 
 Trade::Trade(unsigned long q_,double p_, 
       unsigned long active_id_, unsigned long passive_id_): 

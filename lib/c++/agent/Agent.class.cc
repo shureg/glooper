@@ -20,14 +20,9 @@ using namespace GLOOPER_TEST;
 
 unsigned long Agent::instance_counter(0);
 
-Agent::Agent(double _belief,
-     boost::shared_ptr<Market> _spot_mkt,
-     boost::shared_ptr<timer_signal> _timer,
-     boost::shared_ptr<timer_signal> _ro_timer):
+Agent::Agent(double _belief):
    SimulationObject(++instance_counter),
-   spot_mkt(_spot_mkt),
-   belief(_belief),
-   timer(_timer), ro_timer(_ro_timer)
+   belief(_belief)
 {}
 
 Agent* Agent::clone() const
@@ -40,10 +35,29 @@ boost::shared_ptr<Market> Agent::get_market() const
    return spot_mkt;
 }
 
+Agent& Agent::set_spot_mkt(const boost::shared_ptr<Market>& _mkt)
+{
+   spot_mkt = _mkt;
+   return *this;
+}
+
+Agent& Agent::set_timer(const boost::shared_ptr<timer_signal>& _timer)
+{
+   timer = _timer;
+   return *this;
+}
+
+Agent& Agent::set_ro_timer(const boost::shared_ptr<timer_signal>& _ro_timer)
+{
+   ro_timer = _ro_timer;
+   return *this;
+}
+
 XmlField Agent::xml_description() const
 {
    XmlField tmp("Agent");
-   tmp("id")=id;
+   tmp("id") = id;
+   tmp("type") = agent_type_str();
    tmp("belief") = belief;
    tmp("timer") = (*ro_timer)();
 

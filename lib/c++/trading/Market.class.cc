@@ -302,6 +302,8 @@ void Market::reset()
    trades.clear();
    bid_orders.clear();
    ask_orders.clear();
+   Trade::reset_instance_ctr();
+   Order::reset_instance_ctr();
 }
 
 XmlField Market::xml_description() const

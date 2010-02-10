@@ -26,13 +26,13 @@ SWIG_LIBR_PATH = /usr/lib/R/lib
 
 MODULE := $(PROJECT_NAME)
 
-TARGET_LANGS := python
+TARGET_LANGS := python lua
 
 INTERFACE_SOURCES = $(foreach l,$(TARGET_LANGS),$(OUTPUT_PATH)/$(MODULE).$l.swig_wrap.cc)
 INTERFACE_DEPS = $(patsubst %.cc,%.swd,$(INTERFACE_SOURCES))
 
 LIB_EXT_DEPS = $(LIB_NAME_STEM) sedna
-LIB_EXT_DEP_PATHS = $(PROJECT_LIB_PATH)
+LIB_EXT_DEP_PATHS = $(PROJECT_LIB_PATH) $(SEDNA_C_PATH)
 
 .PHONY: swigclean wrap swiginstall
 

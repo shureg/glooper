@@ -29,10 +29,7 @@ namespace GLOOPER_TEST
    {
    public:
 
-      Agent(double,
-	    boost::shared_ptr<Market>,
-	    boost::shared_ptr<timer_signal>,
-	    boost::shared_ptr<timer_signal>);
+      Agent(double);
 
       virtual void update_belief(double) = 0;
 
@@ -48,20 +45,34 @@ namespace GLOOPER_TEST
 
       Agent* clone() const;
 
+      Agent& set_spot_mkt(const boost::shared_ptr<Market>&);
+
+      Agent& set_timer(const boost::shared_ptr< timer_signal >&);
+      
+      Agent& set_ro_timer(const boost::shared_ptr< timer_signal >&);
+
    protected:
 
       static unsigned long instance_counter;
 
-      boost::shared_ptr<Market> spot_mkt;
-
       double belief;
+
+      boost::shared_ptr<Market> spot_mkt;
 
       boost::shared_ptr< timer_signal > timer;
 
       boost::shared_ptr< timer_signal > ro_timer;
 
+      virtual const char* agent_type_str() const = 0;
+
       virtual Agent* real_clone() const = 0;
    };
+
+   //! Required for Boost Pointer Container library to enable deep copy 
+   inline Agent* new_clone( const Agent& a )
+   {
+      return a.clone();
+   }
 }
 
 #endif   // ----- #ifndef _GLT_AGENT_CLASS_INC  -----

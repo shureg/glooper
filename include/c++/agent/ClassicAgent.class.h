@@ -17,7 +17,7 @@
 #ifndef  _GLT_CLASSICAGENT_CLASS_INC
 #define  _GLT_CLASSICAGENT_CLASS_INC
 
-#include "agent/Agent.class.h"
+#include "agent/TradingAgent.class.h"
 #include "rng/generator/UniformGenerator.class.h"
 #include "trading/Position.struct.h"
 
@@ -25,30 +25,23 @@
 
 namespace GLOOPER_TEST
 {
-   class ClassicAgent: public Agent
+   class ClassicAgent: public TradingAgent
    {
    public:
 
-      ClassicAgent(double,double,double,double,
-	    boost::shared_ptr<Market>,double,
-	    boost::shared_ptr<timer_signal>,
-	    boost::shared_ptr<timer_signal>);
+      ClassicAgent(double belief,
+	    double wealth,
+	    double p_min, double f_min, double bas_max);
 
       ~ClassicAgent();
 
-      void place_order();
-
       XmlField xml_description() const;
 
-      void position_update(const Order&);
-
-      bool can_trade();
+      void update_belief(double);
 
    protected:
 
       RNG::UniformGenerator U;
-
-      void update_belief(double);
 
       bool will_revise(double);
 
@@ -62,35 +55,13 @@ namespace GLOOPER_TEST
 
       double bas_max;
 
-      Position pos;
-
-      double wealth;
-
-      double desired_investment_proportion() const;
-
-      double current_investment_proportion(double) const;
-
-      double investment_value(double) const;
-
-      bool is_active() const;
-
-      double bid_ask_spread(double,bool) const;
+      RNG::UniformGenerator spread_gen;
 
       double spread_fraction() const;
 
-      double mark_to_market() const;
-
-      Position get_order_quantity(double) const;
-
-      void check_liquidity();
-
-      void reset_orders();
-
-      boost::logic::tribool order_is_bid() const;
-
-      bool is_bankrupt;
-
       Agent* real_clone() const;
+
+      const char* agent_type_str() const;
       
    };
 }
