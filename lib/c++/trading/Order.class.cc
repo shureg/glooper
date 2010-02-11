@@ -24,12 +24,17 @@ using boost::logic::tribool;
 using boost::logic::indeterminate;
 using CALLBACK_LOG::LOG;
 
-unsigned long Order::instance_counter(0ul);
+unsigned long Order::instance_ctr(0ul);
+
+void Order::reset_instance_ctr()
+{
+   Order::instance_ctr = 0ul;
+}
 
 Order::Order(Agent& _owner,
       double _price, unsigned long _quantity, bool _bid,
       unsigned long _order_time):
-   SimulationObject(++instance_counter),
+   SimulationObject(++instance_ctr),
    owner(_owner),
    price(_price), quantity(_quantity), bid(_bid),
    market(false), order_time(_order_time),
@@ -52,7 +57,7 @@ Order::Order(Agent& _owner,
 Order::Order(Agent& _owner,
       unsigned long _quantity, bool _bid,
       unsigned long _order_time):
-   SimulationObject(++instance_counter),
+   SimulationObject(++instance_ctr),
    owner(_owner),
    price(-1.), quantity(_quantity), bid(_bid),
    market(true), order_time(_order_time),

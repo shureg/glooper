@@ -26,20 +26,20 @@
 #include "xml_serialisation/XmlContainerWrap.class.h"
 
 #include "agent/AgentGenerator.class.h"
+#include "trading/Market.class.h"
 
 using namespace RNG;
 
 namespace GLOOPER_TEST
 {
-   class Agent;
-
    class AgentPopulation: public Process
    {
    public:
 
       AgentPopulation(
 	    const boost::shared_ptr< TypedRandomGenerator<double> >&,
-	    const boost::shared_ptr< AgentGenerator >&);
+	    const boost::shared_ptr< AgentGenerator >&,
+	    const boost::shared_ptr< Market >&);
 
       void evolve();
 
@@ -54,6 +54,8 @@ namespace GLOOPER_TEST
    protected:
 
       boost::shared_ptr< AgentGenerator> agt_gen;
+
+      boost::shared_ptr< Market > mkt;
 
       double last_info;
 

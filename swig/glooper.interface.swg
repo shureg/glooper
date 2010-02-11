@@ -44,23 +44,21 @@ namespace GLOOPER_TEST
       Market();
    };
 
-   class ClassicAgentGenerator: public AgentGenerator
-   {
-   public:
-
-      ClassicAgentGenerator(
-	    const bsp_TRGd&, const bsp_TRGd&,
-	    const bsp_TRGd&, const bsp_TRGd&, const bsp_TRGd&,
-	    const boost::shared_ptr<Market>&, unsigned long);
-
-   };
-
    class AgentPopulation: public Process
    {
    public:
 
       AgentPopulation(const bsp_TRGd&,
-			const boost::shared_ptr<GLOOPER_TEST::AgentGenerator>&);
+			const boost::shared_ptr<GLOOPER_TEST::AgentGenerator>&,
+			const boost::shared_ptr<Market>&);
+   };
+
+   class LuaAgentGenerator: public AgentGenerator
+   {
+   public:
+
+      LuaAgentGenerator(const char* cfg_filename);
+
    };
 
    class StandardFSSimulation: public StandardSimulation

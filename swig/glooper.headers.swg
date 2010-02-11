@@ -2,9 +2,10 @@
 #include "rng/rng.hpp"
 #include "trading/Market.class.h"
 #include "agent/AgentGenerator.class.h"
-#include "agent/ClassicAgentGenerator.class.h"
+#include "agent/LuaAgentGenerator.class.h"
 #include "process/AgentPopulation.class.h"
 #include "simulation/StandardFSSimulation.class.h"
 #include "db/SednaDBInterface.class.h"
 #include "rng/generator/UniformGenerator.class.h"
+#include "agent/ClassicAgent.class.h"
 %}

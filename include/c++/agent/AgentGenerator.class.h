@@ -18,41 +18,62 @@
 #define  AGENTGENERATOR_CLASS_INC
 
 #include "core/SimulationObject.class.h"
-#include "rng/generator/TypedRandomGenerator.class.hpp"
 #include "boost/shared_ptr.hpp"
+#include "boost/weak_ptr.hpp"
 #include "agent/Agent.class.h"
+#include "boost/ptr_container/ptr_vector.hpp"
+#include "rng/generator/RandomGenerator.class.h"
+#include "boost/unordered_map.hpp"
+#include <utility>
+#include <list>
 
-typedef boost::shared_ptr< RNG::TypedRandomGenerator<double> > bsp_TRGd;
+typedef std::pair<std::string, RNG::RandomGenerator* > 
+   gen_key_type;
+
 typedef boost::shared_ptr< GLOOPER_TEST::timer_signal > bsp_ts;
 
 namespace GLOOPER_TEST
 {
+   typedef struct
+   {
+      Agent* agt;
+      std::list<gen_key_type> gen_keys;
+      bool last;
+   } agent_generation_context;
+
    class AgentGenerator: public SimulationObject
    {
    public:
 
-      AgentGenerator(const bsp_TRGd&, const bsp_TRGd&);
+      AgentGenerator(const char*);
+
+      void generate();
+
+      const boost::ptr_vector< Agent >& get_agt_vector() const;
 
       XmlField xml_description() const;
 
-      virtual Agent* generate_item() = 0;
-
-      virtual const bool stop_generation() = 0;
-
-      void set_timer(const bsp_ts&);
-
-      void set_ro_timer(const bsp_ts&);
-
-
    protected:
 
-      boost::shared_ptr< RNG::TypedRandomGenerator<double> > belief_generator;
+      const char* cfg_filename;
 
-      boost::shared_ptr< RNG::TypedRandomGenerator<double> > wealth_generator;
+      virtual void load_cfg_file() = 0;
 
-      boost::shared_ptr< timer_signal > timer;
+      void add_Agent(const Agent&);
 
-      boost::shared_ptr< timer_signal > ro_timer; 
+      void register_generator(
+	    const gen_key_type&,
+	    const Agent& agent);
+
+      virtual agent_generation_context 
+	 get_next_agt() = 0;
+
+      boost::ptr_vector< Agent > agt_vector;
+
+      boost::unordered_map< 
+	 gen_key_type,
+	 std::list< unsigned long > > 
+	    generator_registry;
 
    };
 }

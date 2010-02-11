@@ -86,11 +86,13 @@ namespace GLOOPER_TEST
 
       const bool is_cleared() const;
 
+      static void reset_instance_ctr();
+
       XmlField xml_description() const;
 
    protected:
 
-      static unsigned long instance_counter;
+      static unsigned long instance_ctr;
 
       const double price;
       
