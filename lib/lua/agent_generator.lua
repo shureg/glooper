@@ -22,5 +22,5 @@ agent_counter = 0
 function fixed_number_agent_generator()
    a,g = basic_agent_ctor_call()
    agent_counter = agent_counter + 1
-   return a,g,(agent_counter >= N_agents)
+   return a,g,agent_counter,(agent_counter >= N_agents)
 end
