@@ -1,7 +1,9 @@
 package.cpath = glooper_path.."/swig/output/?.so;"..package.cpath
 
-glooper = require "glooper_lua_swig_wrap.so"
-rng = require "rng_lua_swig_wrap.so"
+local glooper = require "glooper_lua_swig_wrap.so"
+local rng = require "rng_lua_swig_wrap.so"
+
+module(...)
 
 function basic_agent_ctor_call()
    args = {}
@@ -20,5 +22,5 @@ agent_counter = 0
 function fixed_number_agent_generator()
    a,g = basic_agent_ctor_call()
    agent_counter = agent_counter + 1
-   return a,g,#g,(agent_counter >= N_agents)
+   return a,g,(agent_counter >= N_agents)
 end

@@ -1,10 +1,12 @@
 glooper_path = "/simulation_data/glooper"
 
-dofile(glooper_path.."/lib/lua/agent_generator.lua")
+package.path = glooper_path.."/lib/lua/?.lua;"..package.path
 
-agent_ctor = glooper.ClassicAgent
+local agt_gen = require "agent_generator" 
 
-generator_args = {
+agt_gen.agent_ctor = glooper.ClassicAgent
+
+agt_gen.generator_args = {
    belief = rng.UniformGenerator(),
    wealth = rng.ParetoGenerator(10000,1.4),
    f_min = rng.UniformGenerator(0.05,0.1),
@@ -12,8 +14,8 @@ generator_args = {
    bas_max = rng.UniformGenerator(0.001,0.01)
 }
 
-non_generator_args = {}
+agt.gen.non_generator_args = {}
 
-N_agents = 2
+agt_gen.N_agents = 2
 
-generator = fixed_number_agent_generator
+generator = agt_gen.fixed_number_agent_generator
