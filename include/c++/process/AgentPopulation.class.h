@@ -38,8 +38,7 @@ namespace GLOOPER_TEST
 
       AgentPopulation(
 	    const boost::shared_ptr< TypedRandomGenerator<double> >&,
-	    const boost::shared_ptr< AgentGenerator >&,
-	    const boost::shared_ptr< Market >&);
+	    const boost::shared_ptr< AgentGenerator >&);
 
       void evolve();
 
@@ -54,8 +53,6 @@ namespace GLOOPER_TEST
    protected:
 
       boost::shared_ptr< AgentGenerator> agt_gen;
-
-      boost::shared_ptr< Market > mkt;
 
       double last_info;
 

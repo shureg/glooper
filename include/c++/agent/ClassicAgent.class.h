@@ -29,7 +29,8 @@ namespace GLOOPER_TEST
    {
    public:
 
-      ClassicAgent(double belief,
+      ClassicAgent(const Market& spot_mkt,
+	    double belief,
 	    double wealth,
 	    double p_min, double f_min, double bas_max);
 
@@ -62,7 +63,7 @@ namespace GLOOPER_TEST
       Agent* real_clone() const;
 
       const char* agent_type_str() const;
-      
+
    };
 }
 

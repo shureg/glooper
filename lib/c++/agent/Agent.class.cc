@@ -15,13 +15,17 @@
 // =====================================================================================
 
 #include "agent/Agent.class.h"
+#include "boost/make_shared.hpp"
+
+using boost::make_shared;
 
 using namespace GLOOPER_TEST;
 
 unsigned long Agent::instance_counter(0);
 
-Agent::Agent(double _belief):
+Agent::Agent(const Market& _spot_mkt, double _belief):
    SimulationObject(++instance_counter),
+   spot_mkt(make_shared<Market>(_spot_mkt)),
    belief(_belief)
 {}
 
@@ -33,12 +37,6 @@ Agent* Agent::clone() const
 boost::shared_ptr<Market> Agent::get_market() const
 {
    return spot_mkt;
-}
-
-Agent& Agent::set_spot_mkt(const boost::shared_ptr<Market>& _mkt)
-{
-   spot_mkt = _mkt;
-   return *this;
 }
 
 Agent& Agent::set_timer(const boost::shared_ptr<timer_signal>& _timer)

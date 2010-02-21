@@ -26,6 +26,7 @@
 namespace GLOOPER_TEST
 {
    typedef boost::signal< void (Order*) > order_reg_signal;
+   typedef boost::signal< void (const Trade&) > trade_reg_signal;
 
    class Market: public SimulationObject
    {
@@ -46,6 +47,8 @@ namespace GLOOPER_TEST
 
       double mark_to_market(bool) const;
 
+      double last_traded_price() const;
+
       double mid_market() const;
 
       void remove_order(const Order&);
@@ -63,6 +66,11 @@ namespace GLOOPER_TEST
       void pull_agent_orders(const Agent&);
 
       void reset();
+
+      Market* clone() const;
+
+      trade_reg_signal&
+	 get_trade_broadcast()
       
       XmlField xml_description() const;
 
@@ -85,6 +93,10 @@ namespace GLOOPER_TEST
       double minimum_tick;
 
       boost::shared_ptr<order_reg_signal> ord_sig;
+
+      boost::shared_ptr<trade_reg_signal> trade_broadcast;
+
+      virtual Market* real_clone() const;
 
    };
 }

@@ -1,7 +1,10 @@
 glooper_path = "/simulation_data/glooper"
 
 package.path = glooper_path.."/lib/lua/?.lua;"..package.path
+package.cpath = glooper_path.."/swig/output/?.so;"..package.cpath
 
+local glooper = require "glooper_lua_swig_wrap.so"
+local rng = require "rng_lua_swig_wrap.so"
 local agt_gen = require "agent_generator" 
 
 agt_gen.agent_ctor = glooper.ClassicAgent

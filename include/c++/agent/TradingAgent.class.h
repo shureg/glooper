@@ -29,7 +29,8 @@ namespace GLOOPER_TEST
    {
    public:
 
-      TradingAgent(double,
+      TradingAgent(const Market&,
+	    double,
 	    double);
 
       void place_order();

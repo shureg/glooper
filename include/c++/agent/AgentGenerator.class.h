@@ -44,6 +44,8 @@ namespace GLOOPER_TEST
    class AgentGenerator: public SimulationObject
    {
    public:
+      
+      virtual ~AgentGenerator();
 
       AgentGenerator(const char*);
 

@@ -1,8 +1,3 @@
-package.cpath = glooper_path.."/swig/output/?.so;"..package.cpath
-
-local glooper = require "glooper_lua_swig_wrap.so"
-local rng = require "rng_lua_swig_wrap.so"
-
 module(...)
 
 function basic_agent_ctor_call()

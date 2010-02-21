@@ -18,13 +18,16 @@
 #include "boost/bind.hpp"
 #include "agent/Agent.class.h"
 #include "xml_serialisation/XmlSingleValue.class.hpp"
+#include "boost/make_shared.hpp"
 
 using namespace GLOOPER_TEST;
 using namespace std;
 using namespace XML_SERIALISATION;
+using boost::make_shared;
 
 Market::Market(): SimulationObject(0), init_price(100.), minimum_tick(0.01),
-   ord_sig(new order_reg_signal)
+   ord_sig( make_shared<order_reg_signal>() ), 
+   trade_broadcast( make_shared<trade_reg_signal>() )
 {}
 
 const bool Market::is_crossing_limit_order(const Order& r) const
@@ -242,6 +245,7 @@ const Order* Market::best_order(bool _bid) const
 
 void Market::record_trade(const Trade& tr)
 {
+   (*trade_broadcast)(tr);
    trades.push_back(tr);
 }
 
@@ -251,12 +255,15 @@ double Market::mark_to_market(bool _bid) const
    if( tmp != 0 )
       return tmp->get_price();
    else
-   {
-      if( !trades.empty() )
-	 return trades.back().p;
-      else
-	 return init_price;
-   }
+      return last_traded_price();
+}
+
+double Market::last_traded_price() const
+{
+   if ( !trades.empty() )
+      return trades.back().p;
+   else
+      return init_price;
 }
 
 double Market::mid_market() const
@@ -319,6 +326,22 @@ void Market::reset()
    ask_orders.clear();
    Trade::reset_instance_ctr();
    Order::reset_instance_ctr();
+}
+
+trade_reg_signal& Market::get_trade_broadcast()
+{
+   return trade_broadcast;
+}
+
+Market* Market::clone() const
+{
+   return real_clone();
+}
+
+Market* Market real_clone() const
+{
+   Market* tmp = new Market(*this);
+   return (Market*) tmp;
 }
 
 XmlField Market::xml_description() const

@@ -25,16 +25,12 @@ using namespace GLOOPER_TEST;
 using namespace std;
 using namespace boost::logic;
 
-TradingAgent::TradingAgent(double _belief,
+TradingAgent::TradingAgent(const Market& _spot_mkt
+      double _belief,
       double _wealth):
-   Agent(_belief),
+   Agent(_spot_mkt, _belief),
    wealth(_wealth), is_bankrupt(false)
 {
-   LOG(TRACE,
-	 boost::format("Agent %d created, preparing to save the initial state\n")
-	 % id);
-
-   SimulationObject::db_signal()(*this);
 }
 
 double TradingAgent::investment_value(double mtm) const

@@ -36,9 +36,8 @@ using CALLBACK_LOG::LOG;
 
 AgentPopulation::AgentPopulation(
       const boost::shared_ptr< TypedRandomGenerator<double> >& info_generator,
-      const boost::shared_ptr< AgentGenerator >& agt_gen,
-      const boost::shared_ptr< Market >& mkt):
-   agt_gen(agt_gen), mkt(mkt),
+      const boost::shared_ptr< AgentGenerator >& agt_gen):
+   agt_gen(agt_gen),
    last_info(-1.0), info_generator(info_generator),
    agent_timer(0), turn_timer(0)
 {
@@ -73,7 +72,7 @@ void AgentPopulation::simulation_config()
 	 i = initial_population.begin();
 	 i != initial_population.end();
 	 ++i)
-      (*i).set_spot_mkt(mkt).set_timer(ts).set_ro_timer(ro_ts);
+      (*i).set_timer(ts).set_ro_timer(ro_ts);
 
    XmlWrap ig("Information_Generator",*info_generator);
 
