@@ -27,6 +27,7 @@
 
 #include "agent/AgentGenerator.class.h"
 #include "trading/Market.class.h"
+#include <set>
 
 using namespace RNG;
 
@@ -38,7 +39,8 @@ namespace GLOOPER_TEST
 
       AgentPopulation(
 	    const boost::shared_ptr< TypedRandomGenerator<double> >&,
-	    const boost::shared_ptr< AgentGenerator >&);
+	    const boost::shared_ptr< AgentGenerator >&,
+	    const boost::shared_ptr< Market >&);
 
       void evolve();
 
@@ -57,6 +59,8 @@ namespace GLOOPER_TEST
       double last_info;
 
       boost::shared_ptr< TypedRandomGenerator<double> > info_generator;
+
+      boost::shared_ptr< Market > mkt;
 
       boost::ptr_vector<Agent> population;
 

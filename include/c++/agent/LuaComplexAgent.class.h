@@ -33,9 +33,9 @@ namespace GLOOPER_TEST
    {
    public:
 
-      LuaComplexAgent(const Market& spot_mkt,
-	    double belief,
+      LuaComplexAgent(double belief,
 	    double wealth,
+	    int mean_reversion,
 	    unsigned long max_memory,
 	    unsigned long significance_threshold,
 	    const char* lua_cfg_filename);
@@ -52,9 +52,11 @@ namespace GLOOPER_TEST
 
       int obj_ref;
 
-      int bel_adj_luaref, bel_upd_luaref;
+      int bel_adj_luaref, bel_upd_luaref, spread_luaref;
 
       void adjust_belief(double p_more_extreme);
+
+      double spread_fraction() const;
 
       const boost::logic::tribool next_mode() const;
 

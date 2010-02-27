@@ -8,4 +8,5 @@
 #include "db/SednaDBInterface.class.h"
 #include "rng/generator/UniformGenerator.class.h"
 #include "agent/ClassicAgent.class.h"
+#include "agent/LuaComplexAgent.class.h"
 %}

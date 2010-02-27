@@ -25,11 +25,10 @@ using namespace GLOOPER_TEST;
 using namespace std;
 using namespace boost::logic;
 
-ClassicAgent::ClassicAgent(const Market& spot_mkt,
-      double belief,
+ClassicAgent::ClassicAgent(double belief,
       double wealth,
       double p_min, double f_min, double bas_max):
-   TradingAgent(spot_mkt,belief,wealth),
+   TradingAgent(belief,wealth),
    p_min(p_min), f_min(f_min), bas_max(bas_max), 
    spread_gen( RNG::UniformGenerator(bas_max/10.,bas_max) )
 

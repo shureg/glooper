@@ -15,15 +15,17 @@
 // =====================================================================================
 
 #include "agent/LuaComplexAgent.class.h"
-#include <ifstream>
+#include <fstream>
 
-LuaComplexAgent::LuaComplexAgent:(const Market& spot_mkt,
-      double belief,
+using namespace GLOOPER_TEST;
+
+LuaComplexAgent::LuaComplexAgent(double belief,
       double wealth,
+      int mean_reversion,
       unsigned long max_memory,
       unsigned long significance_threshold,
       const char* lua_cfg_filename): 
-   ComplexAgent(spot_mkt,belief,wealth,max_memory,significance_threshold)
+   ComplexAgent(belief,wealth,mean_reversion,max_memory,significance_threshold)
 {
    L = luaL_newstate();
    luaL_openlibs(L);
@@ -39,7 +41,7 @@ LuaComplexAgent::LuaComplexAgent:(const Market& spot_mkt,
    if( !lua_istable(L,-1) )
       LOG(EXCEPTION,boost::format
 	    ("The \"LuaComplexAgent\" reference in Lua file %s must be a table\n")
-	    % lua_cfg_filename;
+	    % lua_cfg_filename
 	    );
    
    lua_pushstring(L,"update_belief");
@@ -48,7 +50,7 @@ LuaComplexAgent::LuaComplexAgent:(const Market& spot_mkt,
    if( lua_isnil(L,-1) )
       LOG(EXCEPTION, boost::format
 	    ("The \"LuaComplexAgent\" table in Lua file %s does not have an "\
-	     \"update_belief\" field\n") % lua_cfg_filename
+	     "update_belief\" field\n") % lua_cfg_filename
 	    );
 
    if( !lua_isfunction(L,-1) )
@@ -65,7 +67,7 @@ LuaComplexAgent::LuaComplexAgent:(const Market& spot_mkt,
    if( lua_isnil(L,-1) )
       LOG(EXCEPTION, boost::format
 	    ("The \"ComplexAgent\" table in Lua file %s does not have an "\
-	     \"adjust_belief\" field\n") % lua_cfg_filename
+	     "adjust_belief\" field\n") % lua_cfg_filename
 	    );
 
    if( !lua_isfunction(L,-1) )
@@ -76,6 +78,23 @@ LuaComplexAgent::LuaComplexAgent:(const Market& spot_mkt,
    
    bel_adj_luaref = luaL_ref(L,LUA_REGISTRYINDEX);
 
+   lua_pushstring(L,"spread_fraction");
+   lua_rawget(L,-2);
+
+   if( lua_isnil(L,-1) )
+      LOG(EXCEPTION, boost::format
+	    ("The \"ComplexAgent\" table in Lua file %s does not have an "\
+	     "spread_fraction\" field\n") % lua_cfg_filename
+	    );
+
+   if( !lua_isfunction(L,-1) )
+      LOG(EXCEPTION, boost::format
+	    ("The \"spread_fraction\" field in the \"ComplexAgent\" table "\
+	     "in Lua file %s is not a function\n") % lua_cfg_filename
+	    );
+   
+   spread_luaref = luaL_ref(L,LUA_REGISTRYINDEX);
+   
    obj_ref = luaL_ref(L,LUA_REGISTRYINDEX);
 
    std::ifstream ifs(lua_cfg_filename);
@@ -92,7 +111,7 @@ LuaComplexAgent::~LuaComplexAgent()
 {
    luaL_unref(L,LUA_REGISTRYINDEX,bel_upd_luaref);
    luaL_unref(L,LUA_REGISTRYINDEX,bel_adj_luaref);
-   luaL_unref(L,LUA)
+   luaL_unref(L,LUA_REGISTRYINDEX,spread_luaref);
    lua_close(L);
 }
 
@@ -104,7 +123,7 @@ void LuaComplexAgent::update_belief(double xi)
    lua_rawset(L,-3);
 
    lua_rawgeti(L,LUA_REGISTRYINDEX,bel_upd_luaref);
-   lua_pushnumber(xi);
+   lua_pushnumber(L,xi);
    int res = lua_pcall(L,1,0,0);
    if (res != 0)
       LOG(EXCEPTION,boost::format
@@ -134,7 +153,7 @@ void LuaComplexAgent::adjust_belief(double p_more_extreme)
    lua_rawset(L,-3);
 
    lua_rawgeti(L,LUA_REGISTRYINDEX,bel_adj_luaref);
-   lua_pushnumber(p_more_extreme);
+   lua_pushnumber(L,p_more_extreme);
    int res = lua_pcall(L,1,0,0);
    if (res != 0)
       LOG(EXCEPTION,boost::format
@@ -145,6 +164,20 @@ void LuaComplexAgent::adjust_belief(double p_more_extreme)
    lua_rawget(L,-2);
    belief = lua_tonumber(L,-1);
    lua_pop(L,2);
+}
+
+double LuaComplexAgent::spread_fraction() const
+{
+   lua_rawgeti(L,LUA_REGISTRYINDEX,spread_luaref);
+   int res = lua_pcall(L,0,1,0);
+   if (res != 0)
+      LOG(EXCEPTION,boost::format
+	    ("LuaComplexAgent %d: "\
+	     "could not call LuaComplexAgent.spread_fraction: "\
+	     "%s\n") % id % (lua_tostring(L,-1))
+	    );
+   double result = lua_tonumber(L,-1);
+   lua_pop(L,1);
 }
 
 const boost::logic::tribool LuaComplexAgent::next_mode() const

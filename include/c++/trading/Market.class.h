@@ -70,7 +70,7 @@ namespace GLOOPER_TEST
       Market* clone() const;
 
       trade_reg_signal&
-	 get_trade_broadcast()
+	 get_trade_broadcast();
       
       XmlField xml_description() const;
 
@@ -100,4 +100,5 @@ namespace GLOOPER_TEST
 
    };
 }
+
 #endif //_GLT_MARKET_CLASS_INC
