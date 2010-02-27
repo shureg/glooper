@@ -59,13 +59,13 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 #Simulation-related objects creation
 
+comment = raw_input("Provide a short description for simulation %d" % simid)
+
 N_batches = 1
 
-N_runs = 100
+N_runs = 1
 
-N_steps = 100
-
-sim_comment = "spread_test"
+N_steps = 30
 
 post_process = True
 
