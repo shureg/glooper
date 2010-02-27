@@ -2,7 +2,7 @@
 
 %include "glooper.headers.swg"
 
-%import "rng/rng.python.swig_wrap.swg"
+%import "rng/rng.lua.swig_wrap.swg"
 
 namespace GLOOPER_TEST
 {

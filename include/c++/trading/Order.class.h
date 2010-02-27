@@ -94,6 +94,8 @@ namespace GLOOPER_TEST
 
       static unsigned long instance_ctr;
 
+      Agent& owner;
+
       const double price;
       
       mutable unsigned long quantity;
@@ -112,8 +114,6 @@ namespace GLOOPER_TEST
       boost::signals::connection owner_connection;
 
       boost::signals::connection trade_registration_connection;
-
-      Agent& owner;
 
       void record_trade(const Trade&) const;
 

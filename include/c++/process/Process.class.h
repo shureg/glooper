@@ -30,6 +30,8 @@ namespace GLOOPER_TEST
       virtual void batch_config() = 0;
 
       virtual void run_config() = 0;
+
+      virtual ~Process(){}
    };
 }
 

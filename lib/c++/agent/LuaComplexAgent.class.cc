@@ -177,7 +177,10 @@ double LuaComplexAgent::spread_fraction() const
 	     "%s\n") % id % (lua_tostring(L,-1))
 	    );
    double result = lua_tonumber(L,-1);
+   
    lua_pop(L,1);
+   
+   return result;
 }
 
 const boost::logic::tribool LuaComplexAgent::next_mode() const
