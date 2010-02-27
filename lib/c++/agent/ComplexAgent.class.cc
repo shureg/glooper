@@ -19,18 +19,19 @@
 #include "callback_log/LOG.h"
 
 using namespace GLOOPER_TEST;
-using boost::logic::indeterminate;
 
-ComplexAgent::ComplexAgent(const Market& spot_mkt,
-      double belief,
+const boost::logic::tribool neither = boost::logic::indeterminate;
+
+ComplexAgent::ComplexAgent(double belief,
       double wealth,
       int mean_reversion,
       unsigned long max_memory,
       unsigned long significance_threshold): 
-   TradingAgent(spot_mkt,belief,wealth),
+   TradingAgent(belief,wealth),
    distr_byvalue(return_distribution.get<0>()),
    distr_bytime(return_distribution.get<1>()),
-   mean_reverter( (mean_reversion==0)?(indeterminate):(mean_reversion>0) ),
+   mean_reverter( 
+	 (mean_reversion==0)?(neither):(boost::logic::tribool(mean_reversion>0)) ),
    max_memory(max_memory),
    significance_threshold(significance_threshold)
 {
@@ -41,9 +42,12 @@ ComplexAgent::ComplexAgent(const Market& spot_mkt,
 	       "memory length %d - belief adjustment will never be invoked\n")
 	    % id % significance_threshold % max_memory
 	 );
+}
 
+void ComplexAgent::init()
+{
    market_broadcast_conn = spot_mkt->get_trade_broadcast().connect(
-	 boost::bind( ComplexAgent::add_return,this,_1 ) )
+	 boost::bind( &ComplexAgent::add_return,this,_1 ) );
 }
 
 ComplexAgent::~ComplexAgent()
@@ -74,7 +78,7 @@ void ComplexAgent::add_return(const Trade& trd)
 
    if(!indeterminate(mean_reverter) && belief != 0.5)
    {
-      double last_ratio = distr_bytime.back().ratio();
+      double last_ratio = distr_bytime.back().ratio;
 
       if( history_significant() && last_ratio != 1.)
 	 adjust_belief( 
@@ -87,7 +91,7 @@ double ComplexAgent::ecdf(double ratio) const
 {
    multiset_index::iterator lb = distr_byvalue.lower_bound(ratio);
 
-   return (double) ( distance(distr_byvalue.first(),lb) * 1. ) / 
+   return (double) ( distance(distr_byvalue.begin(),lb) * 1. ) / 
       (distr_byvalue.size() * 1.); 
 }
 

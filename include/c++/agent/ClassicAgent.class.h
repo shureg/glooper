@@ -29,8 +29,7 @@ namespace GLOOPER_TEST
    {
    public:
 
-      ClassicAgent(const Market& spot_mkt,
-	    double belief,
+      ClassicAgent(double belief,
 	    double wealth,
 	    double p_min, double f_min, double bas_max);
 
@@ -39,6 +38,8 @@ namespace GLOOPER_TEST
       XmlField xml_description() const;
 
       void update_belief(double);
+
+      void init(){}
 
    protected:
 

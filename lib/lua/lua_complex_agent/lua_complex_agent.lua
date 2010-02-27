@@ -1,6 +1,6 @@
 local rng = require "rng_lua_swig_wrap"
 
-LuaComplexAgent = {U = rng.UniformGenerator()}
+LuaComplexAgent = {U = rng.UniformGenerator(), max_spread=0.01}
 
 LuaComplexAgent.update_belief = function(xi)
    LuaComplexAgent.belief = LuaComplexAgent.belief + U()*(xi-LuaComplexAgent.belief)
@@ -17,4 +17,9 @@ LuaComplexAgent.adjust_belief = function(z)
    end
 
    LuaComplexAgent.belief = LuaComplexAgent.belief + U()*z*(K - LuaComplexAgent.belief)
+end
+
+LuaComplexAgent.spread_fraction = function()
+   local min_spread = LuaComplexAgent.max_spread*0.1
+   return U()*(LuaComplexAgent.max_spread - min_spread) + min_spread
 end

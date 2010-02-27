@@ -25,10 +25,9 @@ using namespace GLOOPER_TEST;
 using namespace std;
 using namespace boost::logic;
 
-TradingAgent::TradingAgent(const Market& _spot_mkt
-      double _belief,
+TradingAgent::TradingAgent(double _belief,
       double _wealth):
-   Agent(_spot_mkt, _belief),
+   Agent(_belief),
    wealth(_wealth), is_bankrupt(false)
 {
 }

@@ -31,7 +31,7 @@ namespace GLOOPER_TEST
 
       virtual ~Agent();
 
-      Agent(const Market&, double);
+      Agent(double);
 
       virtual void update_belief(double) = 0;
 
@@ -45,11 +45,15 @@ namespace GLOOPER_TEST
 
       boost::shared_ptr<Market> get_market() const;
 
+      Agent& set_market(const boost::shared_ptr<Market>&);
+
       Agent* clone() const;
 
       Agent& set_timer(const boost::shared_ptr< timer_signal >&);
       
       Agent& set_ro_timer(const boost::shared_ptr< timer_signal >&);
+
+      virtual void init() = 0;
 
    protected:
 

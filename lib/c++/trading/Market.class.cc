@@ -330,7 +330,7 @@ void Market::reset()
 
 trade_reg_signal& Market::get_trade_broadcast()
 {
-   return trade_broadcast;
+   return *trade_broadcast;
 }
 
 Market* Market::clone() const
@@ -338,7 +338,7 @@ Market* Market::clone() const
    return real_clone();
 }
 
-Market* Market real_clone() const
+Market* Market::real_clone() const
 {
    Market* tmp = new Market(*this);
    return (Market*) tmp;

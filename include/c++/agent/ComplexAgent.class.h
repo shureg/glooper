@@ -24,6 +24,7 @@
 #include "boost/multi_index_container.hpp"
 #include "boost/multi_index/ordered_index.hpp"
 #include "boost/multi_index/sequenced_index.hpp"
+#include "boost/multi_index/member.hpp"
 #include "boost/logic/tribool.hpp"
 #include <cmath>
 
@@ -41,24 +42,28 @@ namespace GLOOPER_TEST
       {}
    };
 
-   typedef boost::multi_index_container< price_change,
-	   boost::multi_index::indexed_by< 
-	      boost::multi_index::ordered_non_unique<
-	       boost::multi_index::member<
+   using namespace boost;
+   using namespace boost::multi_index;
+
+   typedef multi_index_container< price_change,
+	   indexed_by< 
+	      ordered_non_unique<
+	      member<
 		  price_change,double,&price_change::ratio>
 		  >,
-	      boost::multi_index::sequenced<> >
+	      sequenced<> >
 	    > price_history;
 
    typedef price_history::nth_index<0>::type multiset_index;
    typedef price_history::nth_index<1>::type list_index;
 
+   extern const boost::logic::tribool neither;
+
    class ComplexAgent: public TradingAgent
    {
    public:
 
-      ComplexAgent(const Market& spot_mkt,
-	    double belief,
+      ComplexAgent(double belief,
 	    double wealth,
 	    int mean_reversion,
 	    unsigned long max_memory,
@@ -67,6 +72,8 @@ namespace GLOOPER_TEST
       ~ComplexAgent();
 
       XmlField xml_description() const;
+
+      void init();
 
    protected:
 
