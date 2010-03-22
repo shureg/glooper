@@ -20,7 +20,8 @@
 
 using namespace GLOOPER_TEST;
 
-const boost::logic::tribool neither = boost::logic::indeterminate;
+const boost::logic::tribool 
+   GLOOPER_TEST::neither = boost::logic::indeterminate;
 
 ComplexAgent::ComplexAgent(double belief,
       double wealth,

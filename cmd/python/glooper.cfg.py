@@ -59,15 +59,15 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 #Simulation-related objects creation
 
-comment = raw_input("Provide a short description for simulation %d" % simid)
+sim_comment = "TF agents - very large size population" #raw_input("Provide a short description for simulation %d: " % simid)
 
 N_batches = 1
 
 N_runs = 1
 
-N_steps = 30
+N_steps = 100
 
-post_process = True
+post_process = ["trd","agt","ord","inf"]
 
 dbi = glooper.SednaDBInterface("SimulationDB","Bender Rodriguez","bmsma_DTAH1","SimulationData")
 

@@ -64,6 +64,8 @@ namespace GLOOPER_TEST
 
       boost::ptr_vector<Agent> population;
 
+      std::vector<unsigned int> population_index;
+
       boost::ptr_vector<Agent> initial_population;
 
       unsigned long agent_timer;

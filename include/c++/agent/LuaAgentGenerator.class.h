@@ -44,6 +44,8 @@ namespace GLOOPER_TEST
 
       agent_generation_context get_next_agt();
 
+      int gen_ref;
+
    };
 }
 

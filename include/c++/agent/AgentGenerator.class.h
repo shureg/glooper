@@ -45,7 +45,7 @@ namespace GLOOPER_TEST
    {
    public:
       
-      virtual ~AgentGenerator();
+      virtual ~AgentGenerator(){}
 
       AgentGenerator(const char*);
 

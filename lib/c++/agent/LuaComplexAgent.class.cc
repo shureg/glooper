@@ -97,73 +97,50 @@ LuaComplexAgent::LuaComplexAgent(double belief,
    
    obj_ref = luaL_ref(L,LUA_REGISTRYINDEX);
 
-   std::ifstream ifs(lua_cfg_filename);
+//   std::ifstream ifs(lua_cfg_filename);
 
-   std::istreambuf_iterator<char> f_begin(ifs);
-   std::istreambuf_iterator<char> f_end;
+//   std::istreambuf_iterator<char> f_begin(ifs);
+//   std::istreambuf_iterator<char> f_end;
 
-   lua_cfg_file_content = std::string(f_begin,f_end);
+//   lua_cfg_file_content = std::string(f_begin,f_end);
 
-   ifs.close();
+//   ifs.close();
 }
 
 LuaComplexAgent::~LuaComplexAgent()
 {
-   luaL_unref(L,LUA_REGISTRYINDEX,bel_upd_luaref);
-   luaL_unref(L,LUA_REGISTRYINDEX,bel_adj_luaref);
-   luaL_unref(L,LUA_REGISTRYINDEX,spread_luaref);
-   lua_close(L);
 }
 
 void LuaComplexAgent::update_belief(double xi)
 {
-   lua_rawgeti(L,LUA_REGISTRYINDEX,obj_ref);
-   lua_pushstring(L,"belief");
-   lua_pushnumber(L,belief);
-   lua_rawset(L,-3);
-
    lua_rawgeti(L,LUA_REGISTRYINDEX,bel_upd_luaref);
    lua_pushnumber(L,xi);
-   int res = lua_pcall(L,1,0,0);
+   lua_pushnumber(L,belief);
+   int res = lua_pcall(L,2,1,0);
    if (res != 0)
       LOG(EXCEPTION,boost::format
 	    ("LuaComplexAgent %d: could not call LuaComplexAgent.update_belief: "\
 	     "%s\n") % id % (lua_tostring(L,-1))
 	    );
-   lua_pushstring(L,"belief");
-   lua_rawget(L,-2);
    belief = lua_tonumber(L,-1);
-   lua_pop(L,2);
+   lua_pop(L,1);
 }
 
 void LuaComplexAgent::adjust_belief(double p_more_extreme)
 {
-   lua_rawgeti(L,LUA_REGISTRYINDEX,obj_ref);
-
-   lua_pushstring(L,"belief");
-   lua_pushnumber(L,belief);
-   lua_rawset(L,-3);
-
-   lua_pushstring(L,"last_move_up");
-   lua_pushboolean(L, distr_bytime.back().ratio > 1. );
-   lua_rawset(L,-3);
-
-   lua_pushstring(L,"mean_reverter");
-   lua_pushboolean(L,(bool) mean_reverter);
-   lua_rawset(L,-3);
-
    lua_rawgeti(L,LUA_REGISTRYINDEX,bel_adj_luaref);
    lua_pushnumber(L,p_more_extreme);
-   int res = lua_pcall(L,1,0,0);
+   lua_pushnumber(L,belief);
+   lua_pushboolean(L,(bool) mean_reverter);
+   lua_pushboolean(L, (distr_bytime.back().ratio > 1.) );
+   int res = lua_pcall(L,4,1,0);
    if (res != 0)
       LOG(EXCEPTION,boost::format
 	    ("LuaComplexAgent %d: could not call LuaComplexAgent.adjust_belief: "\
 	     "%s\n") % id % (lua_tostring(L,-1))
 	    );
-   lua_pushstring(L,"belief");
-   lua_rawget(L,-2);
    belief = lua_tonumber(L,-1);
-   lua_pop(L,2);
+   lua_pop(L,1);
 }
 
 double LuaComplexAgent::spread_fraction() const
@@ -204,8 +181,8 @@ XmlField LuaComplexAgent::xml_description() const
 {
    XmlField tmp = ComplexAgent::xml_description();
 
-   tmp.add_field("Lua.Config.File.Contents",
-	 lua_cfg_file_content.begin(),lua_cfg_file_content.end(),"");
+//   tmp.add_field("Lua.Config.File.Contents",
+//	 lua_cfg_file_content.begin(),lua_cfg_file_content.end(),"");
 
    return tmp;
 }

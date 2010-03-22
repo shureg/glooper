@@ -1,25 +1,29 @@
-local rng = require "rng_lua_swig_wrap"
+module(...,package.seeall)
 
-LuaComplexAgent = {U = rng.UniformGenerator(), max_spread=0.01}
+require "rng_lua_swig_wrap"
 
-LuaComplexAgent.update_belief = function(xi)
-   LuaComplexAgent.belief = LuaComplexAgent.belief + U()*(xi-LuaComplexAgent.belief)
+rng = rng_lua_swig_wrap
+
+U = rng.UniformGenerator()
+
+update_belief = function(xi,belief)
+   return belief + U()*(xi-belief)
 end
 
-LuaComplexAgent.adjust_belief = function(z)
-   local codirected = (LuaComplexAgent.belief > 0.5 and LuaComplexAgent.last_move_up) or (LuaComplexAgent.belief < 0.5 and not LuaComplexAgent.last_move_up) 
+adjust_belief = function(z,belief,mean_reverter,last_move_up)
+   local codirected = (belief > 0.5 and last_move_up) or (belief < 0.5 and not last_move_up) 
    local K = -1
    
-   if (LuaComplexAgent.mean_reverter and codirected ) or (not LuaComplexAgent.mean_reverter and not codirected) then
+   if (mean_reverter and codirected ) or (not mean_reverter and not codirected) then
       K = 0.5
    else
-      if LuaComplexAgent.belief > 0.5 then K = 1 else K = 0 end
+      if belief > 0.5 then K = 1 else K = 0 end
    end
 
-   LuaComplexAgent.belief = LuaComplexAgent.belief + U()*z*(K - LuaComplexAgent.belief)
+   return belief + (1-z)*(K - belief)
 end
 
-LuaComplexAgent.spread_fraction = function()
-   local min_spread = LuaComplexAgent.max_spread*0.1
-   return U()*(LuaComplexAgent.max_spread - min_spread) + min_spread
+spread_fraction = function()
+   local min_spread = max_spread*0.1
+   return U()*(max_spread - min_spread) + min_spread
 end

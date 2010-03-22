@@ -29,7 +29,7 @@ namespace GLOOPER_TEST
    {
    public:
 
-      virtual ~Agent();
+      virtual ~Agent(){}
 
       Agent(double);
 

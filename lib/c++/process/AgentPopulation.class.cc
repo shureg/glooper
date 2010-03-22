@@ -21,6 +21,7 @@
 #include "xml_serialisation/XmlWrap.class.h"
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
+#include "rng/algorithm/shuffle.hpp"
 
 #include <fstream>
 #include <algorithm>
@@ -70,6 +71,10 @@ void AgentPopulation::simulation_config()
    ts->connect( boost::bind(&AgentPopulation::get_agent_timer,this,true) );
    ro_ts->connect( boost::bind(&AgentPopulation::get_agent_timer,this,false) );
 
+   population_index.clear();
+
+   unsigned int p_ix = 0;
+
    for( boost::ptr_vector<Agent>::iterator 
 	 i = initial_population.begin();
 	 i != initial_population.end();
@@ -77,6 +82,7 @@ void AgentPopulation::simulation_config()
    {
       (*i).set_market(mkt).set_timer(ts).set_ro_timer(ro_ts);
       (*i).init();
+      population_index.push_back(p_ix++);
    }
 
    XmlWrap ig("Information_Generator",*info_generator);
@@ -120,12 +126,14 @@ void AgentPopulation::evolve()
    LOG(TRACE,boost::format(
 	    "Using information value %f\n") % last_info);
 
-   for(boost::ptr_vector<Agent>::iterator 
-	 i = population.begin(); i!=population.end(); ++i)
+   RNG::knuth_shuffle(population_index.begin(),population_index.end());
+
+   for(std::vector<unsigned int>::iterator 
+	 i = population_index.begin(); i != population_index.end(); ++i)
    {
-      i->update_belief(last_info);
-      if( i->can_trade() )
-	 i->place_order();
+      population[*i].update_belief(last_info);
+      if( population[*i].can_trade() )
+	 population[*i].place_order();
    }
 
    XmlContainerWrap ep = 

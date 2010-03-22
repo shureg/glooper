@@ -28,7 +28,7 @@ try:
       os.system("mkdir -pv %s" % root_datadir)
       os.system("mkdir -pv %s" % csv_datadir)
 
-      query_labels = ["agt","trd","inf","ord","lob"]
+      query_labels = post_process
 
       for ql in query_labels:
 	 os.system("mkdir -pv %s" % os.path.join(DATA_PATH,version_string,str(simid),"csv",ql))
@@ -81,8 +81,6 @@ try:
    cbl.log(cbl.INFO,"All operations complete\n")
 
 except sedna.SednaException, ex:
-   cbl.log(cbl.EXTERNAL_EXCEPTION,"SednaException caught in Python: %s\n" % str(ex))
    raise ex
 except Exception, ex:
-   cbl.log(cbl.EXTERNAL_EXCEPTION,"Exception caught in Python: %s\n" % str(ex))
    raise ex
