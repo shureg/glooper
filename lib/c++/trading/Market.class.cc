@@ -157,7 +157,7 @@ void Market::process_order(Order& r)
 	    "registration\n")
 	 );
 
-   SimulationObject::db_signal()(*this);
+   //SimulationObject::db_signal()(*this);
    
    LOG(TRACE, boost::format("Market: ending the market object db "\
 	    "registration\n")
