@@ -198,7 +198,7 @@ void TradingAgent::place_order()
 	       {
 		  dq = get_order_quantity( best->get_price() );
 		  if( (bool) order_status == !act.is_bid() && (dq.q != 0))
-		     LOG(EXCEPTION, boost::format("Agent %d: order direction has been "\
+		     LOG(WARNING, boost::format("Agent %d: order direction has been "\
 			      "reversed in the middle of executing an active order, "\
 			      "most recent order parameters: (%d) %d @ %.3f\n")
 			   % id % dq.is_long % dq.q % best->get_price()
@@ -262,11 +262,15 @@ void TradingAgent::reset_orders()
 double TradingAgent::mark_to_market() const
 {
    if(indeterminate(pos.is_long))
-      LOG(EXCEPTION, boost::format("Agent %d: the internal mark-to-market method "\
-	       "may not be called when there is no position in the asset\n")
+   {
+     LOG(WARNING, boost::format("Agent %d: the internal mark-to-market method "\
+	       "should not be called when there is no position in the asset\n")
 	    % id
 	    );
-   return spot_mkt->mark_to_market(!pos.is_long);
+     return 0.;
+   }
+   else
+     return spot_mkt->mark_to_market(!pos.is_long);
 }
 
 bool TradingAgent::can_trade()

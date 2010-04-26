@@ -19,12 +19,12 @@ agt_gen.generator_args = {
 }
 
 agt_gen.non_generator_args = {
-   mean_reversion = -1,
+   mean_reversion = 1,
    max_memory = 100,
    significance_threshold = 20,
    lua_cfg_filename = "lc_agt.cfg.lua"
 }
 
-agt_gen.N_agents = 500
+agt_gen.N_agents = 200
 
 generator = agt_gen.fixed_number_agent_generator
