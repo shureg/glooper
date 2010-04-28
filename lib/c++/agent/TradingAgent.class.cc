@@ -250,7 +250,18 @@ void TradingAgent::place_order()
       }
    }
 
+   LOG(TRACE, boost::format(
+	 "Starting post-trade agent registration process for agent %d\n")
+       % id
+       );
+
    SimulationObject::db_signal()(*this);
+
+   LOG(TRACE, boost::format(
+	 "Ending post-trade agent registration process for agent %d\n")
+       % id
+       );
+
 }
 
 void TradingAgent::reset_orders()
