@@ -100,9 +100,15 @@ XmlField ComplexAgent::xml_description() const
 {
    XmlField tmp = TradingAgent::xml_description();
 
+   LOG(TRACE, boost::format("Recording max_memory for agent %d\n") % id);
+
    tmp("max_memory") = max_memory;
 
+   LOG(TRACE, boost::format("Recording sig_threshold for agent %d\n") % id);
+
    tmp("significance_threshold") = significance_threshold;
+
+   LOG(TRACE, boost::format("Recording trend_mode for agent %d\n") % id);
 
    tmp("trend_mode") = 
       (indeterminate(mean_reverter))?("NA"):(

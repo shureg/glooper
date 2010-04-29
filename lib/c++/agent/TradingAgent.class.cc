@@ -340,14 +340,23 @@ void TradingAgent::check_liquidity()
 
 XmlField TradingAgent::xml_description() const
 {
+
    XmlField tmp = Agent::xml_description();
+
+   LOG(TRACE, boost::format("Recording wealth for agent %d\n") % id);
 
    tmp("wealth") = wealth;
 
+   LOG(TRACE, boost::format("Recording position for agent %d\n") % id);
+
    tmp("position") = (double) pos;
+
+   LOG(TRACE, boost::format("Recording dip for agent %d\n") % id);
 
    tmp("desired_investment_proportion") =
       desired_investment_proportion();
+
+   LOG(TRACE, boost::format("Recording bankrupcy for agent %d\n") % id);
 
    tmp("is_bankrupt") = is_bankrupt;
    
