@@ -1,8 +1,7 @@
 *.o
 *.so
 *.a
-*.swp
-*.swn
+.*.sw*
 *~
 *.d
 install

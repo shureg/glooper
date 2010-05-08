@@ -35,7 +35,10 @@ namespace GLOOPER_TEST
       Market();
 
       //! Order processing method
-      void process_order(Order&);
+      /*! Returns true if a limit order has been places as a result
+       *  of order processing, false otherwise
+       */
+      const bool process_order(Order&);
 
       const std::set<Order,buyers_pick>&
 	 get_ask_orders() const;

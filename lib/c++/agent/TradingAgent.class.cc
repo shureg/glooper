@@ -185,40 +185,46 @@ void TradingAgent::place_order()
 		  % id % ctr++ % act.is_bid() % act.get_quantity() % act.get_price()
 		  );
 
-	    spot_mkt->process_order(act);
-	    
-	    order_status = order_is_bid();
+	    bool placed_limit = spot_mkt->process_order(act);
 
-	    if(!indeterminate(order_status))
+	    // if a limit order has been placed straight away stop
+	    if(placed_limit) stop = true;
+	    else
 	    {
-	       best = spot_mkt->best_order( (bool) order_status );
+	       order_status = order_is_bid();
 
-	       // if there are any opposing limit orders remaining, continue
-	       if(best != 0)
+	       if(!indeterminate(order_status))
 	       {
-		  dq = get_order_quantity( best->get_price() );
-		  if( (bool) order_status == !act.is_bid() && (dq.q != 0))
-		     LOG(WARNING, boost::format("Agent %d: order direction has been "\
-			      "reversed in the middle of executing an active order, "\
-			      "most recent order parameters: (%d) %d @ %.3f\n")
-			   % id % dq.is_long % dq.q % best->get_price()
-			   );
-	       }
-	       else
-	       {
-		  if(act.get_quantity() != 0)
+		  best = spot_mkt->best_order( (bool) order_status );
+
+		  // if there are any opposing limit orders remaining, continue
+		  if(best != 0)
 		  {
-		     LOG(TRACE, boost::format("Agent %d: active order has not been fully "\
-			      "executed, sending the remainder to the market: "\
-			      "(%d) %.0f @ %.3f\n")
-			   % id % act.is_bid() % act.get_quantity() % act.get_price()
-			   );
-		     spot_mkt->process_order(act);
+		     dq = get_order_quantity( best->get_price() );
+		     if( (bool) order_status == !act.is_bid() && (dq.q != 0))
+			LOG(WARNING, boost::format("Agent %d: order direction has been "\
+				 "reversed in the middle of executing an active order, "\
+				 "most recent order parameters: (%d) %d @ %.3f\n")
+			      % id % dq.is_long % dq.q % best->get_price()
+			      );
+		     stop = true;
 		  }
-		  stop = true;
+		  else
+		  {
+		     if(act.get_quantity() != 0)
+		     {
+			LOG(TRACE, boost::format("Agent %d: active order has not been fully "\
+				 "executed, sending the remainder to the market: "\
+				 "(%d) %.0f @ %.3f\n")
+			      % id % act.is_bid() % act.get_quantity() % act.get_price()
+			      );
+			spot_mkt->process_order(act);
+		     }
+		     stop = true;
+		  }
 	       }
+	       else stop = true;
 	    }
-	    else stop = true;
 	 }
       }
       else

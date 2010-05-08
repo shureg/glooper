@@ -44,10 +44,14 @@ const bool Market::is_crossing_limit_order(const Order& r) const
    }
 }
 
-void Market::process_order(Order& r)
+const bool Market::process_order(Order& r)
 {
    //register incoming order
    SimulationObject::db_signal()(r);
+
+   //pre-set the return value
+   
+   bool ret_value = false;
 
    // A trade may occur
    if( r.is_market() xor is_crossing_limit_order(r) )
@@ -128,6 +132,7 @@ void Market::process_order(Order& r)
    else
    {
       add_limit_order(r);
+      ret_value = true;
    }
 
    double p_a(0.), p_b(0.);
@@ -162,6 +167,8 @@ void Market::process_order(Order& r)
    LOG(TRACE, boost::format("Market: ending the market object db "\
 	    "registration\n")
 	 );
+
+   return ret_value;
 
 }
 
