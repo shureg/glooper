@@ -70,6 +70,12 @@ namespace GLOOPER_TEST
 
       bool is_bankrupt;
 
+      mutable bool force_passive;
+
+   private:
+
+      boost::logic::tribool illiquid_market_order_status(double dip) const;
+
    };
 }
 
