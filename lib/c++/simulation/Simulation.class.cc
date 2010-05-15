@@ -177,15 +177,15 @@ void Simulation::simulate()
 
 	    current_context = step_context;
 
-	    dbi.set_autocommit(false);
+	    //dbi.set_autocommit(false);
 
-	    dbi.begin_transaction();
+	    //dbi.begin_transaction();
 
 	    process->evolve();
 
-	    dbi.commit_transaction();
+	    //dbi.commit_transaction();
 
-	    dbi.set_autocommit(true);
+	    //dbi.set_autocommit(true);
 
 	    ++step_ctr;
 	 }
