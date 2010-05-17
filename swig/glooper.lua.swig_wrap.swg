@@ -43,4 +43,23 @@ namespace GLOOPER_TEST
 	    kw.belief, kw.wealth, kw.mean_reversion, kw.max_memory, kw.significance_threshold, kw.lua_cfg_filename)
       end
    %}
+
+   %rename(_HomogeneousAgent) HomogeneousAgent;
+
+   class HomogeneousAgent: public Agent
+   {
+   public:
+      HomogeneousAgent(
+	    double belief, 
+	    unsigned long order_size,
+	    double spread);   
+   };
+
+   //Emulating keyword argument constructor for HomogeneousAgent
+   %luacode %{
+      function glooper_lua_swig_wrap.HomogeneousAgent(kw)
+	 return glooper_lua_swig_wrap._HomogeneousAgent(
+	    kw.belief, kw.order_size, kw.spread)
+      end
+   %}
 }

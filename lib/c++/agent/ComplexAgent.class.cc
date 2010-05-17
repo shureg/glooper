@@ -110,9 +110,18 @@ XmlField ComplexAgent::xml_description() const
 
    LOG(TRACE, boost::format("Recording trend_mode for agent %d\n") % id);
 
-   tmp("trend_mode") = 
-      (indeterminate(mean_reverter))?("NA"):(
-	    ((bool) mean_reverter)?("MR"):("TF"));
+   //tmp("trend_mode") = 
+   //   (indeterminate(mean_reverter))?("NA"):(
+	//    ((bool) mean_reverter)?("MR"):("TF"));
+
+   if(indeterminate(mean_reverter))
+      tmp("trend_mode") = "NA";
+   else if ( (bool) mean_reverter == true )
+      tmp("trend_mode") = "MR";
+   else
+      tmp("trend_mode") = "TF";
+
+   LOG(TRACE, boost::format("Finished recording trend_mode for agent %d\n") % id);
 
    return tmp;
 }

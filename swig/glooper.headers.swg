@@ -9,4 +9,5 @@
 #include "rng/generator/UniformGenerator.class.h"
 #include "agent/ClassicAgent.class.h"
 #include "agent/LuaComplexAgent.class.h"
+#include "agent/HomogeneousAgent.class.h"
 %}
