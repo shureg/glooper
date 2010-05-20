@@ -255,7 +255,7 @@ void TradingAgent::place_order()
 	       {
 		  dq = get_order_quantity( best->get_price() );
 		  if( (bool) order_status == !act.is_bid() && (dq.q != 0))
-		     LOG(WARNING, boost::format("Agent %d: order direction has been "\
+		     LOG(EXCEPTION, boost::format("Agent %d: order direction has been "\
 			      "reversed in the middle of executing an active order, "\
 			      "most recent order parameters: (%d) %d @ %.3f\n")
 			   % id % dq.is_long % dq.q % best->get_price()

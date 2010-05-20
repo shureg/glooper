@@ -13,3 +13,4 @@ swig/output
 *.pyc
 test
 *.orig
+cmd/python/err.log
