@@ -28,12 +28,12 @@ namespace GLOOPER_TEST
 
       StandardSimulation(const boost::shared_ptr<Process>&,
 	    const std::string&, 
-	    const SednaDBInterface&, const char*, 
+	    const char*, const char*, 
 	    unsigned long, unsigned long);
 
       StandardSimulation(const boost::shared_ptr<Process>&,
 	    const std::string&, 
-	    const SednaDBInterface&, unsigned long, 
+	    const char*, unsigned long, 
 	    unsigned long, unsigned long);
       
       const bool end_simulation() const;
