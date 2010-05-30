@@ -59,7 +59,7 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 #Simulation-related objects creation
 
-sim_comment = "50 MR Agents (full shift) + Beta info(2.5)" #raw_input("Provide a short description for simulation %d: " % simid)
+sim_comment = "500 MR Agents (full shift) + Beta info(2.5)" #raw_input("Provide a short description for simulation %d: " % simid)
 
 N_batches = 1
 

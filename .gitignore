@@ -14,3 +14,4 @@ swig/output
 test
 *.orig
 cmd/python/err.log
+cmd/python/nohup.out

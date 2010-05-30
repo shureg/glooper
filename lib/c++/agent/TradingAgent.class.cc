@@ -192,6 +192,8 @@ void TradingAgent::place_order()
 
    tribool order_status = order_is_bid();
 
+   tribool prev_order_status;
+
    if( !indeterminate(order_status) )
    {
       reset_orders();
@@ -244,7 +246,12 @@ void TradingAgent::place_order()
 
 	    spot_mkt->process_order(act);
 
+	    prev_order_status = order_status;
+
 	    order_status = order_is_bid();
+
+	    if( !indeterminate(order_status) && order_status == !prev_order_status )
+	       order_status = indeterminate;
 
 	    if(!indeterminate(order_status))
 	    {
