@@ -22,7 +22,8 @@ using GLOOPER_TEST::Agent;
 
 HomogeneousAgent::HomogeneousAgent(double belief, 
       unsigned long order_size, double spread):
-   Agent(belief), order_size(order_size), spread(spread)
+   Agent(belief), order_size(order_size), spread(spread),
+   spread_gen(RNG::UniformGenerator(spread/10.,spread))
 {}
 
 void HomogeneousAgent::update_belief(double xi)
@@ -83,7 +84,8 @@ void HomogeneousAgent::place_order()
 	 }
 	 else
 	 {
-	    double spf = ( bid ) ? ( 1./(1.+spread) ) : ( 1. + spread );
+	    double spf = ( bid ) ? 
+	       ( 1./(1.+spread_gen()) ) : ( 1. + spread_gen() );
 
 	    double p_ref = spot_mkt->mark_to_market( bid );
 	    double p_ord = spot_mkt->tick_adjusted_price( spf*p_ref );

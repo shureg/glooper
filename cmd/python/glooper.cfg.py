@@ -59,11 +59,11 @@ F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
 
 #Simulation-related objects creation
 
-sim_comment = "500 MR Agents (full shift) + Beta info(2.5)" #raw_input("Provide a short description for simulation %d: " % simid)
+sim_comment = "100 Hmg Agents + Triangular Info" #raw_input("Provide a short description for simulation %d: " % simid)
 
 N_batches = 1
 
-N_runs = 300
+N_runs = 200
 
 N_steps = 100
 
@@ -73,7 +73,7 @@ dbi = glooper.SednaDBInterface("SimulationDB","Bender Rodriguez","bmsma_DTAH1","
 
 mkt = glooper.Market()
 
-info = rng.BetaGenerator(2.5, 2.5)
+info = rng.TriangularGenerator(0,1,0.5)
 
 agt_gen = glooper.LuaAgentGenerator("agent.cfg.lua")
 

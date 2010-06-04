@@ -11,17 +11,20 @@ glooper = glooper_lua_swig_wrap
 rng = rng_lua_swig_wrap
 agt_gen = agent_generator
 
-agt_gen.agent_ctor = glooper.HomogeneousAgent
+agt_gen.agent_ctor = glooper.LuaComplexAgent
 
 agt_gen.generator_args = {
    belief = rng.UniformGenerator(),
+   wealth = rng.ParetoGenerator(10000,1.4)
 }
 
 agt_gen.non_generator_args = {
-   order_size = 100,
-   spread = 0.005,
+   mean_reversion = 1,
+   max_memory = 100,
+   significance_threshold = 20,
+   lua_cfg_filename = "lc_agt.cfg.lua"
 }
 
-agt_gen.N_agents = 100
+agt_gen.N_agents = 500
 
 generator = agt_gen.fixed_number_agent_generator

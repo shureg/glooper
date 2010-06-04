@@ -51,6 +51,8 @@ namespace GLOOPER_TEST
 
       double spread;
 
+      RNG::UniformGenerator spread_gen;
+
       const char* agent_type_str() const {return "HomogeneousAgent";}
 
       Agent* real_clone() const;
