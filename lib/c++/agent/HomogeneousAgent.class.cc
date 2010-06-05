@@ -21,9 +21,11 @@ using GLOOPER_TEST::HomogeneousAgent;
 using GLOOPER_TEST::Agent;
 
 HomogeneousAgent::HomogeneousAgent(double belief, 
-      unsigned long order_size, double spread):
-   Agent(belief), order_size(order_size), spread(spread),
-   spread_gen(RNG::UniformGenerator(spread/10.,spread))
+      unsigned long order_size, 
+      double min_spread, double max_spread):
+   Agent(belief), order_size(order_size), 
+   min_spread(min_spread), max_spread(max_spread),
+   spread_gen(RNG::UniformGenerator(min_spread,max_spread))
 {}
 
 void HomogeneousAgent::update_belief(double xi)
@@ -115,7 +117,8 @@ XmlField HomogeneousAgent::xml_description() const
    XmlField tmp = Agent::xml_description();
 
    tmp("order_size") = order_size;
-   tmp("spread") = spread;
+   tmp("min_spread") = min_spread;
+   tmp("max_spread") = max_spread;
 
    return tmp;
 }

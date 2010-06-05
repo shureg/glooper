@@ -19,7 +19,8 @@ agt_gen.generator_args = {
 
 agt_gen.non_generator_args = {
    order_size = 100,
-   spread = 0.005,
+   min_spread = 0.001,
+   max_spread = 0.05
 }
 
 agt_gen.N_agents = 100

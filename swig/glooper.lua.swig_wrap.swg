@@ -52,14 +52,15 @@ namespace GLOOPER_TEST
       HomogeneousAgent(
 	    double belief, 
 	    unsigned long order_size,
-	    double spread);   
+	    double min_spread,
+	    double max_spread);   
    };
 
    //Emulating keyword argument constructor for HomogeneousAgent
    %luacode %{
       function glooper_lua_swig_wrap.HomogeneousAgent(kw)
 	 return glooper_lua_swig_wrap._HomogeneousAgent(
-	    kw.belief, kw.order_size, kw.spread)
+	    kw.belief, kw.order_size, kw.min_spread, kw.max_spread)
       end
    %}
 }

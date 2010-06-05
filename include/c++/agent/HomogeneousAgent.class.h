@@ -29,7 +29,7 @@ namespace GLOOPER_TEST
       HomogeneousAgent(
 	    double belief, 
 	    unsigned long order_size,
-	    double spread);
+	    double min_spread, double max_spread);
 
       void update_belief(double);
 
@@ -49,7 +49,7 @@ namespace GLOOPER_TEST
 
       unsigned long order_size;
 
-      double spread;
+      double min_spread, max_spread;
 
       RNG::UniformGenerator spread_gen;
 
