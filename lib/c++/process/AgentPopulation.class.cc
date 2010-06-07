@@ -36,7 +36,7 @@ using XML_SERIALISATION::XmlSingleValue;
 using CALLBACK_LOG::LOG;
 
 AgentPopulation::AgentPopulation(
-      const boost::shared_ptr< TypedRandomGenerator<double> >& info_generator,
+      const boost::shared_ptr< InfoGenerator >& info_generator,
       const boost::shared_ptr< AgentGenerator >& agt_gen,
       const boost::shared_ptr< Market >& mkt):
    agt_gen(agt_gen),
@@ -86,8 +86,11 @@ void AgentPopulation::simulation_config()
    }
 
    XmlWrap ig("Information_Generator",*info_generator);
+=======
+   }
+>>>>>>> laptop
 
-   SimulationObject::db_signal()(ig);
+   SimulationObject::db_signal()(*info_generator);
 
    SimulationObject::db_signal()(*agt_gen);
 
@@ -109,6 +112,8 @@ void AgentPopulation::run_config()
 
    mkt->reset();
 
+   info_generator->reset();
+
    population = initial_population.clone();
 }
 
@@ -117,7 +122,7 @@ void AgentPopulation::evolve()
    LOG(INFO,boost::format(
 	    "Beginning turn %d\n") % turn_timer);
 
-   last_info = (*info_generator)();
+   last_info = info_generator->get_info(turn_timer);
 
    XmlSingleValue iv("Information","value",last_info,true);
    
@@ -131,7 +136,8 @@ void AgentPopulation::evolve()
    for(std::vector<unsigned int>::iterator 
 	 i = population_index.begin(); i != population_index.end(); ++i)
    {
-      population[*i].update_belief(last_info);
+      if(last_info >= 0. && last_info <= 1.)
+   population[*i].update_belief(last_info);
       if( population[*i].can_trade() )
 	 population[*i].place_order();
    }
