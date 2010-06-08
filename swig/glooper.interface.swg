@@ -24,6 +24,11 @@
    typedef boost::shared_ptr< RNG::TypedRandomGenerator<double> > bsp_TRGd;
 %}
 
+%inline
+%{
+   typedef boost::shared_ptr< RNG::TypedRandomGenerator<double> > bspTRGd;
+%}
+
 namespace GLOOPER_TEST
 {
    class SednaDBInterface
@@ -35,7 +40,7 @@ namespace GLOOPER_TEST
 	    const bool = true);
       
       void set_autocommit(const bool);
-};
+   };
 
    class Market: public SimulationObject
    {
@@ -44,11 +49,28 @@ namespace GLOOPER_TEST
       Market();
    };
 
+   class SimpleInfoGenerator: public InfoGenerator
+   {
+   public:
+
+      SimpleInfoGenerator(
+	    const bspTRGd& value_generator);
+   };
+
+   class RandomTimeInfoGenerator: public InfoGenerator
+   {
+   public:
+
+      RandomTimeInfoGenerator(
+	    const bspTRGd& value_generator,
+	    const bspTRGd& event_generator);
+   };
+   
    class AgentPopulation: public Process
    {
    public:
 
-      AgentPopulation(const bsp_TRGd&,
+      AgentPopulation(const boost::shared_ptr<GLOOPER_TEST::InfoGenerator>&,
 			const boost::shared_ptr<GLOOPER_TEST::AgentGenerator>&,
 			const boost::shared_ptr<Market>&);
    };

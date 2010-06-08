@@ -13,3 +13,9 @@ SWIG_SHARED_PTR(bspProcess, GLOOPER_TEST::Process)
 
 SWIG_SHARED_PTR_DERIVED(bspAgentPopulation, GLOOPER_TEST::Process, 
       GLOOPER_TEST::AgentPopulation)
+
+SWIG_SHARED_PTR_DERIVED(bspInfoGenerator, GLOOPER_TEST::SimulationObject, GLOOPER_TEST::InfoGenerator)
+
+SWIG_SHARED_PTR_DERIVED(bspSimpleInfoGenerator, GLOOPER_TEST::InfoGenerator, GLOOPER_TEST::SimpleInfoGenerator)
+
+SWIG_SHARED_PTR_DERIVED(bspRandomTimeInfoGenerator, GLOOPER_TEST::InfoGenerator, GLOOPER_TEST::RandomTimeInfoGenerator)

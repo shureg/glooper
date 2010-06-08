@@ -10,4 +10,7 @@
 #include "agent/ClassicAgent.class.h"
 #include "agent/LuaComplexAgent.class.h"
 #include "agent/HomogeneousAgent.class.h"
+#include "info/InfoGenerator.class.h"
+#include "info/SimpleInfoGenerator.class.h"
+#include "info/RandomTimeInfoGenerator.class.h"
 %}
