@@ -24,7 +24,7 @@
 #include <vector>
 
 typedef RNG::TypedRandomGenerator<double> TRGd;
-typedef boost::shared_ptr< TRG_d > bspTRGd;
+typedef boost::shared_ptr< TRGd > bspTRGd;
 
 namespace GLOOPER_TEST
 {

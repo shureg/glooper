@@ -23,6 +23,6 @@ agt_gen.non_generator_args = {
    max_spread = 0.05
 }
 
-agt_gen.N_agents = 100
+agt_gen.N_agents = 500
 
 generator = agt_gen.fixed_number_agent_generator

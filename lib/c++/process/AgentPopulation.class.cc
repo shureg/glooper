@@ -85,11 +85,6 @@ void AgentPopulation::simulation_config()
       population_index.push_back(p_ix++);
    }
 
-   XmlWrap ig("Information_Generator",*info_generator);
-=======
-   }
->>>>>>> laptop
-
    SimulationObject::db_signal()(*info_generator);
 
    SimulationObject::db_signal()(*agt_gen);

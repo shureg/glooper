@@ -109,13 +109,6 @@ LuaComplexAgent::LuaComplexAgent(double belief,
 
 LuaComplexAgent::~LuaComplexAgent()
 {
-<<<<<<< HEAD
-=======
-   luaL_unref(L,LUA_REGISTRYINDEX,bel_upd_luaref);
-   luaL_unref(L,LUA_REGISTRYINDEX,bel_adj_luaref);
-   luaL_unref(L,LUA_REGISTRYINDEX,spread_luaref);
-   lua_close(L);
->>>>>>> laptop
 }
 
 void LuaComplexAgent::update_belief(double xi)

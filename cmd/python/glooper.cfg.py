@@ -63,7 +63,7 @@ sim_comment = "100 Hmg Agents + Triangular Info" #raw_input("Provide a short des
 
 N_batches = 1
 
-N_runs = 200
+N_runs = 100
 
 N_steps = 100
 
