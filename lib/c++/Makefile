@@ -38,7 +38,7 @@ wrap:
 include lib.compile.mk
 
 $(DY_LIB_NAME): $(LIB_OBJECTS)
-	g++ -shared -Wl,-soname=$(DY_LIB_NAME) -o $(DY_LIB_NAME) $(LIB_DEP_FLAGS) $(LIB_DEP_PATH_FLAGS) $^
+	g++ -shared -pg -Wl,-soname=$(DY_LIB_NAME) -o $(DY_LIB_NAME) $(LIB_DEP_FLAGS) $(LIB_DEP_PATH_FLAGS) $^
 
 
 $(ST_LIB_NAME): $(LIB_OBJECTS)
