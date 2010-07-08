@@ -25,6 +25,6 @@ agt_gen.non_generator_args = {
    lua_cfg_filename = "lc_agt.cfg.lua"
 }
 
-agt_gen.N_agents = 500
+agt_gen.N_agents = 200
 
 generator = agt_gen.fixed_number_agent_generator

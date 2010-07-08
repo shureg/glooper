@@ -406,6 +406,20 @@ void TradingAgent::check_liquidity()
 XmlField TradingAgent::xml_description() const
 {
 
+   double iv, cip;
+
+   if( indeterminate(pos.is_long) )
+   {
+      iv = wealth;
+      cip = 0;
+   }
+   else
+   {
+      double m = mark_to_market();
+      iv = investment_value(m);
+      cip = current_investment_proportion(m);
+   }
+
    XmlField tmp = Agent::xml_description();
 
    LOG(TRACE, boost::format("Recording wealth for agent %d\n") % id);
@@ -416,10 +430,14 @@ XmlField TradingAgent::xml_description() const
 
    tmp("position") = (double) pos;
 
+   tmp("investment_value") = iv;
+
    LOG(TRACE, boost::format("Recording dip for agent %d\n") % id);
 
    tmp("desired_investment_proportion") =
       desired_investment_proportion();
+
+   tmp("current_investment_proportion") = cip;
 
    LOG(TRACE, boost::format("Recording bankrupcy for agent %d\n") % id);
 

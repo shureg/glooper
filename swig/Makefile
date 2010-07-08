@@ -70,7 +70,7 @@ $(OUTPUT_PATH)/$(MODULE).%.swig_wrap.so: WRAP_LIB_SO_NAME = $(DL_PREFIX)$(WRAP_M
 $(OUTPUT_PATH)/$(MODULE).%.swig_wrap.so: SWIG_RPATH_FLAG = $(if $(filter-out release,$(PROJECT_CONFIGURATION_TYPE)),$(,)-rpath=$(PROJECT_LIB_PATH),)
 
 $(OUTPUT_PATH)/$(MODULE).%.swig_wrap.so: $(OUTPUT_PATH)/$(MODULE).%.swig_wrap.o
-	g++ -shared -Wl,-soname=$@$(SWIG_RPATH_FLAG) -o $@ $< $(LIB_DEP_PATH_FLAGS) $(LIB_DEP_FLAGS)
+	g++ -pg -shared -Wl,-soname=$@$(SWIG_RPATH_FLAG) -o $@ $< $(LIB_DEP_PATH_FLAGS) $(LIB_DEP_FLAGS)
 	@$(call make_link,$(CURDIR)/$@,$(WRAP_LIB_SO_NAME))
 
 $(OUTPUT_PATH)/$(MODULE).%.swig_wrap.cc: $(MODULE).%.swig_wrap.swg
