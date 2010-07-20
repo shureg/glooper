@@ -31,7 +31,10 @@ double InfoGenerator::get_info(unsigned long turn_timer)
    double xi = -1.;
 
    if( generate_now(turn_timer) )
+   {
       xi = (*value_generator)();
+      actual_values.push_back(xi);
+   }
 
    info_values.push_back(xi);
 

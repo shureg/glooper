@@ -51,6 +51,9 @@ namespace GLOOPER_TEST
 
       std::vector<double> info_values;
 
+      //! A container for valid info values \f$\in [0,1]$\f
+      std::vector<double> actual_values;
+
    private:
 
       static unsigned long instance_ctr;
