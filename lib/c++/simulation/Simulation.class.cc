@@ -24,6 +24,7 @@
 using namespace GLOOPER_TEST;
 using namespace std;
 using XML_SERIALISATION::XmlSerialisableObject;
+using XML_SERIALISATION::XmlFile;
 
 unsigned long Simulation::external_instance_counter(const char* filename) const
 {
@@ -46,73 +47,84 @@ unsigned long Simulation::external_instance_counter(const char* filename) const
 
 void Simulation::db_insert_slot(const XmlSerialisableObject& so)
 {
-   ostringstream oss;
-
    XmlField tmp = so.xml_description();
 
    tmp("registration_timer") = ++registration_timer;
 
-   oss << tmp;
+   if( current_file == 0 )
+      LOG(EXCEPTION, boost::format("output XmlFile object not set\n") );
 
-   dbi.insert(oss.str(),current_context);
+   current_file->insert(tmp);
 }
 
 Simulation::Simulation(const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
-      const SednaDBInterface& _dbi,
+      const char* base_path,
       const char* external_counter_filename): 
    SimulationObject(external_instance_counter(external_counter_filename)),
-   comment(_comment), process(_process), dbi(_dbi),
+   comment(_comment), base_path(base_path), process(_process),
    batch_ctr(0), run_ctr(0), step_ctr(0),
-   registration_timer(0), simulation_timer(0)
+   registration_timer(0), current_file(0)
 {
-   dbi.open_connection();
+
+   sim_file.assign(sim_string(),"Simulation");
 
    SimulationObject::db_signal().connect( 
 	 boost::bind(&Simulation::db_insert_slot,this,_1) );
 
-   current_context = dbi.default_context();
+   current_file = &sim_file;
 
    SimulationObject::db_signal()(*this);
 }
 
 Simulation::Simulation(const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
-      const SednaDBInterface& _dbi,
+      const char* base_path,
       unsigned long _id): 
    SimulationObject(_id),
-   comment(_comment), process(_process), dbi(_dbi),
+   comment(_comment), base_path(base_path), process(_process),
    batch_ctr(0), run_ctr(0), step_ctr(0),
-   registration_timer(0), simulation_timer(0)
+   registration_timer(0), current_file(0)
 {
-   dbi.open_connection();
 
-   dbi.set_autocommit(true);
+   sim_file.assign(sim_string(),"Simulation");
 
    SimulationObject::db_signal().connect( 
 	 boost::bind(&Simulation::db_insert_slot,this,_1) );
 
-   current_context = dbi.default_context();
+   current_file = &sim_file;
 
    SimulationObject::db_signal()(*this);
 }
 
 Simulation::~Simulation()
 {
-   delete simulation_timer;
+}
+
+const string Simulation::sim_string() const
+{
+   return ( boost::format("%s/sim.%d.xml") % base_path % id ).str();
+}
+
+const string Simulation::batch_string() const
+{
+   return ( boost::format("%s/sim.%d.%d.xml") % base_path % id % batch_ctr ).str();
+}
+
+const string Simulation::run_string() const
+{
+   return ( boost::format("%s/sim.%d.%d.%d.xml") % base_path % id % batch_ctr % run_ctr ).str();
+}
+
+const string Simulation::step_string() const
+{
+   return ( boost::format("%s/sim.%d.%d.%d.%d.xml") 
+	 % base_path % id % batch_ctr % run_ctr % step_ctr ).str();
 }
 
 void Simulation::simulate()
 {
-   dbi.set_autocommit(true);
-
-   simulation_timer = new boost::timer;
-
-   string simulation_context = 
-      dbi.default_context() + 
-      (boost::format("/Simulation[@id=%d]") % id).str();
-   
-   current_context = simulation_context;
+   current_file = &sim_file;
 
    process->simulation_config();
 
@@ -120,16 +132,9 @@ void Simulation::simulate()
 
    while( !end_simulation() )
    {
-      XmlField batch("Batch");
-      batch("id") = batch_ctr;
-      batch("context_id") = (boost::format("%d.%d") % id % batch_ctr).str();
+      batch_file.assign(batch_string(),"Batch");
 
-      dbi.insert((const string) batch,simulation_context);
-
-      string batch_context = simulation_context +
-	 (boost::format("/Batch[@id=%d]") % batch_ctr).str();
-
-      current_context = batch_context;
+      current_file = &batch_file;
 
       LOG(INFO,boost::format("Beginning batch %d\n") % batch_ctr );
       
@@ -139,17 +144,9 @@ void Simulation::simulate()
 
       while( !end_batch() )
       {
-	 XmlField run("Run");
-	 run("id") = run_ctr;
-	 run("context_id") = 
-	    (boost::format("%d.%d.%d") % id % batch_ctr % run_ctr).str();
+	 run_file.assign(run_string(),"Run");
 
-	 dbi.insert((const string) run, batch_context);
-
-	 string run_context = batch_context +
-	    (boost::format("/Run[@id=%d]") % run_ctr).str();
-
-	 current_context = run_context;
+	 current_file = &run_file;
 
 	 LOG(INFO,boost::format("Beginning run %d\n") % run_ctr );
 
@@ -161,36 +158,20 @@ void Simulation::simulate()
 
 	 while( !end_run() )
 	 {
-	    XmlField step("Step");
-	    step("id") = step_ctr;
-	    step("context_id") = 
-	       (boost::format("%d.%d.%d.%d") 
-	       % id % batch_ctr % run_ctr % step_ctr).str(); 
+	    step_file.assign(step_string(),"Step");
 
-	    dbi.insert((const string) step, run_context);
-
-	    string step_context = 
-	       (boost::format(
-	       "index-scan(\"step_context\",\"%s\",\"EQ\")") 
-		% (const string) step("context_id")
-		  ).str();
-
-	    current_context = step_context;
-
-	    //dbi.set_autocommit(false);
-
-	    //dbi.begin_transaction();
+	    current_file = &step_file;
 
 	    process->evolve();
 
-	    //dbi.commit_transaction();
-
-	    //dbi.set_autocommit(true);
+	    step_file.commit();
 
 	    ++step_ctr;
 	 }
 
 	 LOG(INFO,boost::format("Ending run %d\n") % run_ctr );
+
+	 run_file.commit();
 
 	 ++run_ctr;
       }
@@ -199,12 +180,16 @@ void Simulation::simulate()
 
       batch_run_structure.push_back(run_ctr);
 
+      batch_file.commit();
+
       ++batch_ctr;
    }
 
-   current_context = simulation_context;
+   current_file = &sim_file;
 
    simulation_cleanup();
+
+   sim_file.commit();
 }
 
 const vector<unsigned long>& Simulation::get_batch_run_structure() const
@@ -214,10 +199,6 @@ const vector<unsigned long>& Simulation::get_batch_run_structure() const
 
 void Simulation::simulation_cleanup()
 {
-   string attr_fmt = (boost::format("attribute %s {%f}")
-      % "simulation_time" % ( simulation_timer->elapsed() ))
-      .str();
-   dbi.insert(attr_fmt, current_context);
 }
 
 XmlField Simulation::xml_description() const

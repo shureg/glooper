@@ -22,18 +22,18 @@ using namespace std;
 StandardSimulation::StandardSimulation(
       const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
-      const SednaDBInterface& _dbi, const char* _efn,
+      const char* base_path, const char* _efn,
       unsigned long _N_batches, unsigned long _N_runs):
-   Simulation(_process,_comment,_dbi,_efn), 
+   Simulation(_process,_comment,base_path,_efn), 
    N_batches(_N_batches), N_runs(_N_runs)
 {}
 
 StandardSimulation::StandardSimulation(
       const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
-      const SednaDBInterface& _dbi, unsigned long _id,
+      const char* base_path, unsigned long _id,
       unsigned long _N_batches, unsigned long _N_runs):
-   Simulation(_process,_comment,_dbi,_id), 
+   Simulation(_process,_comment,base_path,_id), 
    N_batches(_N_batches), N_runs(_N_runs)
 {}
 

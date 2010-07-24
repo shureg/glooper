@@ -19,8 +19,7 @@
 
 #include "boost/shared_ptr.hpp"
 #include "core/SimulationObject.class.h"
-#include "db/SednaDBInterface.class.h"
-#include "boost/timer.hpp"
+#include "xml_serialisation/XmlFile.class.h"
 #include <vector>
 
 namespace GLOOPER_TEST
@@ -32,10 +31,10 @@ namespace GLOOPER_TEST
    public:
 
       Simulation(const boost::shared_ptr<Process>&,
-	    const std::string&, const SednaDBInterface&, const char*);
+	    const std::string&, const char*, const char*);
 
       Simulation(const boost::shared_ptr<Process>&,
-	    const std::string&, const SednaDBInterface&, unsigned long);
+	    const std::string&, const char*, unsigned long);
 
       ~Simulation();
 
@@ -55,9 +54,9 @@ namespace GLOOPER_TEST
 
       const std::string comment;
 
-      boost::shared_ptr<Process> process;
+      const char* base_path;
 
-      SednaDBInterface dbi;
+      boost::shared_ptr<Process> process;
 
       unsigned long batch_ctr;
 
@@ -65,21 +64,36 @@ namespace GLOOPER_TEST
 
       unsigned long step_ctr;
 
-      unsigned long external_instance_counter(const char*) const;
+      XML_SERIALISATION::XmlFile sim_file;
 
-      std::string current_context;
+      XML_SERIALISATION::XmlFile batch_file;
+
+      XML_SERIALISATION::XmlFile run_file;
+
+      XML_SERIALISATION::XmlFile step_file;
+
+      unsigned long external_instance_counter(const char*) const;
 
       unsigned long registration_timer;
 
-      boost::timer* simulation_timer;
+      XML_SERIALISATION::XmlFile* current_file;
 
       void simulation_cleanup();
-
-      void add_registration_data(XML_SERIALISATION::XmlField&);
 
       void db_insert_slot(const XML_SERIALISATION::XmlSerialisableObject&);
 
       std::vector<unsigned long> batch_run_structure;
+
+   private:
+
+      const std::string sim_string() const;
+
+      const std::string batch_string() const;
+
+      const std::string run_string() const;
+
+      const std::string step_string() const;
+
    };
 }
 
