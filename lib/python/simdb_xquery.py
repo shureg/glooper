@@ -70,14 +70,21 @@ agt_labels = [
       ('position','@position'),
       ('type','@type'),
       ('des_inv_prop','@desired_investment_proportion'),
+      ('cur_inv_prop','@current_investment_proportion'),
+      ('inv_value','@investment_value'),
+      ('bankrupt','@is_bankrupt'),
+#ClassicAgent attributes
       ('min_rev_prob','@minimum_revision_probability'),
       ('min_bel_adj_prop','@minimum_belief_adjustment_proportion'),
       ('max_bid_ask','@maximum_bid-ask_spread'),
-      ('bankrupt','@is_bankrupt')
+#LuaComplexAgent attributes
+      ('trend_mode','@trend_mode'),
+      ('max_memory','@max_memory'),
+      ('sig_threshold','@significance_threshold')
       ]
 
 agt_csv_labels = ', '.join( map( lambda x: '"%s"' % x[0],agt_labels ) )
-agt_xpath_labels = ', '.join( map( lambda x: "data($agt/%s)" % x[1],agt_labels ) )
+agt_xpath_labels = ', '.join( map( lambda x: "string(data($agt/%s))" % x[1],agt_labels ) )
 
 agt_label_dict = {'agt_csv': agt_csv_labels, 'agt_xpath': agt_xpath_labels}
 
