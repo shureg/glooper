@@ -15,6 +15,8 @@ SEDNA_C_PATH = /simulation_data/sedna/driver/c
 
 PROJECT_WRAP_PATH = $(CURDIR)/swig
 
+TEST_DIR := $(PROJECT_CMD_PATH)/unit_test
+
 export BOOST_INCLUDE_PATH
 
 export SEDNA_C_PATH

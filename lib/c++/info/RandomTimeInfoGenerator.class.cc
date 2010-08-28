@@ -17,6 +17,7 @@
 #include "info/RandomTimeInfoGenerator.class.h"
 
 using GLOOPER_TEST::RandomTimeInfoGenerator;
+using GLOOPER_TEST::InfoGenerator;
 
 RandomTimeInfoGenerator::RandomTimeInfoGenerator(
       const bspTRGd& value_generator,
@@ -28,4 +29,11 @@ RandomTimeInfoGenerator::RandomTimeInfoGenerator(
 const bool RandomTimeInfoGenerator::generate_now(unsigned long turn_timer)
 {
    return ( U() <= (*event_generator)() );
+}
+
+InfoGenerator* RandomTimeInfoGenerator::real_clone() const
+{
+   RandomTimeInfoGenerator* tmp = new RandomTimeInfoGenerator(*this);
+
+   return (InfoGenerator*) tmp;
 }

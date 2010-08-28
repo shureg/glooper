@@ -18,14 +18,29 @@
 
 using namespace GLOOPER_TEST;
 
-boost::signal<void (const XmlSerialisableObject&) >& SimulationObject::db_signal()
+db_sig_ptr_type SimulationObject::sig_ptr;
+
+db_sig_type& SimulationObject::db_signal()
 {
-   static boost::signal< void(const XmlSerialisableObject&) > tmp;
-   return tmp;
+   return *(SimulationObject::sig_ptr.get());
 }
 
 SimulationObject::SimulationObject(unsigned long _id): id(_id)
-{}
+{
+   init_sig_ptr();
+}
+
+void SimulationObject::init_sig_ptr()
+{
+   if(sig_ptr.get() == 0)
+   {
+      LOG(TRACE, boost::format(
+	       "Assigning thread-specific signal ptr for thread %s\n")
+	    % (boost::this_thread::get_id())
+	    );
+      sig_ptr.reset(new db_sig_type);
+   }
+}
 
 unsigned long SimulationObject::get_id() const
 {

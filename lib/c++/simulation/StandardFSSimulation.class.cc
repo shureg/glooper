@@ -23,9 +23,11 @@ StandardFSSimulation::StandardFSSimulation(
       const boost::shared_ptr<Process>& _process,
       const string& _comment,
       const char* base_path, const char* _efn,
+      const boost::shared_ptr<TableDBInterface>& tdb,
       unsigned long _N_batches, unsigned long _N_runs,
       unsigned long _N_steps):
-   StandardSimulation(_process,_comment,base_path,_efn,_N_batches,_N_runs),
+   StandardSimulation(_process,_comment,base_path,
+	 _efn,tdb,_N_batches,_N_runs),
    N_steps(_N_steps)
 {}
 
@@ -33,15 +35,17 @@ StandardFSSimulation::StandardFSSimulation(
       const boost::shared_ptr<Process>& _process,
       const string& _comment,
       const char* base_path, unsigned long _id,
+      const boost::shared_ptr<TableDBInterface>& tdb,
       unsigned long _N_batches, unsigned long _N_runs,
       unsigned long _N_steps):
-   StandardSimulation(_process,_comment,base_path,_id,_N_batches,_N_runs),
+   StandardSimulation(_process,_comment,base_path,
+	 _id,tdb,_N_batches,_N_runs),
    N_steps(_N_steps)
 {}
 
 const bool StandardFSSimulation::end_run() const
 {
-   return ( step_ctr >= N_steps );
+   return ( current_run->step_ctr >= N_steps );
 }
 
 XmlField StandardFSSimulation::xml_description() const

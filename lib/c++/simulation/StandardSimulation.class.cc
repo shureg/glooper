@@ -23,8 +23,9 @@ StandardSimulation::StandardSimulation(
       const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
       const char* base_path, const char* _efn,
+      const boost::shared_ptr<TableDBInterface>& tdb,
       unsigned long _N_batches, unsigned long _N_runs):
-   Simulation(_process,_comment,base_path,_efn), 
+   Simulation(_process,_comment,base_path,tdb,_efn), 
    N_batches(_N_batches), N_runs(_N_runs)
 {}
 
@@ -32,8 +33,9 @@ StandardSimulation::StandardSimulation(
       const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
       const char* base_path, unsigned long _id,
+      const boost::shared_ptr<TableDBInterface>& tdb,
       unsigned long _N_batches, unsigned long _N_runs):
-   Simulation(_process,_comment,base_path,_id), 
+   Simulation(_process,_comment,base_path,tdb,_id), 
    N_batches(_N_batches), N_runs(_N_runs)
 {}
 

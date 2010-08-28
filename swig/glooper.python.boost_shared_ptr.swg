@@ -11,6 +11,8 @@ SWIG_SHARED_PTR_DERIVED(bspLuaAgentGenerator, GLOOPER_TEST::AgentGenerator,
 
 SWIG_SHARED_PTR(bspProcess, GLOOPER_TEST::Process)
 
+SWIG_SHARED_PTR(bspTableDBInterface, GLOOPER_TEST::TableDBInterface)
+
 SWIG_SHARED_PTR_DERIVED(bspAgentPopulation, GLOOPER_TEST::Process, 
       GLOOPER_TEST::AgentPopulation)
 

@@ -46,7 +46,11 @@ namespace GLOOPER_TEST
 
       XmlField xml_description() const;
 
+      void reconfigure();
+
    protected:
+
+      const char* lua_cfg_filename;
 
       lua_State* L;
 

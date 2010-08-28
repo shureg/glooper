@@ -31,7 +31,17 @@ namespace GLOOPER_TEST
 
       virtual void run_config() = 0;
 
+      virtual void thread_config() = 0;
+
+      Process* clone() const;
+
+      Process* thread_space_clone() const;
+
       virtual ~Process(){}
+
+   protected:
+
+      virtual Process* real_clone() const = 0;
    };
 }
 

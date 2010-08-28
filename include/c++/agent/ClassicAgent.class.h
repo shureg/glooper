@@ -39,7 +39,7 @@ namespace GLOOPER_TEST
 
       void update_belief(double);
 
-      void init(){}
+      void reconfigure(){}
 
    protected:
 

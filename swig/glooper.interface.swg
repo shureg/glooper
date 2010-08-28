@@ -1,4 +1,5 @@
 %import "rng/rng.python.swig_wrap.swg"
+%import "callback_log/callback_log.python.swig_wrap.swg"
 
 %include "cstring.i"
 %include "std_string.i"
@@ -42,6 +43,13 @@ namespace GLOOPER_TEST
       void set_autocommit(const bool);
    };
 
+   class TableDBInterface
+   {
+   public:
+
+      TableDBInterface(const char* lua_cfg_file, const char* outdir);
+   };
+
    class Market: public SimulationObject
    {
    public:
@@ -73,6 +81,12 @@ namespace GLOOPER_TEST
       AgentPopulation(const boost::shared_ptr<GLOOPER_TEST::InfoGenerator>&,
 			const boost::shared_ptr<GLOOPER_TEST::AgentGenerator>&,
 			const boost::shared_ptr<Market>&);
+
+      const std::string agt_gen_description(const std::string& fmt) const;
+
+      const std::string info_description(const std::string& fmt) const;
+
+      const std::string mkt_description(const std::string& fmt) const;
    };
 
    class LuaAgentGenerator: public AgentGenerator
@@ -80,6 +94,8 @@ namespace GLOOPER_TEST
    public:
 
       LuaAgentGenerator(const char* cfg_filename);
+
+      size_t population_size() const;
 
    };
 
@@ -90,18 +106,26 @@ namespace GLOOPER_TEST
       StandardFSSimulation(const boost::shared_ptr<GLOOPER_TEST::Process>&,
 	    const std::string&, 
 	    const char*, const char*,
+	    const boost::shared_ptr<GLOOPER_TEST::TableDBInterface>&,
 	    unsigned long, unsigned long,
 	    unsigned long);
 
       StandardFSSimulation(const boost::shared_ptr<GLOOPER_TEST::Process>&,
 	    const std::string&, 
 	    const char*, unsigned long,
+	    const boost::shared_ptr<GLOOPER_TEST::TableDBInterface>&,
 	    unsigned long, unsigned long,
 	    unsigned long);
       
       void simulate();
 
+      void set_N_threads(const unsigned long);
+
+      void set_log_ptr(const boost::shared_ptr<CALLBACK_LOG::CallbackLog>&);
+
       const std::vector<unsigned long>& get_batch_run_structure() const;
+
+      unsigned long get_total_step_count() const;
 
    };
 

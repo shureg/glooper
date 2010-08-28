@@ -64,11 +64,15 @@ namespace GLOOPER_TEST
 
       void check_liquidity();
 
+      void check_leverage();
+
       void reset_orders();
 
       boost::logic::tribool order_is_bid() const;
 
       bool is_bankrupt;
+
+      bool is_overleveraged;
 
       mutable bool force_passive;
 

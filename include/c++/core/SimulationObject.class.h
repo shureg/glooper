@@ -18,12 +18,18 @@
 #define  _GLT_SIMULATIONOBJECT_CLASS_INC
 
 #include "xml_serialisation/XmlSerialisableObject.class.h"
-#include "boost/signals.hpp"
+#include "boost/signals2.hpp"
 #include <algorithm>
 #include "boost/bind.hpp"
+#include "boost/thread.hpp"
 
 using XML_SERIALISATION::XmlSerialisableObject;
 using XML_SERIALISATION::XmlField;
+
+typedef boost::signals2::signal< void(const XmlSerialisableObject&) >
+   db_sig_type;
+
+typedef boost::thread_specific_ptr< db_sig_type > db_sig_ptr_type;
 
 namespace GLOOPER_TEST
 {
@@ -33,16 +39,19 @@ namespace GLOOPER_TEST
 
       SimulationObject(unsigned long);
 
-      static boost::signal <void (const XmlSerialisableObject&) >& 
-	 db_signal();
+      static db_sig_type& db_signal();
 
       template<class CONT> void db_container_signal(const CONT&);
 
       unsigned long get_id() const;
 
+      static void init_sig_ptr();
+
    protected:
 
       unsigned long id;
+
+      static db_sig_ptr_type sig_ptr;
 
    };
 

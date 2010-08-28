@@ -39,7 +39,7 @@ namespace GLOOPER_TEST
 
       bool can_trade(){return true;}
 
-      void init(){}
+      void reconfigure(){}
 
       XmlField xml_description() const;
 

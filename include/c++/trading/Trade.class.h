@@ -18,6 +18,7 @@
 #define  TRADE_CLASS_INC_INC
 
 #include"core/SimulationObject.class.h"
+#include"utility/thread_wrap.class.hpp"
 
 namespace GLOOPER_TEST
 {
@@ -42,7 +43,7 @@ namespace GLOOPER_TEST
 
    protected:
 
-      static unsigned long instance_ctr;
+      static thread_wrap<unsigned long> instance_ctr;
 
    private:
 

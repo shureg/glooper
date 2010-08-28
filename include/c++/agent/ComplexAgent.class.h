@@ -28,7 +28,10 @@
 #include "boost/logic/tribool.hpp"
 #include <cmath>
 
-#include "boost/signals.hpp"
+#include "boost/signals2.hpp"
+
+#include <set>
+#include <deque>
 
 namespace GLOOPER_TEST
 {
@@ -36,6 +39,7 @@ namespace GLOOPER_TEST
    {
       double p0,p1;
       double ratio;
+      std::multiset<double>::iterator where;
 
       price_change(double _p0, double _p1):
 	 p0(_p0),p1(_p1),ratio(p1/p0)
@@ -43,9 +47,9 @@ namespace GLOOPER_TEST
    };
 
    using namespace boost;
-   using namespace boost::multi_index;
+   //using namespace boost::multi_index;
 
-   typedef multi_index_container< price_change,
+   /*typedef multi_index_container< price_change,
 	   indexed_by< 
 	      ordered_non_unique<
 	      member<
@@ -55,7 +59,7 @@ namespace GLOOPER_TEST
 	    > price_history;
 
    typedef price_history::nth_index<0>::type multiset_index;
-   typedef price_history::nth_index<1>::type list_index;
+   typedef price_history::nth_index<1>::type list_index;*/
 
    extern const boost::logic::tribool neither;
 
@@ -73,14 +77,17 @@ namespace GLOOPER_TEST
 
       XmlField xml_description() const;
 
-      void init();
+      void reconfigure();
 
    protected:
 
-      price_history return_distribution;
+      //price_history return_distribution;
 
-      multiset_index& distr_byvalue;
-      list_index& distr_bytime;
+      //multiset_index& distr_byvalue;
+      //list_index& distr_bytime;
+      
+      std::multiset<double> distr_byvalue;
+      std::deque<price_change> distr_bytime;
 
       boost::logic::tribool mean_reverter;
 
@@ -104,7 +111,7 @@ namespace GLOOPER_TEST
 
    private:
 
-      boost::signals::connection market_broadcast_conn;
+      boost::signals2::connection market_broadcast_conn;
    };
 }
 

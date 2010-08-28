@@ -33,6 +33,8 @@ namespace GLOOPER_TEST
       const bool generate_now(unsigned long){return true;}
 
       const char* info_generator_type() const {return "SimpleInfoGenerator";}
+
+      InfoGenerator* real_clone() const;
    };
 }
 

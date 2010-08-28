@@ -41,6 +41,8 @@ namespace GLOOPER_TEST
 
       XmlField xml_description() const;
 
+      InfoGenerator* clone() const;
+
    protected:
 
       virtual const bool generate_now(unsigned long turn_timer) = 0;
@@ -53,6 +55,8 @@ namespace GLOOPER_TEST
 
       //! A container for valid info values \f$\in [0,1]$\f
       std::vector<double> actual_values;
+
+      virtual InfoGenerator* real_clone() const = 0;
 
    private:
 

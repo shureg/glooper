@@ -44,7 +44,7 @@ install:
 	     install -Dv $(PROJECT_INCLUDE_PATH)/$$h $(INSTALL_PREFIX)/include/$(PROJECT_NAME)/$$h; \
 	   done
 
-test: install
+test: lib
 	$(MAKE) --directory=$(TEST_DIR)
 
 .PHONY: lib cmd wrap

@@ -46,6 +46,11 @@ void InfoGenerator::reset()
    info_values.clear();
 }
 
+InfoGenerator* InfoGenerator::clone() const
+{
+   return real_clone();
+}
+
 XmlField InfoGenerator::xml_description() const
 {
    XmlField tmp("Information.Generator");

@@ -23,7 +23,7 @@
 
 namespace GLOOPER_TEST
 {
-   typedef boost::signal< unsigned long () > timer_signal;
+   typedef boost::signals2::signal< unsigned long () > timer_signal;
 
    class Agent: public SimulationObject
    {
@@ -53,7 +53,7 @@ namespace GLOOPER_TEST
       
       Agent& set_ro_timer(const boost::shared_ptr< timer_signal >&);
 
-      virtual void init() = 0;
+      virtual void reconfigure() = 0;
 
    protected:
 

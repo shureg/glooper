@@ -25,8 +25,20 @@ LuaComplexAgent::LuaComplexAgent(double belief,
       unsigned long max_memory,
       unsigned long significance_threshold,
       const char* lua_cfg_filename): 
-   ComplexAgent(belief,wealth,mean_reversion,max_memory,significance_threshold)
+   ComplexAgent(belief,wealth,mean_reversion,max_memory,significance_threshold), lua_cfg_filename(lua_cfg_filename), L(0)
 {
+}
+
+LuaComplexAgent::~LuaComplexAgent()
+{
+}
+
+void LuaComplexAgent::reconfigure()
+{
+   ComplexAgent::reconfigure();
+   
+   //if(L!=0) lua_close(L);
+
    L = luaL_newstate();
    luaL_openlibs(L);
    luaL_dofile(L,lua_cfg_filename);
@@ -96,19 +108,6 @@ LuaComplexAgent::LuaComplexAgent(double belief,
    spread_luaref = luaL_ref(L,LUA_REGISTRYINDEX);
    
    obj_ref = luaL_ref(L,LUA_REGISTRYINDEX);
-
-//   std::ifstream ifs(lua_cfg_filename);
-
-//   std::istreambuf_iterator<char> f_begin(ifs);
-//   std::istreambuf_iterator<char> f_end;
-
-//   lua_cfg_file_content = std::string(f_begin,f_end);
-
-//   ifs.close();
-}
-
-LuaComplexAgent::~LuaComplexAgent()
-{
 }
 
 void LuaComplexAgent::update_belief(double xi)

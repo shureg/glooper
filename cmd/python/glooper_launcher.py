@@ -3,10 +3,16 @@
 import os
 import sedna
 import sys
+import datetime
 
 try:
 
-   os.system("se_sm SimulationDB")
+   #os.system("se_sm SimulationDB")
+
+   custom_settings_file = None
+
+   if len(sys.argv) > 1:
+      custom_settings_file = str( sys.argv[1] )
 
    execfile("glooper.cfg.py")
 
@@ -14,73 +20,73 @@ try:
 
    cbl.log(cbl.INFO,"Beginning simulation %d\n" % simid)
 
+   t0 = datetime.datetime.now()
+
    sim.simulate()
 
-#Simulation data post-processing
+   t1 = datetime.datetime.now()
 
-   if post_process:
+   cbl.log(cbl.INFO,"Ending simulation %d\n" % simid)
 
-      cbl.log(cbl.INFO,"Simulation complete, beginning post-processing\n")
+#Statistical post-processing
+   
+   batch_run_structure = sim.get_batch_run_structure()
 
-      root_datadir = os.path.join(DATA_PATH,version_string,str(simid))
-      csv_datadir = os.path.join(DATA_PATH,version_string,str(simid),"csv")
+   brs_vector_filename = os.path.join(DATA_PATH,version_string,str(simid),"brs.vector")
 
-      os.system("mkdir -pv %s" % root_datadir)
-      os.system("mkdir -pv %s" % csv_datadir)
+   brs_vector_file = open(brs_vector_filename,'w')
 
-      query_labels = post_process
+   brs_vector_file.write( '\n'.join( map(lambda z: str(z), batch_run_structure)) )
 
-      for ql in query_labels:
-	 os.system("mkdir -pv %s" % os.path.join(DATA_PATH,version_string,str(simid),"csv",ql))
+   brs_vector_file.close()
 
-      conn = None
+   cbl.log(cbl.INFO,"Beginning statistical post-processing for simulation %d" % simid)
 
-      batch_run_structure = sim.get_batch_run_structure()
+   os.chdir(STATS_PATH)
 
-      nb = len(batch_run_structure)
+   os.system("R --slave --no-save --no-restore --args %s %d < process.R" % (os.path.join(DATA_PATH,version_string), simid) )
 
-      brs_vector_filename = os.path.join(DATA_PATH,version_string,str(simid),"brs.vector")
+   cbl.log(cbl.INFO,"Statistical post-processing for simulation %d complete" % simid)
 
-      brs_vector_file = open(brs_vector_filename,'w')
+#Register simulation-specific information
 
-      brs_vector_file.write( '\n'.join( map(lambda z: str(z), batch_run_structure)) )
+   cbl.log(cbl.INFO,"Beginning registration for simulation %d\n" % simid)
+   
+   sim_reg_file = os.path.join(DATA_PATH,"simulation_registry.csv")
+   if not os.path.exists(sim_reg_file):
+      srf = open(sim_reg_file,'w')
+      srf.write( ','.join( 
+	 ['library_version','simulation_id','threads','total_batches','total_runs','total_steps','runs_per_batch','steps_per_run','agents',
+	    'comment','multibatch_cfg_file','info_generator','agent_generators','market',
+	    'data_path','log_path','log_based_runtime_seconds','log_based_runtime_str','timestamp']) + '\n' )
+      srf.close()
 
-      brs_vector_file.close()
+   tsc = sim.get_total_step_count();
 
-      sys.path.append(XQUERY_LIB_PATH)
+   agt_count = agt_gen.population_size();
 
-      import simdb_xquery
+   nb = len(batch_run_structure)
 
-      # Connect to the SimulationDB database which is located on localhost
-      conn = sedna.SednaConnection('localhost', 'SimulationDB','SYSTEM','MANAGER')
-      cbl.log(cbl.INFO,"Connection to SimulationDB has been successfully established\n")
+   nr = sum(batch_run_structure)
 
-      # Execute query ...
-      for b_id in xrange(nb):
-	 for r_id in xrange(batch_run_structure[b_id]):
-	    for ql in query_labels:
-	       xq_dict = {"xq_label": ql, "xpath_root": 'doc("SimulationDB")/SimulationData', "sim_id": simid, "bat_id": b_id, "run_id": r_id}
-	       cbl.log(cbl.INFO,"Starting xquery for label %(xq_label)s for batch %(bat_id)d, run id %(run_id)d\n" % xq_dict)
-	       conn.beginTransaction()
-	       conn.execute( simdb_xquery.get_xquery(xq_dict) )
-	       outfilename = os.path.join(csv_datadir,ql,"%(xq_label)s.%(sim_id)d.%(bat_id)d.%(run_id)d.csv" % xq_dict)
-	       cbl.log(cbl.INFO,"Writing query result to file %s\n" % outfilename)
-	       outfile = open(outfilename,'w') 
-	       for res in conn.resultSequence():
-		  outfile.write(res)
-	       conn.endTransaction('commit')
+   rt = t1 - t0;
 
-      # Check connection status and close it
-      if conn != None and conn.status() == 'ok':
-	 conn.close()
+   srf = open(sim_reg_file,'a')
 
-      cbl.log(cbl.INFO,"Simulation %d post-processing complete\n" % simid)
+   srf.write( ','.join(
+      [ version_string, str(simid), str(N_threads), str(nb), str(nr), str(tsc), ("%d" % (1.*nr/nb)), ( "%d" % (1.*tsc/nr) ), str(agt_count) ,
+	 ('"%s"' % sim_comment), str(custom_settings_file),
+	 ('"%s"' % agt_pop.info_description("Python")), ('"%s"' % agt_pop.agt_gen_description("Python")), ('"%s"' % agt_pop.mkt_description("Python")),  
+	 root_datadir, root_logdir, str( round(rt.days*24*60*60 + rt.seconds + rt.microseconds*1./1e6) ), str(rt), str( datetime.datetime.now() )
+	 ]) + '\n'
+   )
 
-   os.system("se_smsd SimulationDB")
+   srf.close()
+
+   cbl.log(cbl.INFO,"Registration for simulation %d complete \n" % simid)
+
 
    cbl.log(cbl.INFO,"All operations complete\n")
 
-except sedna.SednaException, ex:
-   raise ex
 except Exception, ex:
    raise ex

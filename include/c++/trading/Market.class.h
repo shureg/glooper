@@ -25,14 +25,16 @@
 
 namespace GLOOPER_TEST
 {
-   typedef boost::signal< void (Order*) > order_reg_signal;
-   typedef boost::signal< void (const Trade&) > trade_reg_signal;
+   typedef boost::signals2::signal< void (Order*) > order_reg_signal;
+   typedef boost::signals2::signal< void (const Trade&) > trade_reg_signal;
 
    class Market: public SimulationObject
    {
    public:
 
       Market();
+
+      Market(const Market&);
 
       //! Order processing method
       /*! Returns true if a limit order has been places as a result
@@ -74,8 +76,12 @@ namespace GLOOPER_TEST
 
       trade_reg_signal&
 	 get_trade_broadcast();
+
+      const double& get_maximum_leverage_factor() const;
       
       XmlField xml_description() const;
+
+      XmlField short_description() const;
 
    protected:
 
@@ -98,6 +104,8 @@ namespace GLOOPER_TEST
       boost::shared_ptr<order_reg_signal> ord_sig;
 
       boost::shared_ptr<trade_reg_signal> trade_broadcast;
+
+      const double maximum_leverage_factor;
 
       virtual Market* real_clone() const;
 

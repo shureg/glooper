@@ -61,6 +61,29 @@ void AgentGenerator::register_generator(
    generator_registry[ gen_key ].push_back(agt.get_id());
 }
 
+size_t AgentGenerator::population_size() const
+{
+   return agt_vector.size();
+}
+
+XmlField AgentGenerator::generator_description() const
+{
+   XmlField tmp("generators");
+
+   for (boost::unordered_map<gen_key_type, std::list<unsigned long> >::
+	 const_iterator 
+	 i = generator_registry.begin(); 
+	 i != generator_registry.end();
+	 ++i)
+   {
+      XmlField gen_tmp(std::string(i->first.first));
+      gen_tmp.add_field(i->first.second->xml_description());
+      tmp.add_field(gen_tmp);
+   }
+
+   return tmp;
+}
+
 XmlField AgentGenerator::xml_description() const
 {
    XmlField tmp("Agent.Generator");

@@ -236,7 +236,7 @@ void TradingAgent::place_order()
 	 {
 	    Order act(
 		  *this, best->get_price(), dq.q, (bool) dq.is_long,
-		  (*timer)() );
+		  *(*timer)() );
 	    
 	    LOG(TRACE, boost::format(
 		     "Agent %d: beginning pass %d of order-matching sequence "\
@@ -308,13 +308,13 @@ void TradingAgent::place_order()
 		  % id % dq % p_ord
 		  );
 	    Order pass(*this, p_ord, dq.q, (bool) dq.is_long, 
-		  (*timer)() );
+		  *(*timer)() );
 
 	    spot_mkt->process_order(pass);
 	 }
       }
    }
-
+/*  
    LOG(TRACE, boost::format(
 	 "Starting post-trade agent registration process for agent %d\n")
        % id
@@ -326,7 +326,7 @@ void TradingAgent::place_order()
 	 "Ending post-trade agent registration process for agent %d\n")
        % id
        );
-
+*/
 }
 
 void TradingAgent::reset_orders()
@@ -352,7 +352,8 @@ double TradingAgent::mark_to_market() const
 bool TradingAgent::can_trade()
 {
    check_liquidity();
-   return !is_bankrupt;
+   check_leverage();
+   return !(is_bankrupt || is_overleveraged);
 }
 
 void TradingAgent::check_liquidity()
@@ -387,7 +388,7 @@ void TradingAgent::check_liquidity()
 
 	 if(rq>0)
 	 {
-	    Order r(*this,rq,(bool)!pos.is_long,(*timer)());
+	    Order r(*this,rq,(bool)!pos.is_long,*(*timer)());
 	    spot_mkt->process_order(r);
 	 }
 
@@ -400,6 +401,21 @@ void TradingAgent::check_liquidity()
 	       );
       }
 
+   }
+}
+
+void TradingAgent::check_leverage()
+{
+   if( !indeterminate(pos.is_long) )
+   {
+      double m = mark_to_market();
+
+      double L = spot_mkt->get_maximum_leverage_factor();
+
+      if(pos.is_long)
+	 is_overleveraged = ( wealth < investment_value(m)*(L-1)/L );
+      else
+	 is_overleveraged = ( wealth < -investment_value(m)*(L+1)/L );
    }
 }
 
@@ -422,24 +438,16 @@ XmlField TradingAgent::xml_description() const
 
    XmlField tmp = Agent::xml_description();
 
-   LOG(TRACE, boost::format("Recording wealth for agent %d\n") % id);
-
    tmp("wealth") = wealth;
-
-   LOG(TRACE, boost::format("Recording position for agent %d\n") % id);
 
    tmp("position") = (double) pos;
 
    tmp("investment_value") = iv;
 
-   LOG(TRACE, boost::format("Recording dip for agent %d\n") % id);
-
    tmp("desired_investment_proportion") =
       desired_investment_proportion();
 
    tmp("current_investment_proportion") = cip;
-
-   LOG(TRACE, boost::format("Recording bankrupcy for agent %d\n") % id);
 
    tmp("is_bankrupt") = is_bankrupt;
    

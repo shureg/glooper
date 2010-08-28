@@ -20,11 +20,23 @@
 #include <sstream>
 #include "boost/bind.hpp"
 #include "core/version.h"
+#include "boost/scoped_ptr.hpp"
+#include "rng/rng.hpp"
+#include "boost/make_shared.hpp"
+#include "boost/assign.hpp"
+
+using boost::make_shared;
 
 using namespace GLOOPER_TEST;
 using namespace std;
 using XML_SERIALISATION::XmlSerialisableObject;
 using XML_SERIALISATION::XmlFile;
+
+boost::mutex Simulation::run_ctr_mutex;
+
+Simulation::run_space::run_space():
+   registration_timer(0ul), step_ctr(0ul)
+{}
 
 unsigned long Simulation::external_instance_counter(const char* filename) const
 {
@@ -49,30 +61,50 @@ void Simulation::db_insert_slot(const XmlSerialisableObject& so)
 {
    XmlField tmp = so.xml_description();
 
-   tmp("registration_timer") = ++registration_timer;
+   if(runs_executing)
+   {
+      ++(current_run->registration_timer);
+      current_run->tdb->get_external_fields()[4] =
+	 current_tbl_context(4,4)[4];
+   }
+   else
+   {
+      sim_file.insert(tmp);
+   }
 
-   if( current_file == 0 )
-      LOG(EXCEPTION, boost::format("output XmlFile object not set\n") );
+   current_run->tdb->process(tmp);
+}
 
-   current_file->insert(tmp);
+void Simulation::connect_db_signal()
+{
+   SimulationObject::db_signal().connect( 
+	 boost::bind(&Simulation::db_insert_slot,this,_1) );
 }
 
 Simulation::Simulation(const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
       const char* base_path,
+      const boost::shared_ptr<TableDBInterface>& tdb,
       const char* external_counter_filename): 
    SimulationObject(external_instance_counter(external_counter_filename)),
    comment(_comment), base_path(base_path), process(_process),
-   batch_ctr(0), run_ctr(0), step_ctr(0),
-   registration_timer(0), current_file(0)
+   tdb_init(tdb),
+   batch_ctr(0), run_ctr(0),
+   N_threads(0), runs_executing(false),
+   total_step_count(0)
 {
 
-   sim_file.assign(sim_string(),"Simulation");
+   sim_file.assign(sim_string(),"SimulationData");
 
-   SimulationObject::db_signal().connect( 
-	 boost::bind(&Simulation::db_insert_slot,this,_1) );
+   current_run.reset( new Simulation::run_space );
 
-   current_file = &sim_file;
+   tdb_init->init( boost::assign::list_of
+	 ("sim_id")("batch_id")("run_id")("step_id")("registration_timer"),
+	 (boost::format("%d") % id).str() );
+
+   current_run->tdb = make_shared<TableDBInterface>(*tdb_init);
+
+   connect_db_signal();
 
    SimulationObject::db_signal()(*this);
 }
@@ -80,19 +112,27 @@ Simulation::Simulation(const boost::shared_ptr<Process>& _process,
 Simulation::Simulation(const boost::shared_ptr<Process>& _process,
       const std::string& _comment,
       const char* base_path,
+      const boost::shared_ptr<TableDBInterface>& tdb,
       unsigned long _id): 
    SimulationObject(_id),
    comment(_comment), base_path(base_path), process(_process),
-   batch_ctr(0), run_ctr(0), step_ctr(0),
-   registration_timer(0), current_file(0)
+   tdb_init(tdb),
+   batch_ctr(0), run_ctr(0),
+   N_threads(0), runs_executing(false),
+   total_step_count(0)
 {
 
-   sim_file.assign(sim_string(),"Simulation");
+   sim_file.assign(sim_string(),"SimulationData");
 
-   SimulationObject::db_signal().connect( 
-	 boost::bind(&Simulation::db_insert_slot,this,_1) );
+   current_run.reset( new Simulation::run_space );
 
-   current_file = &sim_file;
+   tdb_init->init( boost::assign::list_of
+	 ("sim_id")("batch_id")("run_id")("step_id")("registration_timer"),
+	 (boost::format("%d") % id).str() );
+
+   current_run->tdb = make_shared<TableDBInterface>(*tdb_init);
+
+   connect_db_signal();
 
    SimulationObject::db_signal()(*this);
 }
@@ -108,33 +148,121 @@ const string Simulation::sim_string() const
 
 const string Simulation::batch_string() const
 {
-   return ( boost::format("%s/sim.%d.%d.xml") % base_path % id % batch_ctr ).str();
+   return ( boost::format("%s/sim.%d.%03d.xml") % base_path % id % batch_ctr ).str();
 }
 
-const string Simulation::run_string() const
+const string Simulation::run_string(unsigned long rc) const
 {
-   return ( boost::format("%s/sim.%d.%d.%d.xml") % base_path % id % batch_ctr % run_ctr ).str();
+   return ( boost::format("%s/sim.%d.%03d.%03d.xml") % base_path % id % batch_ctr % rc ).str();
 }
 
-const string Simulation::step_string() const
+const string Simulation::step_string(unsigned long rc) const
 {
-   return ( boost::format("%s/sim.%d.%d.%d.%d.xml") 
-	 % base_path % id % batch_ctr % run_ctr % step_ctr ).str();
+   return ( boost::format("%s/sim.%d.%03d.%03d.%05d.xml") 
+	 % base_path % id % batch_ctr % rc % 
+	 (current_run->step_ctr) ).str();
+}
+
+unsigned long Simulation::increment_run_ctr()
+{
+   boost::lock_guard<boost::mutex> run_ctr_lock(run_ctr_mutex);
+
+   return run_ctr++;
+}
+
+void Simulation::do_runs()
+{
+   LOG(INFO,boost::format("Beginning run execution in thread %s\n")
+	 % (boost::this_thread::get_id())
+	 );
+
+   log_ptr->spawn_threaded_log();
+
+   if( current_run.get() == 0 )
+      current_run.reset( new Simulation::run_space );
+
+   current_run->tdb = make_shared<TableDBInterface>(*tdb_init);
+
+   SimulationObject::init_sig_ptr();
+
+   connect_db_signal();
+
+   RNG::init();
+
+   current_run->process = boost::shared_ptr<Process>(
+	 this->process->clone() );
+
+   current_run->process->thread_config();
+
+   while( !end_batch() )
+   {
+      unsigned long local_run_ctr = increment_run_ctr();
+
+      //log_ptr->set_context((boost::format("%s.%s.%s") 
+	       //% id % batch_ctr % local_run_ctr).str());
+
+      current_run->tdb->transaction_begin( 
+	    current_tbl_context(2, 0, local_run_ctr) );
+
+      LOG(INFO,boost::format("Beginning run %d\n") % local_run_ctr );
+
+      current_run->process->run_config();
+
+      current_run->step_ctr = 0;
+
+      current_run->registration_timer = 0;
+
+      while( !end_run() )
+      {
+	 //log_ptr->set_context((boost::format("%s.%s.%s.%s") 
+		  //% id % batch_ctr % local_run_ctr % 
+		  //current_run->step_ctr).str());
+
+	 current_run->tdb->get_external_fields()[3] =
+	    current_tbl_context(3,3)[3];
+
+	 LOG(TRACE,boost::format(
+		  "Evolving process at %0x on thread %s\n")
+	       % (current_run->process) % 
+	       (boost::this_thread::get_id())
+	       );
+
+	 current_run->process->evolve();
+
+	 ++(current_run->step_ctr);
+      }
+
+      //log_ptr->set_context((boost::format("%s.%s.%s") 
+	       //% id % batch_ctr % local_run_ctr).str());
+
+      update_total_step_count(current_run->step_ctr);
+
+      LOG(INFO,boost::format("Ending run %d\n") % local_run_ctr );
+
+      current_run->tdb->transaction_end();
+   }
+
+   LOG(INFO,boost::format("Ending run execution in thread %s\n")
+	 % (boost::this_thread::get_id())
+	 );
 }
 
 void Simulation::simulate()
 {
-   current_file = &sim_file;
+   //log_ptr->set_context((boost::format("%s") % id).str());
+
+   current_run->tdb->transaction_begin( current_tbl_context() );
 
    process->simulation_config();
+
+   current_run->tdb->transaction_end();
 
    batch_ctr = 0;
 
    while( !end_simulation() )
    {
-      batch_file.assign(batch_string(),"Batch");
-
-      current_file = &batch_file;
+      //log_ptr->set_context((boost::format("%s.%s") 
+	  //     % id % batch_ctr).str());
 
       LOG(INFO,boost::format("Beginning batch %d\n") % batch_ctr );
       
@@ -142,50 +270,26 @@ void Simulation::simulate()
 
       run_ctr = 0;
 
-      while( !end_batch() )
-      {
-	 run_file.assign(run_string(),"Run");
+      runs_executing = true;
 
-	 current_file = &run_file;
+      for(unsigned long t = 0; t < N_threads; ++t)
+	 runs.create_thread( boost::bind( &Simulation::do_runs,this ) );
 
-	 LOG(INFO,boost::format("Beginning run %d\n") % run_ctr );
+      runs.join_all();
 
-	 process->run_config();
+      //log_ptr->set_context((boost::format("%s.%s") 
+	//       % id % batch_ctr).str());
 
-	 step_ctr = 0;
-
-	 registration_timer = 0;
-
-	 while( !end_run() )
-	 {
-	    step_file.assign(step_string(),"Step");
-
-	    current_file = &step_file;
-
-	    process->evolve();
-
-	    step_file.commit();
-
-	    ++step_ctr;
-	 }
-
-	 LOG(INFO,boost::format("Ending run %d\n") % run_ctr );
-
-	 run_file.commit();
-
-	 ++run_ctr;
-      }
+      runs_executing = false;
 
       LOG(INFO,boost::format("Ending batch %d\n") % batch_ctr );
 
       batch_run_structure.push_back(run_ctr);
 
-      batch_file.commit();
-
       ++batch_ctr;
    }
 
-   current_file = &sim_file;
+   //log_ptr->set_context((boost::format("%s") % id).str());
 
    simulation_cleanup();
 
@@ -197,8 +301,50 @@ const vector<unsigned long>& Simulation::get_batch_run_structure() const
    return batch_run_structure;
 }
 
+void Simulation::update_total_step_count(unsigned long steps)
+{
+   boost::lock_guard<boost::mutex> total_step_lock(total_step_count_mutex);
+
+   total_step_count += steps;
+}
+
 void Simulation::simulation_cleanup()
 {
+}
+
+vector<string> Simulation::current_tbl_context(
+      unsigned long lvl1, unsigned long lvl0, unsigned long rc) const
+{
+   vector<string> tmp(lvl1+1);
+
+   if(lvl0 < 1)
+      tmp[0] = (boost::format("%d") % id).str();
+   if(lvl1 > 0 && lvl0 < 2)
+      tmp[1] = (boost::format("%03d") % batch_ctr).str();
+   if(lvl1 > 1 && lvl0 < 3)
+      tmp[2] = (boost::format("%03d") % rc).str();
+   if(lvl1 > 2 && lvl0 < 4)
+      tmp[3] = (boost::format("%05d") % current_run->step_ctr).str();
+   if(lvl1 > 3 && lvl0 < 5)
+      tmp[4] = (boost::format("%07d") 
+	    % current_run->registration_timer).str();
+
+   return tmp;
+}
+
+void Simulation::set_N_threads(const unsigned long _N_threads)
+{
+   N_threads = _N_threads;
+}
+
+void Simulation::set_log_ptr(const boost::shared_ptr<CallbackLog>& _log_ptr)
+{
+   log_ptr = _log_ptr;
+}
+
+unsigned long Simulation::get_total_step_count() const
+{
+   return total_step_count;
 }
 
 XmlField Simulation::xml_description() const

@@ -46,6 +46,25 @@ AgentPopulation::AgentPopulation(
 {
 }
 
+AgentPopulation::AgentPopulation(const AgentPopulation& ap)
+{
+   agt_gen = ap.agt_gen;
+   last_info = ap.last_info;
+   
+   info_generator = 
+      boost::shared_ptr<InfoGenerator>( ap.info_generator->clone() );
+
+   mkt = boost::shared_ptr<Market>( ap.mkt->clone() );
+
+   population = ap.population.clone();
+   population_index = ap.population_index;
+   initial_population = ap.initial_population.clone();
+
+   agent_timer = ap.agent_timer;
+   turn_timer = ap.turn_timer;
+}
+
+
 unsigned long AgentPopulation::get_agent_timer(bool increase)
 {
    if(increase)
@@ -65,6 +84,28 @@ void AgentPopulation::simulation_config()
 
    initial_population = agt_gen->get_agt_vector().clone();
 
+   thread_config();
+
+   SimulationObject::db_signal()(*info_generator);
+
+   SimulationObject::db_signal()(*agt_gen);
+
+   XmlContainerWrap ip = agent_population_description(
+	 "Initial.Agent.Population", initial_population);
+
+   SimulationObject::db_signal()(ip);
+}
+
+void AgentPopulation::batch_config() {}
+
+void AgentPopulation::thread_config()
+{
+   LOG(TRACE, boost::format(
+	    "Beginning thread-specific configuration procedure for "\
+	    "AgentPopulation process at %0x on thread %s\n")
+	 % this % (boost::this_thread::get_id())
+	 );
+
    boost::shared_ptr<timer_signal> ts(new timer_signal);
    boost::shared_ptr<timer_signal> ro_ts(new timer_signal);
 
@@ -81,21 +122,11 @@ void AgentPopulation::simulation_config()
 	 ++i)
    {
       (*i).set_market(mkt).set_timer(ts).set_ro_timer(ro_ts);
-      (*i).init();
+      (*i).reconfigure();
       population_index.push_back(p_ix++);
    }
 
-   SimulationObject::db_signal()(*info_generator);
-
-   SimulationObject::db_signal()(*agt_gen);
-
-   XmlContainerWrap ip = agent_population_description(
-	 "Initial.Agent.Population", initial_population);
-
-   SimulationObject::db_signal()(ip);
 }
-
-void AgentPopulation::batch_config() {}
 
 void AgentPopulation::run_config()
 {
@@ -143,11 +174,20 @@ void AgentPopulation::evolve()
 
    SimulationObject::db_signal()(ep);
 
+   SimulationObject::db_signal()(*mkt);
+
    LOG(INFO,boost::format(
 	    "Ending turn %d\n") % turn_timer);
 
    turn_timer++;
 
+}
+
+Process* AgentPopulation::real_clone() const
+{
+   AgentPopulation* tmp = new AgentPopulation(*this);
+
+   return (Process*) tmp;
 }
 
 XmlContainerWrap AgentPopulation::agent_population_description
@@ -161,4 +201,19 @@ XmlContainerWrap AgentPopulation::agent_population_description
       tmp.add_item( *i );
    }
    return tmp;
+}
+
+const string AgentPopulation::agt_gen_description(const string& fmt) const
+{
+   return agt_gen->generator_description().string_format(fmt);
+}
+
+const string AgentPopulation::info_description(const string& fmt) const
+{
+   return info_generator->xml_description().string_format(fmt);
+}
+
+const string AgentPopulation::mkt_description(const string& fmt) const
+{
+   return mkt->short_description().string_format(fmt);
 }

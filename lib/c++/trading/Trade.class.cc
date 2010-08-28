@@ -18,11 +18,11 @@
 
 using namespace GLOOPER_TEST;
 
-unsigned long Trade::instance_ctr(0ul);
+thread_wrap<unsigned long> Trade::instance_ctr(0ul);
 
 void Trade::reset_instance_ctr()
 {
-   Trade::instance_ctr = 0ul;
+   Trade::instance_ctr.reset(0ul);
 }
 
 Trade::Trade(unsigned long q_,double p_, 

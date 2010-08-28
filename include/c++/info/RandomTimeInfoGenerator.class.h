@@ -40,6 +40,8 @@ namespace GLOOPER_TEST
 
       const char* info_generator_type() const {return "RandomTimeInfoGenerator";}
 
+      InfoGenerator* real_clone() const;
+
    };
 }
 

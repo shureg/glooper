@@ -28,12 +28,14 @@ namespace GLOOPER_TEST
 
       StandardSimulation(const boost::shared_ptr<Process>&,
 	    const std::string&, 
-	    const char*, const char*, 
+	    const char*, const char*,
+	    const boost::shared_ptr<TableDBInterface>&,
 	    unsigned long, unsigned long);
 
       StandardSimulation(const boost::shared_ptr<Process>&,
 	    const std::string&, 
 	    const char*, unsigned long, 
+	    const boost::shared_ptr<TableDBInterface>&,
 	    unsigned long, unsigned long);
       
       const bool end_simulation() const;

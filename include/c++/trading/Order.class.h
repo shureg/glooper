@@ -17,7 +17,7 @@
 #ifndef _GLT_ORDER_CLASS_INC
 #define _GLT_ORDER_CLASS_INC
 
-#include "boost/signals.hpp"
+#include "boost/signals2.hpp"
 #include "boost/logic/tribool.hpp"
 #include "callback_log/LOG.h"
 #include <stdexcept>
@@ -30,10 +30,10 @@ namespace GLOOPER_TEST
 {
    class Order;
 
-   typedef boost::signal< void (const Order&) > \
+   typedef boost::signals2::signal< void (const Order&) > \
 	      trade_signal;
 
-   typedef boost::signal< void (const Trade&) > \
+   typedef boost::signals2::signal< void (const Trade&) > \
 	      detailed_trade_signal;
 
    class Agent;
@@ -92,7 +92,7 @@ namespace GLOOPER_TEST
 
    protected:
 
-      static unsigned long instance_ctr;
+      static thread_wrap<unsigned long> instance_ctr;
 
       Agent& owner;
 
@@ -111,9 +111,9 @@ namespace GLOOPER_TEST
 
       boost::shared_ptr<detailed_trade_signal> trade_registration_signal;
 
-      boost::signals::connection owner_connection;
+      boost::signals2::connection owner_connection;
 
-      boost::signals::connection trade_registration_connection;
+      boost::signals2::connection trade_registration_connection;
 
       void record_trade(const Trade&) const;
 

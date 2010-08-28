@@ -15,3 +15,10 @@
 // =====================================================================================
 
 #include "process/Process.class.h"
+
+using GLOOPER_TEST::Process;
+
+Process* Process::clone() const
+{
+   return real_clone();
+}

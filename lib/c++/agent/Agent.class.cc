@@ -60,20 +60,12 @@ XmlField Agent::xml_description() const
 {
    XmlField tmp("Agent");
 
-   LOG(TRACE, boost::format("Recording id for agent %d\n") % id);
-
    tmp("id") = id;
-
-   LOG(TRACE, boost::format("Recording type for agent %d\n") % id);
 
    tmp("type") = agent_type_str();
    
-   LOG(TRACE, boost::format("Recording belief for agent %d\n") % id);
-
    tmp("belief") = belief;
    
-   LOG(TRACE, boost::format("Recording timer for agent %d\n") % id);
-
    tmp("timer") = (*ro_timer)();
 
    return tmp;

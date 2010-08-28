@@ -20,6 +20,8 @@
 
 using namespace GLOOPER_TEST;
 
+using namespace std;
+
 const boost::logic::tribool 
    GLOOPER_TEST::neither = boost::logic::indeterminate;
 
@@ -29,14 +31,12 @@ ComplexAgent::ComplexAgent(double belief,
       unsigned long max_memory,
       unsigned long significance_threshold): 
    TradingAgent(belief,wealth),
-   distr_byvalue(return_distribution.get<0>()),
-   distr_bytime(return_distribution.get<1>()),
    mean_reverter( 
 	 (mean_reversion==0)?(neither):(boost::logic::tribool(mean_reversion>0)) ),
    max_memory(max_memory),
    significance_threshold(significance_threshold)
 {
-   if( significance_threshold > max_memory )
+   if( max_memory > 0 && significance_threshold > max_memory )
       LOG(EXCEPTION,boost::format(
 	       "Complex Agent %d: "\
 	       "The significance threshold %d exceeds the maximum "\
@@ -45,8 +45,9 @@ ComplexAgent::ComplexAgent(double belief,
 	 );
 }
 
-void ComplexAgent::init()
+void ComplexAgent::reconfigure()
 {
+   market_broadcast_conn.disconnect();
    market_broadcast_conn = spot_mkt->get_trade_broadcast().connect(
 	 boost::bind( &ComplexAgent::add_return,this,_1 ) );
 }
@@ -58,22 +59,47 @@ ComplexAgent::~ComplexAgent()
 
 const bool ComplexAgent::history_significant() const
 {
-   return (return_distribution.size() >= significance_threshold);
+   return (distr_bytime.size() >= significance_threshold);
 }
 
 void ComplexAgent::add_return(const Trade& trd)
 {
+   LOG(TRACE, boost::format(
+	    "Entering ComplexAgent::add_return for agent %d at %0x\n")
+	 % id % this
+	 );
+
    double last_price;
-   if ( !return_distribution.empty() )
+   if ( !distr_bytime.empty() )
       last_price = distr_bytime.back().p1;
    else
       last_price = spot_mkt->last_traded_price();
 
+   LOG(TRACE, boost::format(
+	    "ComplexAgent::add_return - last price determined "\
+	    "(agent %d at %0x\n)")
+	 % id % this
+	 );
+
+   price_change dp(last_price, trd.p);
+
+   dp.where =
+      distr_byvalue.insert( dp.ratio );
+
    distr_bytime.push_back( 
-	 price_change( last_price, trd.p ) );
+	 price_change( dp ) );
+
+   LOG(TRACE, boost::format(
+	    "ComplexAgent::price changed recorded "\
+	    "(agent %d at %0x\n)")
+	 % id % this
+	 );
    
    if( max_memory > 0 && distr_bytime.size() > max_memory )
+   {
+      distr_byvalue.erase(distr_bytime.front().where);
       distr_bytime.pop_front();
+   }
 
    mean_reverter = next_mode();
 
@@ -90,7 +116,8 @@ void ComplexAgent::add_return(const Trade& trd)
 
 double ComplexAgent::ecdf(double ratio) const
 {
-   multiset_index::iterator lb = distr_byvalue.lower_bound(ratio);
+   multiset<double>::iterator 
+      lb = distr_byvalue.lower_bound(ratio);
 
    return (double) ( distance(distr_byvalue.begin(),lb) * 1. ) / 
       (distr_byvalue.size() * 1.); 
@@ -100,15 +127,9 @@ XmlField ComplexAgent::xml_description() const
 {
    XmlField tmp = TradingAgent::xml_description();
 
-   LOG(TRACE, boost::format("Recording max_memory for agent %d\n") % id);
-
    tmp("max_memory") = max_memory;
 
-   LOG(TRACE, boost::format("Recording sig_threshold for agent %d\n") % id);
-
    tmp("significance_threshold") = significance_threshold;
-
-   LOG(TRACE, boost::format("Recording trend_mode for agent %d\n") % id);
 
    //tmp("trend_mode") = 
    //   (indeterminate(mean_reverter))?("NA"):(
@@ -120,8 +141,6 @@ XmlField ComplexAgent::xml_description() const
       tmp("trend_mode") = "MR";
    else
       tmp("trend_mode") = "TF";
-
-   LOG(TRACE, boost::format("Finished recording trend_mode for agent %d\n") % id);
 
    return tmp;
 }

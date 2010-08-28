@@ -27,8 +27,28 @@ using boost::make_shared;
 
 Market::Market(): SimulationObject(0), init_price(100.), minimum_tick(0.01),
    ord_sig( make_shared<order_reg_signal>() ), 
-   trade_broadcast( make_shared<trade_reg_signal>() )
+   trade_broadcast( make_shared<trade_reg_signal>() ),
+   maximum_leverage_factor(1)
 {}
+
+Market::Market(const Market& mkt): SimulationObject(mkt.id),
+   maximum_leverage_factor(mkt.maximum_leverage_factor)
+{
+   ask_orders = mkt.ask_orders;
+
+   bid_orders = mkt.bid_orders;
+
+   trades = mkt.trades;
+
+   init_price = mkt.init_price;
+
+   minimum_tick = mkt.minimum_tick;
+
+   ord_sig = make_shared<order_reg_signal>();
+
+   trade_broadcast = make_shared<trade_reg_signal>();
+
+}
 
 const bool Market::is_crossing_limit_order(const Order& r) const
 {
@@ -58,10 +78,17 @@ const bool Market::process_order(Order& r)
    {
       // Connecting trade-recording function slot to the potential
       // trade-emitting signal
-      boost::signals::connection tr = 
+      boost::signals2::connection tr = 
 	 r.get_trade_registration_signal().connect(
 	    boost::bind(
 	       &Market::record_trade,this,_1) 
+	    );
+
+      LOG(TRACE,boost::format(
+	       "Market object at %0x,with bid set at %0x (size %d), and "\
+	       "ask set at %0x (size %d)")
+	    % this % (&bid_orders) % (bid_orders.size()) 
+	    % (&ask_orders) % (ask_orders.size())
 	    );
 
       if(r.is_bid())
@@ -197,6 +224,14 @@ void Market::add_limit_order(Order& r,
 
 void Market::pull_agent_orders(const Agent& agt)
 {
+   
+   LOG(TRACE,boost::format(
+	    "Market object at %0x,with bid set at %0x (size %d), and "\
+	    "ask set at %0x (size %d)")
+	 % this % (&bid_orders) % (bid_orders.size()) 
+	 % (&ask_orders) % (ask_orders.size())
+	 );
+
    set<Order,buyers_pick> new_ask_orders;
 
    for( set<Order,buyers_pick>::const_iterator
@@ -252,6 +287,11 @@ const Order* Market::best_order(bool _bid) const
 
 void Market::record_trade(const Trade& tr)
 {
+   LOG(TRACE,boost::format(
+	    "Preparing to broadcast a trade in Market object %0x "\
+	    "using broadcast signal %0x\n")
+	 % this % ( trade_broadcast.get() )
+	 );
    (*trade_broadcast)(tr);
    trades.push_back(tr);
 }
@@ -340,6 +380,11 @@ trade_reg_signal& Market::get_trade_broadcast()
    return *trade_broadcast;
 }
 
+const double& Market::get_maximum_leverage_factor() const
+{
+   return maximum_leverage_factor;
+}
+
 Market* Market::clone() const
 {
    return real_clone();
@@ -349,6 +394,16 @@ Market* Market::real_clone() const
 {
    Market* tmp = new Market(*this);
    return (Market*) tmp;
+}
+
+XmlField Market::short_description() const
+{
+   XmlField tmp("Market");
+   
+   tmp("init_price") = init_price;
+   tmp("minimum_tick") = minimum_tick;
+
+   return tmp;
 }
 
 XmlField Market::xml_description() const

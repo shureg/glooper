@@ -24,11 +24,11 @@ using boost::logic::tribool;
 using boost::logic::indeterminate;
 using CALLBACK_LOG::LOG;
 
-unsigned long Order::instance_ctr(0ul);
+thread_wrap<unsigned long> Order::instance_ctr(0ul);
 
 void Order::reset_instance_ctr()
 {
-   Order::instance_ctr = 0ul;
+   Order::instance_ctr.reset(0ul);
 }
 
 Order::Order(Agent& _owner,
@@ -107,6 +107,10 @@ void Order::match(const Order& r) const
       r.execute(mutual_quantity,r.get_price(),order_time);
       Trade tmp(mutual_quantity, r.get_price(),
 	    get_id(), r.get_id());
+      LOG(TRACE,boost::format("Preparing to register trade object at %0x "\
+	       "in order object %0x using registration signal at %0x\n")
+	    % (&tmp) % this % ( trade_registration_signal.get() )
+	    );
       (*trade_registration_signal)(tmp);
    }
 }

@@ -53,6 +53,10 @@ namespace GLOOPER_TEST
 
       const boost::ptr_vector< Agent >& get_agt_vector() const;
 
+      size_t population_size() const;
+
+      XmlField generator_description() const;
+
       XmlField xml_description() const;
 
    protected:

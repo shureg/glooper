@@ -42,6 +42,12 @@ namespace GLOOPER_TEST
 	    const boost::shared_ptr< AgentGenerator >&,
 	    const boost::shared_ptr< Market >&);
 
+      //! A custom copy constructor
+      /*! Must ensure that thread-specific heap-allocated 
+       *  data members are cloned, rather than simply copied
+       */
+      AgentPopulation(const AgentPopulation&);
+
       void evolve();
 
       unsigned long get_agent_timer(bool);
@@ -51,6 +57,14 @@ namespace GLOOPER_TEST
       void batch_config();
 
       void run_config();
+
+      void thread_config();
+
+      const std::string agt_gen_description(const std::string& fmt) const;
+
+      const std::string info_description(const std::string& fmt) const;
+
+      const std::string mkt_description(const std::string& fmt) const;
 
    protected:
 
@@ -71,6 +85,8 @@ namespace GLOOPER_TEST
       unsigned long agent_timer;
 
       unsigned long turn_timer;
+
+      Process* real_clone() const;
 
       XML_SERIALISATION::XmlContainerWrap agent_population_description
 	 (const std::string&,

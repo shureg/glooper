@@ -80,7 +80,7 @@ void HomogeneousAgent::place_order()
 		  % id % order_size
 		  );
 
-	    Order mkt( *this, order_size, bid, (*timer)() );
+	    Order mkt( *this, order_size, bid, *(*timer)() );
 	    
 	    spot_mkt->process_order(mkt);
 	 }
@@ -98,7 +98,7 @@ void HomogeneousAgent::place_order()
 		  % id % order_size % p_ord
 		  );
 
-	    Order lim( *this, p_ord, order_size, bid, (*timer)() );
+	    Order lim( *this, p_ord, order_size, bid, *(*timer)() );
 	    
 	    spot_mkt->process_order(lim);
 	 }

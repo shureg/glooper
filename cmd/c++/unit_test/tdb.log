@@ -1,0 +1,21 @@
+2010-Aug-07 16:30:49.089891 | <root: default> - EXCEPTION - [1] : table_db.cfg.lua: Entry tables[2] is not a table
+2010-Aug-07 18:23:18.237355 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 18:26:43.884237 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 19:36:24.242061 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 19:39:24.599018 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 20:00:03.723776 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 20:01:07.747294 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 20:01:46.404386 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 20:23:41.342462 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 20:51:32.837687 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 20:57:22.026836 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 21:03:09.663800 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 21:03:09.664298 | <root: default> - EXCEPTION - [2] : TableDBInterface::process_row_data - could not find attribute active_id in header table Trade
+2010-Aug-07 21:12:51.433988 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 21:15:30.421014 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 21:19:52.916379 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-07 21:22:40.044723 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x664f30
+2010-Aug-08 11:59:42.946038 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x665390
+2010-Aug-08 12:14:21.116745 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x665390
+2010-Aug-08 12:15:17.497261 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x665390
+2010-Aug-08 12:17:27.509102 | <root: default> - TRACE - [1] : Assigning thread-specific signal ptr for thread 0x665390
