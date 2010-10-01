@@ -37,7 +37,7 @@ namespace GLOOPER_TEST
       Market(const Market&);
 
       //! Order processing method
-      /*! Returns true if a limit order has been places as a result
+      /*! Returns true if a limit order has been placed as a result
        *  of order processing, false otherwise
        */
       const bool process_order(Order&);
@@ -65,6 +65,13 @@ namespace GLOOPER_TEST
        * amount of cash
        */
       unsigned long raise_cash(const double&) const;
+
+      /*! Ckoses out an agent's short as fully as possible, based on
+       * the cash available to the agent and the availability of offers
+       */
+      void close_out_short(Agent&, unsigned long, double, unsigned long);
+
+      unsigned long gauge_market_depth(bool check_bids, unsigned long limit = 0) const;
 
       double tick_adjusted_price(double) const;
 
@@ -106,6 +113,8 @@ namespace GLOOPER_TEST
       boost::shared_ptr<trade_reg_signal> trade_broadcast;
 
       const double maximum_leverage_factor;
+
+      void register_order(const Order&, bool crossing) const;
 
       virtual Market* real_clone() const;
 

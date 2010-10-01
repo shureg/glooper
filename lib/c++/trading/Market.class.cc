@@ -18,6 +18,7 @@
 #include "boost/bind.hpp"
 #include "agent/Agent.class.h"
 #include "xml_serialisation/XmlSingleValue.class.hpp"
+#include "xml_serialisation/XmlFieldWrap.class.h"
 #include "boost/make_shared.hpp"
 
 using namespace GLOOPER_TEST;
@@ -66,15 +67,17 @@ const bool Market::is_crossing_limit_order(const Order& r) const
 
 const bool Market::process_order(Order& r)
 {
+   bool crossing = is_crossing_limit_order(r);
+
    //register incoming order
-   SimulationObject::db_signal()(r);
+   register_order(r, crossing);
 
    //pre-set the return value
    
    bool ret_value = false;
 
    // A trade may occur
-   if( r.is_market() xor is_crossing_limit_order(r) )
+   if( r.is_market() xor crossing )
    {
       // Connecting trade-recording function slot to the potential
       // trade-emitting signal
@@ -222,6 +225,73 @@ void Market::add_limit_order(Order& r,
    }
 }
 
+void Market::register_order(const Order& r, bool crossing) const
+{
+   XmlField ord = r.xml_description();
+
+   
+   set<Order,sellers_pick>::const_iterator bid = bid_orders.begin();
+
+   size_t bs = bid_orders.size();
+
+   if(bs > 0)
+   {
+      ord("bid0_price") = bid->get_price();
+      ord("bid0_quantity") = bid->get_quantity();
+   }
+   else
+   {
+      ord("bid0_price") = "";
+      ord("bid0_quantity") = "";
+   }
+
+   if(bs > 1)
+   {
+      bid++;
+      ord("bid1_price") = bid->get_price();
+      ord("bid1_quantity") = bid->get_quantity();
+   }
+   else
+   {
+      ord("bid1_price") = "";
+      ord("bid1_quantity") = "";
+   }
+   
+   set<Order,buyers_pick>::const_iterator ask = ask_orders.begin();
+
+   size_t as = ask_orders.size();
+
+   if(as > 0)
+   {
+      ord("ask0_price") = ask->get_price();
+      ord("ask0_quantity") = ask->get_quantity();
+   }
+   else
+   {
+      ord("ask0_price") = "";
+      ord("ask0_quantity") = "";
+   }
+
+   if(as > 1)
+   {
+      ask++;
+      ord("ask1_price") = ask->get_price();
+      ord("ask1_quantity") = ask->get_quantity();
+   }
+   else
+   {
+      ord("ask1_price") = "";
+      ord("ask1_quantity") = "";
+   }
+   
+   ord("is_crossing") = crossing;
+
+   SimulationObject::db_signal()( XmlFieldWrap(ord) );
+   
+   //SimulationObject::db_signal()(r);
+
+}
+
 void Market::pull_agent_orders(const Agent& agt)
 {
    
@@ -359,6 +429,80 @@ unsigned long Market::raise_cash(const double& _cash) const
    }
 
    return q_m;
+}
+
+void Market::close_out_short(Agent& agt, unsigned long short_size, double cash_available, unsigned long agent_timer)
+{
+   if(cash_available > 0 && !ask_orders.empty())
+   {
+      unsigned long dq, q = 0;
+      double p, dc, c = 0.;
+
+      set<Order,buyers_pick>::const_iterator current_ask = ask_orders.begin();
+
+      bool stop = false;
+
+      while(c < cash_available && q < short_size && current_ask != ask_orders.end() && !stop )
+      {
+	 dq = min(current_ask->get_quantity(), short_size - q);
+	 p = current_ask->get_price();
+
+	 if(cash_available - c < dq*p)
+	 {
+	    dq = (unsigned long) floor( (cash_available-c)/p );
+	    dc = cash_available - c;
+	    stop = true;
+	 }
+	 else dc = dq*p;
+
+	 q += dq;
+	 c += dc;
+
+	 ++current_ask;
+      }
+
+      Order close_short(agt,q,true,agent_timer);
+
+      process_order(close_short);
+   }
+}
+
+unsigned long Market::gauge_market_depth(bool check_bids, unsigned long limit) const
+{
+   unsigned long q = 0;
+
+   bool with_limit = (limit > 0);
+
+   bool stop=false;
+
+   unsigned long dq;
+
+   if( check_bids )
+   {
+      set<Order,sellers_pick>::const_iterator current = bid_orders.begin();
+
+      while(current != bid_orders.end()  && !stop )
+      {
+	 dq = current->get_quantity();
+	 q += (with_limit)?(min(dq,limit-q)):(dq);
+	 if(with_limit) stop = (q == limit);
+	 ++current;
+      }
+   }
+   else
+   {
+      set<Order,buyers_pick>::const_iterator current = ask_orders.begin();
+
+      while(current != ask_orders.end()  && !stop )
+      {
+	 dq = current->get_quantity();
+	 q += (with_limit)?(min(dq,limit-q)):(dq);
+	 if(with_limit) stop = (q == limit);
+	 ++current;
+      }
+   }
+
+   return q;
 }
 
 double Market::tick_adjusted_price(double p) const

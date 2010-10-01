@@ -20,6 +20,7 @@ agt =
       {'cur_inv_prop','current_investment_proportion'},
       {'inv_value','investment_value'},
       {'bankrupt','is_bankrupt'},
+      {'overleveraged','is_overleveraged'},
 --ClassicAgent attributes
       {'min_rev_prob','minimum_revision_probability'},
       {'min_bel_adj_prop','minimum_belief_adjustment_proportion'},
@@ -54,8 +55,17 @@ ord =
 	 'quantity',
 	 'is_bid',
 	 'is_market',
+	 'is_crossing',
 	 'order_time',
-	 'owner_id'
+	 'owner_id',
+	 'bid0_price',
+	 'bid0_quantity',
+	 'ask0_price',
+	 'ask0_quantity',
+	 'bid1_price',
+	 'bid1_quantity',
+	 'ask1_price',
+	 'ask1_quantity',
       }
    }
 

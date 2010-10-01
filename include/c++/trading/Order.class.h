@@ -154,7 +154,7 @@ namespace GLOOPER_TEST
 	       return false;
 	 }
 	 else
-	    return r1.is_better_for_seller(r2);
+	    return (bool) r1.is_better_for_seller(r2);
       }
    };
 
