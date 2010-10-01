@@ -93,7 +93,7 @@ for ql in query_labels:
 
 #default settings
 
-sim_comment = "final test" #raw_input("Provide a short description for simulation %d: " % simid)
+sim_comment = "N/A" #raw_input("Provide a short description for simulation %d: " % simid)
 
 N_batches = 1
 
@@ -114,6 +114,8 @@ info = glooper.SimpleInfoGenerator( igen )
 tdb_cfg_file = "table_db.cfg.lua"
 
 agt_gen_cfg_file = "agent.cfg.lua"
+
+sim_reg_filename = "simulation_registry.csv"
 
 # If a custom settings file has been provided, execute it to override default settings
 if( custom_settings_file != None):
