@@ -28,7 +28,7 @@ using namespace boost::logic;
 TradingAgent::TradingAgent(double _belief,
       double _wealth):
    Agent(_belief),
-   wealth(_wealth), is_bankrupt(false), force_passive(false)
+   wealth(_wealth), is_bankrupt(false), is_overleveraged(false), force_passive(false)
 {
 }
 
@@ -404,6 +404,14 @@ void TradingAgent::check_liquidity()
    }
 }
 
+void TradingAgent::determine_overleverage(double iv, double L)
+{
+   if(pos.is_long)
+      is_overleveraged = ( wealth < iv*(L-1)/L );
+   else
+      is_overleveraged = ( wealth < -iv*(L+1)/L );
+}
+
 void TradingAgent::check_leverage()
 {
    if( !indeterminate(pos.is_long) )
@@ -412,10 +420,23 @@ void TradingAgent::check_leverage()
 
       double L = spot_mkt->get_maximum_leverage_factor();
 
-      if(pos.is_long)
-	 is_overleveraged = ( wealth < investment_value(m)*(L-1)/L );
-      else
-	 is_overleveraged = ( wealth < -investment_value(m)*(L+1)/L );
+      double iv = investment_value(m);
+
+      determine_overleverage(iv,L);
+
+      if(is_overleveraged)
+      {
+	 if(pos.is_long)
+	 {
+	    Order close_long(*this, spot_mkt->gauge_market_depth(true,pos.q),false,*(*timer)());
+	    spot_mkt->process_order(close_long);
+	 }
+	 else
+	    spot_mkt->close_out_short(*this,pos.q,iv,*(*timer)());
+      }
+
+      determine_overleverage(investment_value( mark_to_market() ), L );
+
    }
 }
 
@@ -450,6 +471,8 @@ XmlField TradingAgent::xml_description() const
    tmp("current_investment_proportion") = cip;
 
    tmp("is_bankrupt") = is_bankrupt;
+
+   tmp("is_overleveraged") = is_overleveraged;
    
    return tmp;
 }
