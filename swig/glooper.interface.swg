@@ -57,7 +57,7 @@ namespace GLOOPER_TEST
       Market();
    };
 
-   class SimpleInfoGenerator: public InfoGenerator
+   class SimpleInfoGenerator: public RNGInfoGenerator
    {
    public:
 
@@ -65,15 +65,25 @@ namespace GLOOPER_TEST
 	    const bspTRGd& value_generator);
    };
 
-   class RandomTimeInfoGenerator: public InfoGenerator
+   class SimpleIntermittentInfoGenerator:
+      public RNGInfoGenerator, public BasicOccasionalInfoGenerator
    {
    public:
 
-      RandomTimeInfoGenerator(
-	    const bspTRGd& value_generator,
-	    const bspTRGd& event_generator);
+      SimpleIntermittentInfoGenerator(
+	    const bspTRGd& value_generator, 
+	    double generation_prob);
    };
-   
+
+   class TriangularMarkovianInfoGenerator: 
+      public VariableIntermittentInfoGenerator
+   {
+   public:
+
+      TriangularMarkovianInfoGenerator(
+	    double generation_prob);
+   };
+
    class AgentPopulation: public Process
    {
    public:

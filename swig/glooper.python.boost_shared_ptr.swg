@@ -20,4 +20,6 @@ SWIG_SHARED_PTR_DERIVED(bspInfoGenerator, GLOOPER_TEST::SimulationObject, GLOOPE
 
 SWIG_SHARED_PTR_DERIVED(bspSimpleInfoGenerator, GLOOPER_TEST::InfoGenerator, GLOOPER_TEST::SimpleInfoGenerator)
 
-SWIG_SHARED_PTR_DERIVED(bspRandomTimeInfoGenerator, GLOOPER_TEST::InfoGenerator, GLOOPER_TEST::RandomTimeInfoGenerator)
+SWIG_SHARED_PTR_DERIVED(bspSimpleIntermittentInfoGenerator, GLOOPER_TEST::InfoGenerator, GLOOPER_TEST::SimpleIntermittentInfoGenerator)
+
+SWIG_SHARED_PTR_DERIVED(bspTriangularMarkovianInfoGenerator, GLOOPER_TEST::InfoGenerator, GLOOPER_TEST::TriangularMarkovianInfoGenerator)

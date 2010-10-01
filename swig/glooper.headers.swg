@@ -15,5 +15,6 @@
 #include "agent/HomogeneousAgent.class.h"
 #include "info/InfoGenerator.class.h"
 #include "info/SimpleInfoGenerator.class.h"
-#include "info/RandomTimeInfoGenerator.class.h"
+#include "info/SimpleIntermittentInfoGenerator.class.h"
+#include "info/TriangularMarkovianInfoGenerator.class.h"
 %}
