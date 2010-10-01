@@ -1,0 +1,1 @@
+/home/ShureG/glooper/cfg/multibatch/agent_investigation_1/many_agents/010c_1000NA_tri.sim.cfg.py

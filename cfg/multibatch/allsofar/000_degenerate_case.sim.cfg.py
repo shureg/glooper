@@ -1,0 +1,1 @@
+/home/ShureG/glooper/cfg/multibatch/batch_1/000_degenerate_case.sim.cfg.py

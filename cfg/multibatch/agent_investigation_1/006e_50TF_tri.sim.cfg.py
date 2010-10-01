@@ -1,6 +1,6 @@
 execfile(os.path.join(cwd,"common.cfg.py"))
 
-sim_comment = "agent effects: 50 TW agents, triangular information"
+sim_comment = "agent effects: 50 TF agents, triangular information"
 
 info = glooper.SimpleInfoGenerator( rng.TriangularGenerator(0,1,0.5) )
 

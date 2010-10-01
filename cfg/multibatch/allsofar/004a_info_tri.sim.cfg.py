@@ -1,0 +1,1 @@
+/home/ShureG/glooper/cfg/multibatch/batch_1/004a_info_tri.sim.cfg.py

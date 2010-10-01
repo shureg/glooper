@@ -1,6 +1,6 @@
 execfile(os.path.join(cwd,"common.cfg.py"))
 
-sim_comment = "memory effects: 200 MR agents, triangular information, memory 1000"
+sim_comment = "memory effects: 200 MR agents, triangular information, memory INF"
 
 info = glooper.SimpleInfoGenerator( rng.TriangularGenerator(0,1,0.5) )
 

@@ -1,0 +1,1 @@
+/home/ShureG/glooper/cfg/multibatch/infogen_investigation/008d_intermit_001.sim.cfg.py

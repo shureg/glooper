@@ -1,0 +1,1 @@
+/home/ShureG/glooper/cfg/multibatch/infogen_investigation/009b_trimark_02.sim.cfg.py

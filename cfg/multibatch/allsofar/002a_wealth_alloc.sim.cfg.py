@@ -1,0 +1,1 @@
+/home/ShureG/glooper/cfg/multibatch/batch_1/002a_wealth_alloc.sim.cfg.py
