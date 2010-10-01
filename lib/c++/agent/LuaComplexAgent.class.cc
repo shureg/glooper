@@ -35,8 +35,6 @@ LuaComplexAgent::~LuaComplexAgent()
 
 void LuaComplexAgent::reconfigure()
 {
-   ComplexAgent::reconfigure();
-   
    //if(L!=0) lua_close(L);
 
    L = luaL_newstate();

@@ -45,7 +45,7 @@ ComplexAgent::ComplexAgent(double belief,
 	 );
 }
 
-void ComplexAgent::reconfigure()
+void ComplexAgent::relink()
 {
    market_broadcast_conn.disconnect();
    market_broadcast_conn = spot_mkt->get_trade_broadcast().connect(
@@ -107,10 +107,23 @@ void ComplexAgent::add_return(const Trade& trd)
    {
       double last_ratio = distr_bytime.back().ratio;
 
+      LOG(TRACE, boost::format(
+	       "[TREND]: Agent %d - Last available price ratio determined to be %.4f\n")
+	    % id % last_ratio
+	    );
+
       if( history_significant() && last_ratio != 1.)
+      {
+	 double b0 = belief;
 	 adjust_belief( 
 	       (last_ratio > 1.) ? (1. - ecdf(last_ratio)) : (ecdf(last_ratio))
 	       );
+	 LOG(TRACE, boost::format(
+		  "[TREND]: Agent %d - belief change "\
+		  "after adjustment is %.8f\n")
+	       % id % (belief - b0)
+	       );
+      }
    }
 }
 

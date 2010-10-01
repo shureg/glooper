@@ -55,6 +55,8 @@ namespace GLOOPER_TEST
 
       virtual void reconfigure() = 0;
 
+      virtual void relink() = 0;
+
    protected:
 
       static unsigned long instance_counter;

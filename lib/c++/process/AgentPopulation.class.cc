@@ -141,6 +141,9 @@ void AgentPopulation::run_config()
    info_generator->reset();
 
    population = initial_population.clone();
+
+   std::for_each( population.begin(), population.end(), 
+	 boost::bind(&Agent::relink,_1) );
 }
 
 void AgentPopulation::evolve()

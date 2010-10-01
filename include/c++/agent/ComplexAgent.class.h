@@ -77,7 +77,7 @@ namespace GLOOPER_TEST
 
       XmlField xml_description() const;
 
-      void reconfigure();
+      void relink();
 
    protected:
 

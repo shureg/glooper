@@ -41,6 +41,8 @@ namespace GLOOPER_TEST
 
       void reconfigure(){}
 
+      void relink(){}
+
    protected:
 
       RNG::UniformGenerator U;
