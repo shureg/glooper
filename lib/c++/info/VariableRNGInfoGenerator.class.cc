@@ -1,11 +1,11 @@
 // =====================================================================================
 // 
-//       Filename:  SimpleInfoGenerator.class.cc
+//       Filename:  VariableRNGInfoGenerator.class.cc
 // 
 //    Description:  
 // 
 //        Version:  1.0
-//        Created:  17/03/10 13:13:25
+//        Created:  03/09/10 13:58:10
 //       Revision:  none
 //       Compiler:  g++
 // 
@@ -14,18 +14,15 @@
 // 
 // =====================================================================================
 
-#include "info/SimpleInfoGenerator.class.h"
+#include "info/VariableRNGInfoGenerator.class.h"
 
 using namespace GLOOPER_TEST;
 
-SimpleInfoGenerator::SimpleInfoGenerator(
-      const bspTRGd& value_generator):
-   RNGInfoGenerator(value_generator)
+VariableRNGInfoGenerator::VariableRNGInfoGenerator(
+      const bspTRGd& value_generator): RNGInfoGenerator(value_generator)
 {}
 
-InfoGenerator* SimpleInfoGenerator::real_clone() const
+void VariableRNGInfoGenerator::generation_config()
 {
-   SimpleInfoGenerator* tmp = new SimpleInfoGenerator(*this);
-
-   return (InfoGenerator*) tmp;
+   value_generator = next_generator();
 }

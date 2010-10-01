@@ -17,14 +17,9 @@
 #ifndef  INFOGENERATOR_CLASS_INC
 #define  INFOGENERATOR_CLASS_INC
 
-#include "rng/generator/TypedRandomGenerator.class.hpp"
 #include "core/SimulationObject.class.h"
-#include "boost/shared_ptr.hpp"
 
 #include <vector>
-
-typedef RNG::TypedRandomGenerator<double> TRGd;
-typedef boost::shared_ptr< TRGd > bspTRGd;
 
 namespace GLOOPER_TEST
 {
@@ -32,8 +27,7 @@ namespace GLOOPER_TEST
    {
    public:
 
-      InfoGenerator(
-	    const bspTRGd& value_generator);
+      InfoGenerator();
 
       double get_info(unsigned long turn_timer);
 
@@ -45,9 +39,11 @@ namespace GLOOPER_TEST
 
    protected:
 
-      virtual const bool generate_now(unsigned long turn_timer) = 0;
+      virtual const bool generate_now() = 0;
 
-      bspTRGd value_generator;
+      virtual double value() const = 0;
+
+      virtual void generation_config(){}
 
       virtual const char* info_generator_type() const = 0;
 
@@ -55,6 +51,8 @@ namespace GLOOPER_TEST
 
       //! A container for valid info values \f$\in [0,1]$\f
       std::vector<double> actual_values;
+
+      unsigned long current_turn_timer;
 
       virtual InfoGenerator* real_clone() const = 0;
 

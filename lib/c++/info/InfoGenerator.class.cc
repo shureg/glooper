@@ -20,19 +20,22 @@ using GLOOPER_TEST::InfoGenerator;
 
 unsigned long InfoGenerator::instance_ctr = 0ul;
 
-InfoGenerator::InfoGenerator(
-      const bspTRGd& value_generator): 
+InfoGenerator::InfoGenerator(): 
    SimulationObject(instance_ctr++),
-   value_generator(value_generator)
+   current_turn_timer(0ul)
 {}
 
 double InfoGenerator::get_info(unsigned long turn_timer)
 {
    double xi = -1.;
 
-   if( generate_now(turn_timer) )
+   current_turn_timer = turn_timer;
+
+   generation_config();
+
+   if( generate_now() )
    {
-      xi = (*value_generator)();
+      xi = value();
       actual_values.push_back(xi);
    }
 
@@ -44,6 +47,7 @@ double InfoGenerator::get_info(unsigned long turn_timer)
 void InfoGenerator::reset()
 {
    info_values.clear();
+   actual_values.clear();
 }
 
 InfoGenerator* InfoGenerator::clone() const
@@ -58,11 +62,6 @@ XmlField InfoGenerator::xml_description() const
    tmp("id") = id;
 
    tmp("type") = info_generator_type();
-
-   XmlField vg("Value.Generator");
-   vg.add_field( value_generator->xml_description() );
-
-   tmp.add_field(vg);
 
    return tmp;
 }

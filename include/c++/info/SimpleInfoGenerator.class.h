@@ -17,11 +17,11 @@
 #ifndef  SIMPLEINFOGENERATOR_CLASS_INC
 #define  SIMPLEINFOGENERATOR_CLASS_INC
 
-#include "info/InfoGenerator.class.h"
+#include "info/RNGInfoGenerator.class.h"
 
 namespace GLOOPER_TEST
 {
-   class SimpleInfoGenerator: public InfoGenerator
+   class SimpleInfoGenerator: public RNGInfoGenerator
    {
    public:
 
@@ -30,7 +30,7 @@ namespace GLOOPER_TEST
 
    protected:
 
-      const bool generate_now(unsigned long){return true;}
+      const bool generate_now(){return true;}
 
       const char* info_generator_type() const {return "SimpleInfoGenerator";}
 
