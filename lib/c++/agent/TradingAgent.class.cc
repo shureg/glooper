@@ -267,7 +267,8 @@ void TradingAgent::place_order()
 			      "most recent order parameters: (%d) %d @ %.3f\n")
 			   % id % dq.is_long % dq.q % best->get_price()
 			   );
-		  stop = true;
+		  //there is no way this statement should be here. this must be a mistake
+		  //stop = true;
 	       }
 	       else
 	       {
