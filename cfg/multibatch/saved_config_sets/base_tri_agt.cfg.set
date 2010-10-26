@@ -1,0 +1,4 @@
+005d   -   agent effects: 50 agents, triangular information   -   /simulation_data/glooper/cfg/multibatch/agent_investigation_1/005d_50_tri.sim.cfg.py
+004a   -   information generator effect - triangular generator   -   /simulation_data/glooper/cfg/multibatch/batch_1/004a_info_tri.sim.cfg.py
+005e   -   agent effects: 200 agents, triangular information   -   /simulation_data/glooper/cfg/multibatch/agent_investigation_1/005e_200_tri.sim.cfg.py
+005f   -   agent effects: 500 agents, triangular information   -   /simulation_data/glooper/cfg/multibatch/agent_investigation_1/005f_500_tri.sim.cfg.py
