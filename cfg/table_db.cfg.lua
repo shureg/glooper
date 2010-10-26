@@ -19,6 +19,7 @@ agt =
       {'des_inv_prop','desired_investment_proportion'},
       {'cur_inv_prop','current_investment_proportion'},
       {'inv_value','investment_value'},
+      {'total_inv_value','total_investment_value'},
       {'bankrupt','is_bankrupt'},
       {'overleveraged','is_overleveraged'},
 --ClassicAgent attributes

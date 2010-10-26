@@ -448,7 +448,7 @@ XmlField TradingAgent::xml_description() const
 
    if( indeterminate(pos.is_long) )
    {
-      iv = wealth;
+      iv = 0;
       cip = 0;
    }
    else
@@ -465,6 +465,8 @@ XmlField TradingAgent::xml_description() const
    tmp("position") = (double) pos;
 
    tmp("investment_value") = iv;
+
+   tmp("total_investment_value") = iv + wealth;
 
    tmp("desired_investment_proportion") =
       desired_investment_proportion();
