@@ -19,3 +19,34 @@ function fixed_number_agent_generator()
    agent_counter = agent_counter + 1
    return a,g,agent_counter,(agent_counter >= N_agents)
 end
+
+mixed_agent_counter = 0
+
+function prepare_next_generator()
+   
+   mixed_generator_counter = (mixed_generator counter or 0) + 1
+
+   local next_generator_entry = mixed_generator_table[mixed_generator_counter]
+
+   current_generator = next_generator_entry.generator
+   
+   agent_counter = 0
+   N_agents = next_generator_entry.N_agents
+   agent_ctor = next_generator_entry.agent_ctor
+   generator_args = next_generator_entry.generator_args
+   non_generator_args = next_generator_entry.non_generator_args
+
+end
+
+function mixed_agent_generator()
+
+   if(not mixed_agent_counter) then prepare_next_generator() end
+
+   local a_,g_,ac_,stop_ = current_generator()
+   mixed_agent_counter = mixed_agent_counter + 1
+
+   if(stop_) then prepare_next_generator() end
+
+   return a_,g_,mixed_agent_counter,(mixed_generator_counter > #mixed_generator_table)
+
+end

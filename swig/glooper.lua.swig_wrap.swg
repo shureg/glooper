@@ -4,6 +4,10 @@
 
 %import "rng/rng.lua.swig_wrap.swg"
 
+%inline %{
+   typedef RNG::TypedRandomGenerator<double> TRG_d;
+%}
+
 namespace GLOOPER_TEST
 {
    %rename(_ClassicAgent) ClassicAgent;//Need this to emulate keyword argument construction
@@ -61,6 +65,23 @@ namespace GLOOPER_TEST
       function glooper_lua_swig_wrap.HomogeneousAgent(kw)
 	 return glooper_lua_swig_wrap._HomogeneousAgent(
 	    kw.belief, kw.order_size, kw.min_spread, kw.max_spread)
+      end
+   %}
+
+   %rename(_NoiseTrader) NoiseTrader;
+
+   class NoiseTrader: public TradingAgent
+   {
+   public:
+      NoiseTrader(double belief, double wealth, 
+	    const TRG_d& belief_generator_, double max_bid_ask_sp);
+   };
+
+   //Emulating keyword argument constructor for NoiseTrader
+   %luacode %{
+      function glooper_lua_swig_wrap.NoiseTrader(kw)
+	 return glooper_lua_swig_wrap._NoiseTrader(
+	    kw.belief, kw.wealth, kw.belief_generator, kw.max_bid_ask_spread)
       end
    %}
 }
