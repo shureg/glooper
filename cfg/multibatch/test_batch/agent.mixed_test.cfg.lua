@@ -15,7 +15,7 @@ agt_gen = agent_generator
 agt_gen.mixed_generator.table = {
    {
       generator = agt_gen.fixed_number_agent_generator,
-      N_agents = 100,
+      N_agents = 20,
       agent_ctor = glooper.StandardComplexAgent,
       generator_args = {
 	 belief = rng.UniformGenerator(),
@@ -30,7 +30,7 @@ agt_gen.mixed_generator.table = {
    },
    {
       generator = agt_gen.fixed_number_agent_generator,
-      N_agents = 100,
+      N_agents = 20,
       agent_ctor = glooper.NoiseTrader,
       generator_args = {
 	 belief = rng.UniformGenerator(),

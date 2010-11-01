@@ -28,10 +28,8 @@ using namespace boost::logic;
 ClassicAgent::ClassicAgent(double belief,
       double wealth,
       double p_min, double f_min, double bas_max):
-   TradingAgent(belief,wealth),
-   p_min(p_min), f_min(f_min), bas_max(bas_max), 
-   spread_gen( RNG::UniformGenerator(bas_max/10.,bas_max) )
-
+   TradingAgent(belief,wealth, RNG::UniformGenerator(bas_max/10,bas_max)),
+   p_min(p_min), f_min(f_min), bas_max(bas_max)
 {
 }
 
@@ -81,12 +79,6 @@ void ClassicAgent::update_belief(double new_belief)
       belief += revision_proportion(new_belief)*(new_belief-belief);
    }
 }
-
-double ClassicAgent::spread_fraction() const
-{
-   return spread_gen();
-}
-
 
 XmlField ClassicAgent::xml_description() const
 {

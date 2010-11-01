@@ -21,11 +21,14 @@ using namespace GLOOPER_TEST;
 
 LuaComplexAgent::LuaComplexAgent(double belief,
       double wealth,
+      const TRG_d& spread_generator,
       int mean_reversion,
       unsigned long max_memory,
       unsigned long significance_threshold,
       const char* lua_cfg_filename): 
-   ComplexAgent(belief,wealth,mean_reversion,max_memory,significance_threshold), lua_cfg_filename(lua_cfg_filename), L(0)
+   ComplexAgent(belief,wealth,spread_generator,
+	 mean_reversion,max_memory,significance_threshold),
+   lua_cfg_filename(lua_cfg_filename), L(0)
 {
 }
 
@@ -87,23 +90,6 @@ void LuaComplexAgent::reconfigure()
 	    );
    
    bel_adj_luaref = luaL_ref(L,LUA_REGISTRYINDEX);
-
-   lua_pushstring(L,"spread_fraction");
-   lua_rawget(L,-2);
-
-   if( lua_isnil(L,-1) )
-      LOG(EXCEPTION, boost::format
-	    ("The \"ComplexAgent\" table in Lua file %s does not have an "\
-	     "spread_fraction\" field\n") % lua_cfg_filename
-	    );
-
-   if( !lua_isfunction(L,-1) )
-      LOG(EXCEPTION, boost::format
-	    ("The \"spread_fraction\" field in the \"ComplexAgent\" table "\
-	     "in Lua file %s is not a function\n") % lua_cfg_filename
-	    );
-   
-   spread_luaref = luaL_ref(L,LUA_REGISTRYINDEX);
    
    obj_ref = luaL_ref(L,LUA_REGISTRYINDEX);
 }
@@ -138,23 +124,6 @@ void LuaComplexAgent::adjust_belief(double p_more_extreme)
 	    );
    belief = lua_tonumber(L,-1);
    lua_pop(L,1);
-}
-
-double LuaComplexAgent::spread_fraction() const
-{
-   lua_rawgeti(L,LUA_REGISTRYINDEX,spread_luaref);
-   int res = lua_pcall(L,0,1,0);
-   if (res != 0)
-      LOG(EXCEPTION,boost::format
-	    ("LuaComplexAgent %d: "\
-	     "could not call LuaComplexAgent.spread_fraction: "\
-	     "%s\n") % id % (lua_tostring(L,-1))
-	    );
-   double result = lua_tonumber(L,-1);
-   
-   lua_pop(L,1);
-   
-   return result;
 }
 
 const boost::logic::tribool LuaComplexAgent::next_mode() const

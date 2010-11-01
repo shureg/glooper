@@ -1,11 +1,11 @@
 // =====================================================================================
 // 
-//       Filename:  LuaComplexAgent.class.h
+//       Filename:  StandardComplexAgent.class.h
 // 
 //    Description:  
 // 
 //        Version:  1.0
-//        Created:  17/02/10 16:26:53
+//        Created:  10/30/2010 07:38:26 PM
 //       Revision:  none
 //       Compiler:  g++
 // 
@@ -14,61 +14,46 @@
 // 
 // =====================================================================================
 
-#ifndef  LUACOMPLEXAGENT_CLASS_INC
-#define  LUACOMPLEXAGENT_CLASS_INC
+#ifndef  STANDARDCOMPLEXAGENT_CLASS_INC
+#define  STANDARDCOMPLEXAGENT_CLASS_INC
 
 #include "agent/ComplexAgent.class.h"
-#include <string>
 
-extern "C"
-{
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-}
+#include "rng/generator/UniformGenerator.class.h"
 
 namespace GLOOPER_TEST
 {
-   class LuaComplexAgent: public ComplexAgent
+   class StandardComplexAgent: public ComplexAgent
    {
    public:
 
-      LuaComplexAgent(double belief,
+      StandardComplexAgent(double belief,
 	    double wealth,
 	    const TRG_d& spread_generator,
 	    int mean_reversion,
 	    unsigned long max_memory,
-	    unsigned long significance_threshold,
-	    const char* lua_cfg_filename);
+	    unsigned long significance_threshold);
 
-      ~LuaComplexAgent();
+      ~StandardComplexAgent();
 
       void update_belief(double xi);
 
       XmlField xml_description() const;
 
-      void reconfigure();
+      void reconfigure(){}
 
    protected:
 
-      const char* lua_cfg_filename;
-
-      lua_State* L;
-
-      int obj_ref;
-
-      int bel_adj_luaref, bel_upd_luaref;
+      RNG::UniformGenerator U;
 
       void adjust_belief(double p_more_extreme);
 
       const boost::logic::tribool next_mode() const;
 
-      std::string lua_cfg_file_content;
-
-      const char* agent_type_str() const;
+      const char* agent_type_str() const {return "StandardComplexAgent";}
 
       Agent* real_clone() const;
    };
 }
 
-#endif   // ----- #ifndef LUACOMPLEXAGENT_CLASS_INC  -----
+#endif   // ----- #ifndef STANDARDCOMPLEXAGENT_CLASS_INC  -----

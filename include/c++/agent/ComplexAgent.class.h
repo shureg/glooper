@@ -69,6 +69,7 @@ namespace GLOOPER_TEST
 
       ComplexAgent(double belief,
 	    double wealth,
+	    const TRG_d& spread_generator,
 	    int mean_reversion,
 	    unsigned long max_memory,
 	    unsigned long significance_threshold);

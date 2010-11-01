@@ -29,8 +29,10 @@ namespace GLOOPER_TEST
    {
    public:
 
-      NoiseTrader(double belief, double wealth, 
-	    const TRG_d& belief_generator_, double max_bid_ask_sp);
+      NoiseTrader(double belief, double wealth,  const TRG_d& spread_generator,
+	    const TRG_d& belief_generator_);
+
+      ~NoiseTrader();
 
       void update_belief(double);
 
@@ -42,17 +44,15 @@ namespace GLOOPER_TEST
 
    protected:
 
-      bspTRG_d belief_generator;
-
-      double max_bid_ask_sp;
-
-      RNG::UniformGenerator U;
-
-      double spread_fraction() const;
+      const bspTRG_d belief_generator;
 
       const char* agent_type_str() const {return "NoiseTrader";}
 
       Agent* real_clone() const;
+
+   private:
+
+      const std::string belief_generator_string;
 
    };
 }

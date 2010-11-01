@@ -23,7 +23,8 @@ using std::string;
 
 LuaAgentGenerator::LuaAgentGenerator(const char* _cfg_filename):
    AgentGenerator(_cfg_filename)
-{}
+{
+}
 
 LuaAgentGenerator::~LuaAgentGenerator()
 {

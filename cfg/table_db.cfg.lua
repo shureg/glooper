@@ -10,26 +10,31 @@ agt =
 	 {container = "Step.End.Agent.Population", label="end_turn"}
       },
       headers = {
+--Agent attributes
       {'agent_id','id'},
       {'belief','belief'},
       {'timer','timer'},
+      {'type','type'},
+--TradingAgent attributes
       {'wealth','wealth'},
       {'position','position'},
-      {'type','type'},
-      {'des_inv_prop','desired_investment_proportion'},
-      {'cur_inv_prop','current_investment_proportion'},
       {'inv_value','investment_value'},
       {'total_inv_value','total_investment_value'},
+      {'des_inv_prop','desired_investment_proportion'},
+      {'cur_inv_prop','current_investment_proportion'},
       {'bankrupt','is_bankrupt'},
       {'overleveraged','is_overleveraged'},
+      {'spread_generator','spread_generator'},
 --ClassicAgent attributes
       {'min_rev_prob','minimum_revision_probability'},
       {'min_bel_adj_prop','minimum_belief_adjustment_proportion'},
       {'max_bid_ask','maximum_bid-ask_spread'},
 --LuaComplexAgent attributes
-      {'trend_mode','trend_mode'},
       {'max_memory','max_memory'},
-      {'sig_threshold','significance_threshold'}
+      {'sig_threshold','significance_threshold'},
+      {'trend_mode','trend_mode'},
+--NoiseTrader attributes
+      {'belief_generator','belief_generator'}
       }
    }
 

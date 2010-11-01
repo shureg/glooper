@@ -510,10 +510,14 @@ void TableDBInterface::process_row_data(
 
    string field_type;
 
-   if( f.field_exists("type") )
-      field_type = f["type"];
-   else
+   const XmlField::attribute_map& attributes = f.get_attributes();
+
+   XmlField::attribute_map::const_iterator record_type_pos = attributes.find("type");
+
+   if( record_type_pos == attributes.end() )
       field_type = field_name;
+   else
+      field_type = record_type_pos->second;
 
    LOG(TRACE, boost::format(
 	    "TableDBinterface::process_row_data: "\
@@ -521,8 +525,6 @@ void TableDBInterface::process_row_data(
 	    "in context \"%s\"\n")
 	 % field_type % table_id % context_label
 	 );
-
-   const XmlField::attribute_map& attributes = f.get_attributes();
 
    //Find the corresponding row header in the raw headers dictionary
    map<string, vector<string> >::iterator this_header = 
@@ -535,8 +537,11 @@ void TableDBInterface::process_row_data(
 	    % table_id
 	    );
 
+   //Create record type id from the table id and field type
+   string record_type_id = table_id + "_" + field_type;
+
    header_pos_map::iterator where =
-      memoized_header_pos.find(table_id);
+      memoized_header_pos.find(record_type_id);
 
    //If a memoized header order does not exist for the field label,
    //create it
@@ -546,7 +551,7 @@ void TableDBInterface::process_row_data(
       vector<size_t> dummy;
       where = memoized_header_pos.insert( memoized_header_pos.begin(),
 	    header_pos_map::value_type
-	    (table_id, dummy)
+	    (record_type_id, dummy)
 	    );
 
       //Go through the attributes of a field one by one
@@ -555,6 +560,11 @@ void TableDBInterface::process_row_data(
       for(XmlField::attribute_map::const_iterator
 	    a = attributes.begin(); a != attributes.end(); ++a)
       {
+	 LOG(TRACE, boost::format(
+		  "TableDBInterface::process_row_data - memoizing header row positions "\
+		  "for record type %s in table %s\n") % record_type_id % table_id
+	       );
+
 	 vector<string>::const_iterator pos =
 	    find(this_header->second.begin(), this_header->second.end(),
 		  a->first);
@@ -565,6 +575,12 @@ void TableDBInterface::process_row_data(
 		     "find attribute %s in header table %s\n")
 		  % (a->first) % (this_header->first)
 		  );
+
+	 LOG(TRACE, boost::format(
+		  "TableDBInterface::process_row_data - memoizing attribute %s "\
+		  "in position %d for header table %s\n")
+	       % (a->first) % (pos - this_header->second.begin()) % (this_header->first)
+	       );
 
 	 where->second.push_back(
 	       pos - this_header->second.begin()

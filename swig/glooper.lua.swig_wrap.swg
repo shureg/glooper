@@ -1,11 +1,8 @@
 %module "glooper_lua_swig_wrap"
 
 %include "glooper.headers.swg"
-
-%import "rng/rng.lua.swig_wrap.swg"
-
-%inline %{
-   typedef RNG::TypedRandomGenerator<double> TRG_d;
+%{
+#include "rng/rng.hpp"
 %}
 
 namespace GLOOPER_TEST
@@ -33,7 +30,7 @@ namespace GLOOPER_TEST
    {
    public:
       LuaComplexAgent(double belief,
-	    double wealth,
+	    double wealth, const RNG::TypedRandomGenerator<double>& spread_generator,
 	    int mean_reversion,
 	    unsigned long max_memory,
 	    unsigned long significance_threshold,
@@ -44,7 +41,7 @@ namespace GLOOPER_TEST
    %luacode %{
       function glooper_lua_swig_wrap.LuaComplexAgent(kw)
 	 return glooper_lua_swig_wrap._LuaComplexAgent(
-	    kw.belief, kw.wealth, kw.mean_reversion, kw.max_memory, kw.significance_threshold, kw.lua_cfg_filename)
+	    kw.belief, kw.wealth, kw.spread_generator, kw.mean_reversion, kw.max_memory, kw.significance_threshold, kw.lua_cfg_filename)
       end
    %}
 
@@ -73,15 +70,38 @@ namespace GLOOPER_TEST
    class NoiseTrader: public TradingAgent
    {
    public:
-      NoiseTrader(double belief, double wealth, 
-	    const TRG_d& belief_generator_, double max_bid_ask_sp);
+      NoiseTrader(double belief, double wealth, const RNG::TypedRandomGenerator<double>& spread_generator,
+	    const RNG::TypedRandomGenerator<double>& belief_generator_);
    };
 
    //Emulating keyword argument constructor for NoiseTrader
    %luacode %{
       function glooper_lua_swig_wrap.NoiseTrader(kw)
 	 return glooper_lua_swig_wrap._NoiseTrader(
-	    kw.belief, kw.wealth, kw.belief_generator, kw.max_bid_ask_spread)
+	    kw.belief, kw.wealth, kw.spread_generator, kw.belief_generator)
       end
    %}
+
+   %rename(_StandardComplexAgent) StandardComplexAgent;
+
+   class StandardComplexAgent: public ComplexAgent
+   {
+   public:
+
+      StandardComplexAgent(double belief,
+	    double wealth,
+	    const RNG::TypedRandomGenerator<double>& spread_generator,
+	    int mean_reversion,
+	    unsigned long max_memory,
+	    unsigned long significance_threshold);
+   };
+
+   //Emulating keyword argument constructor for StandardComplexAgent
+   %luacode %{
+      function glooper_lua_swig_wrap.StandardComplexAgent(kw)
+	 return glooper_lua_swig_wrap._StandardComplexAgent(
+	    kw.belief, kw.wealth, kw.spread_generator, kw.mean_reversion, kw.max_memory, kw.significance_threshold)
+      end
+   %}
+
 }

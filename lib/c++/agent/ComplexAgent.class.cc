@@ -27,10 +27,11 @@ const boost::logic::tribool
 
 ComplexAgent::ComplexAgent(double belief,
       double wealth,
+      const TRG_d& spread_generator,
       int mean_reversion,
       unsigned long max_memory,
       unsigned long significance_threshold): 
-   TradingAgent(belief,wealth),
+   TradingAgent(belief,wealth,spread_generator),
    mean_reverter( 
 	 (mean_reversion==0)?(neither):(boost::logic::tribool(mean_reversion>0)) ),
    max_memory(max_memory),

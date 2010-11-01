@@ -16,24 +16,25 @@
 
 #include "agent/NoiseTrader.class.h"
 
+#include <iostream>
+
 using namespace GLOOPER_TEST;
 
-NoiseTrader::NoiseTrader(double belief, double wealth,
-      const TRG_d& belief_generator_, double max_bid_ask_sp):
-   TradingAgent(belief, wealth),
+NoiseTrader::NoiseTrader(double belief, double wealth, const TRG_d& spread_generator,
+      const TRG_d& belief_generator_):
+   TradingAgent(belief, wealth, spread_generator),
    belief_generator(bspTRG_d(belief_generator_.clone())),
-   max_bid_ask_sp(max_bid_ask_sp), 
-   U( RNG::UniformGenerator( max_bid_ask_sp/10, max_bid_ask_sp ) )
-{}
+   belief_generator_string( belief_generator_.xml_description().string_format("qXML_line"))
+{
+}
+
+NoiseTrader::~NoiseTrader()
+{
+}
 
 void NoiseTrader::update_belief(double)
 {
    belief = (*belief_generator)();
-}
-
-double NoiseTrader::spread_fraction() const
-{
-   return U();
 }
 
 Agent* NoiseTrader::real_clone() const
@@ -47,15 +48,7 @@ XmlField NoiseTrader::xml_description() const
 {
    XmlField tmp = TradingAgent::xml_description();
 
-   tmp("nt_max_bid_ask") = max_bid_ask_sp;
-
-   XmlField bg = belief_generator->xml_description();
-
-   tmp("belief_generator_short") = bg.string_format("Python");
-
-   tmp.add_field("Belief.Generator");
-
-   tmp["Belief.Generator"] = bg;
+   tmp("belief_generator") = belief_generator_string;
 
    return tmp;
 }

@@ -26,9 +26,11 @@ using namespace std;
 using namespace boost::logic;
 
 TradingAgent::TradingAgent(double _belief,
-      double _wealth):
+      double _wealth, const TRG_d& spread_generator):
    Agent(_belief),
-   wealth(_wealth), is_bankrupt(false), is_overleveraged(false), force_passive(false)
+   wealth(_wealth), spread_generator( bspTRG_d( spread_generator.clone() ) ),
+   is_bankrupt(false), is_overleveraged(false), force_passive(false),
+   spread_generator_string( spread_generator.xml_description().string_format("qXML_line") )
 {
 }
 
@@ -88,6 +90,11 @@ void TradingAgent::position_update(const Order& r)
 bool TradingAgent::is_active() const
 {
    return (!force_passive) && ( 2.*abs(belief-0.5) > 0.75 );
+}
+
+double TradingAgent::spread_fraction() const
+{
+   return (*spread_generator)();
 }
 
 double TradingAgent::bid_ask_spread(double price,bool is_bid) const
@@ -476,6 +483,8 @@ XmlField TradingAgent::xml_description() const
    tmp("is_bankrupt") = is_bankrupt;
 
    tmp("is_overleveraged") = is_overleveraged;
+
+   tmp("spread_generator") = spread_generator_string;
    
    return tmp;
 }

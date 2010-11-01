@@ -12,6 +12,8 @@ function basic_agent_ctor_call()
    return agt,gens
 end
 
+--Fixed number agent generator
+
 agent_counter = 0
 
 function fixed_number_agent_generator()
@@ -20,33 +22,39 @@ function fixed_number_agent_generator()
    return a,g,agent_counter,(agent_counter >= N_agents)
 end
 
-mixed_agent_counter = 0
+--Mixed (composite) agent generator
+
+mixed_generator = {agent_counter = 0}
 
 function prepare_next_generator()
    
-   mixed_generator_counter = (mixed_generator counter or 0) + 1
+   mixed_generator.generator_counter = (mixed_generator.generator_counter or 0) + 1
 
-   local next_generator_entry = mixed_generator_table[mixed_generator_counter]
+   local next_generator_entry = mixed_generator.table[mixed_generator.generator_counter]
 
-   current_generator = next_generator_entry.generator
-   
-   agent_counter = 0
-   N_agents = next_generator_entry.N_agents
-   agent_ctor = next_generator_entry.agent_ctor
-   generator_args = next_generator_entry.generator_args
-   non_generator_args = next_generator_entry.non_generator_args
+   if(next_generator_entry) then
+
+      mixed_generator.current_generator = next_generator_entry.generator
+
+      agent_counter = 0
+      N_agents = next_generator_entry.N_agents
+      agent_ctor = next_generator_entry.agent_ctor
+      generator_args = next_generator_entry.generator_args
+      non_generator_args = next_generator_entry.non_generator_args
+
+   end
 
 end
 
 function mixed_agent_generator()
 
-   if(not mixed_agent_counter) then prepare_next_generator() end
+   if(not mixed_generator.generator_counter) then prepare_next_generator() end
 
-   local a_,g_,ac_,stop_ = current_generator()
-   mixed_agent_counter = mixed_agent_counter + 1
+   local a_,g_,ac_,stop_ = mixed_generator.current_generator()
+   mixed_generator.agent_counter = mixed_generator.agent_counter + 1
 
    if(stop_) then prepare_next_generator() end
 
-   return a_,g_,mixed_agent_counter,(mixed_generator_counter > #mixed_generator_table)
+   return a_,g_,mixed_generator.agent_counter,(mixed_generator.generator_counter > #(mixed_generator.table))
 
 end

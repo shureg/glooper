@@ -59,10 +59,6 @@ namespace GLOOPER_TEST
 
       double bas_max;
 
-      RNG::UniformGenerator spread_gen;
-
-      double spread_fraction() const;
-
       Agent* real_clone() const;
 
       const char* agent_type_str() const;

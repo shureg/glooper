@@ -23,6 +23,9 @@
 
 #include <list>
 
+typedef RNG::TypedRandomGenerator<double> TRG_d;
+typedef boost::shared_ptr<TRG_d> bspTRG_d;
+
 namespace GLOOPER_TEST
 {
    class TradingAgent: public Agent
@@ -30,7 +33,7 @@ namespace GLOOPER_TEST
    public:
 
       TradingAgent(double,
-	    double);
+	    double, const TRG_d&);
 
       void place_order();
 
@@ -46,6 +49,8 @@ namespace GLOOPER_TEST
 
       double wealth;
 
+      const bspTRG_d spread_generator;
+
       double desired_investment_proportion() const;
 
       double current_investment_proportion(double) const;
@@ -56,7 +61,7 @@ namespace GLOOPER_TEST
 
       double bid_ask_spread(double,bool) const;
 
-      virtual double spread_fraction() const = 0;
+      double spread_fraction() const;
 
       double mark_to_market() const;
 
@@ -82,6 +87,7 @@ namespace GLOOPER_TEST
 
       boost::logic::tribool illiquid_market_order_status(double dip) const;
 
+      const std::string spread_generator_string;
    };
 }
 

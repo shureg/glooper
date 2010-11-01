@@ -18,4 +18,5 @@
 #include "info/SimpleIntermittentInfoGenerator.class.h"
 #include "info/TriangularMarkovianInfoGenerator.class.h"
 #include "agent/NoiseTrader.class.h"
+#include "agent/StandardComplexAgent.class.h"
 %}
