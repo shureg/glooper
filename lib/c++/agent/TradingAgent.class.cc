@@ -1,6 +1,6 @@
 // =====================================================================================
 // 
-//       Filename:  ClassicAgent.class.cc
+//       Filename:  TradingAgent.class.cc
 // 
 //    Description:  
 // 
@@ -14,7 +14,7 @@
 // 
 // =====================================================================================
 
-#include "agent/ClassicAgent.class.h"
+#include "agent/TradingAgent.class.h"
 #include <cmath>
 #include <iostream>
 #include "rng/generator/UniformGenerator.class.h"
@@ -25,9 +25,9 @@ using namespace GLOOPER_TEST;
 using namespace std;
 using namespace boost::logic;
 
-TradingAgent::TradingAgent(double _belief,
+TradingAgent::TradingAgent(double _belief, const TRG_d& private_info_generator,
       double _wealth, const TRG_d& spread_generator):
-   Agent(_belief),
+   Agent(_belief,private_info_generator),
    wealth(_wealth), spread_generator( bspTRG_d( spread_generator.clone() ) ),
    is_bankrupt(false), is_overleveraged(false), force_passive(false),
    spread_generator_string( spread_generator.xml_description().string_format("qXML_line") )

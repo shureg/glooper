@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-import os
-
-os.environ["MALLOC_CHECK_"] = "1"
-
 #Filename and pathname related settings
 
 PROJECT_ROOT = "/simulation_data"
@@ -75,7 +71,7 @@ log_filename = os.path.join(root_logdir,"sim.%d.log" % simid )
 os.system("mkdir -pv %s" % os.path.join(LOG_PATH,version_string,str(simid)))
 os.system("ln -sf %s %s" % ( log_filename,os.path.join(LOG_PATH,"current_log") ) )
 
-F = cbl.FileCallbackLog(log_filename,"glooper",cbl.TRACE)
+F = cbl.FileCallbackLog(log_filename,"glooper",cbl.INFO)
 
 #Flat XML file path creation
 xml_path = os.path.join(DATA_PATH,version_string,str(simid),"xml")

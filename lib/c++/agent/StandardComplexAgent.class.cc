@@ -22,12 +22,16 @@ using namespace GLOOPER_TEST;
 
 StandardComplexAgent::StandardComplexAgent(
       double belief,
+      const TRG_d& private_info_generator,
       double wealth,
       const TRG_d& spread_generator,
       int mean_reversion,
       unsigned long max_memory,
-      unsigned long significance_threshold):
-   ComplexAgent(belief, wealth, spread_generator, mean_reversion, max_memory, significance_threshold)
+      unsigned long significance_threshold,
+      double public_weight, double private_weight):
+   ComplexAgent(belief, private_info_generator, 
+	 wealth, spread_generator, mean_reversion, max_memory, significance_threshold),
+   public_proportion( public_weight/(public_weight+private_weight) ), private_proportion(1-public_proportion)
 {
 }
 
@@ -35,9 +39,14 @@ StandardComplexAgent::~StandardComplexAgent()
 {
 }
 
-void StandardComplexAgent::update_belief(double xi)
+double StandardComplexAgent::process_public_information(double xi) const
 {
-   belief += (xi-belief)*U();
+   return belief + (xi-belief)*U();
+}
+
+double StandardComplexAgent::combine_public_private_information(double public_xi, double private_xi) const
+{
+   return public_proportion*public_xi + private_proportion*private_xi;
 }
 
 void StandardComplexAgent::adjust_belief(double p_more_extreme)
@@ -77,6 +86,10 @@ Agent* StandardComplexAgent::real_clone() const
 XmlField StandardComplexAgent::xml_description() const
 {
    XmlField tmp = ComplexAgent::xml_description();
+
+   tmp("public_proportion") = public_proportion;
+
+   tmp("private_proportion") = private_proportion;
 
    return tmp;
 }

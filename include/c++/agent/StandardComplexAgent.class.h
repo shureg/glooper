@@ -28,15 +28,16 @@ namespace GLOOPER_TEST
    public:
 
       StandardComplexAgent(double belief,
+	    const TRG_d& private_info_generator,
 	    double wealth,
 	    const TRG_d& spread_generator,
 	    int mean_reversion,
 	    unsigned long max_memory,
-	    unsigned long significance_threshold);
+	    unsigned long significance_threshold,
+	    double public_weight,
+	    double private_weight);
 
       ~StandardComplexAgent();
-
-      void update_belief(double xi);
 
       XmlField xml_description() const;
 
@@ -44,7 +45,15 @@ namespace GLOOPER_TEST
 
    protected:
 
+      double public_proportion;
+
+      double private_proportion;
+
       RNG::UniformGenerator U;
+
+      double process_public_information(double) const;
+
+      double combine_public_private_information(double, double) const;
 
       void adjust_belief(double p_more_extreme);
 

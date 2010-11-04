@@ -23,10 +23,36 @@ using namespace GLOOPER_TEST;
 
 unsigned long Agent::instance_counter(0);
 
-Agent::Agent(double _belief):
+Agent::Agent(double _belief, 
+      const RNG::TypedRandomGenerator<double>& private_info_generator):
    SimulationObject(++instance_counter),
-   belief(_belief)
+   belief(_belief),
+   private_info_generator( 
+	 boost::shared_ptr< RNG::TypedRandomGenerator<double> >( 
+	    private_info_generator.clone() ) ),
+   private_info_generator_string(
+	 private_info_generator.xml_description().
+	    string_format("qXML_line"))
 {}
+
+void Agent::receive_public_information(double xi)
+{
+   if(xi>=0 && xi <= 1.)
+      public_information_record.push_back( process_public_information(xi) );
+   else
+      public_information_record.push_back(-1);
+}
+
+void Agent::update_belief()
+{
+   double private_xi = (*private_info_generator)();
+   double public_xi = public_information_record.back();
+
+   if(public_xi >= 0 && public_xi <= 1)
+      belief = combine_public_private_information(public_xi , private_xi);
+   else
+      belief = private_xi;
+}
 
 Agent* Agent::clone() const
 {
@@ -67,6 +93,8 @@ XmlField Agent::xml_description() const
    tmp("belief") = belief;
    
    tmp("timer") = (*ro_timer)();
+
+   tmp("private_info_generator") = private_info_generator_string;
 
    return tmp;
 }

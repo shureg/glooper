@@ -165,8 +165,8 @@ void AgentPopulation::evolve()
    for(std::vector<unsigned int>::iterator 
 	 i = population_index.begin(); i != population_index.end(); ++i)
    {
-      if(last_info >= 0. && last_info <= 1.)
-   population[*i].update_belief(last_info);
+      population[*i].receive_public_information(last_info);
+      population[*i].update_belief();
       if( population[*i].can_trade() )
 	 population[*i].place_order();
    }

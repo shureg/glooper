@@ -15,6 +15,7 @@ agt =
       {'belief','belief'},
       {'timer','timer'},
       {'type','type'},
+      {'private_info_generator','private_info_generator'},
 --TradingAgent attributes
       {'wealth','wealth'},
       {'position','position'},
@@ -29,10 +30,12 @@ agt =
       {'min_rev_prob','minimum_revision_probability'},
       {'min_bel_adj_prop','minimum_belief_adjustment_proportion'},
       {'max_bid_ask','maximum_bid-ask_spread'},
---LuaComplexAgent attributes
+--StandardComplexAgent attributes
       {'max_memory','max_memory'},
       {'sig_threshold','significance_threshold'},
       {'trend_mode','trend_mode'},
+      {'public_proportion','public_proportion'},
+      {'private_proportion','private_proportion'},
 --NoiseTrader attributes
       {'belief_generator','belief_generator'}
       }

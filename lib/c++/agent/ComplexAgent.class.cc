@@ -26,12 +26,13 @@ const boost::logic::tribool
    GLOOPER_TEST::neither = boost::logic::indeterminate;
 
 ComplexAgent::ComplexAgent(double belief,
+      const TRG_d& private_info_generator,
       double wealth,
       const TRG_d& spread_generator,
       int mean_reversion,
       unsigned long max_memory,
       unsigned long significance_threshold): 
-   TradingAgent(belief,wealth,spread_generator),
+   TradingAgent(belief,private_info_generator,wealth,spread_generator),
    mean_reverter( 
 	 (mean_reversion==0)?(neither):(boost::logic::tribool(mean_reversion>0)) ),
    max_memory(max_memory),

@@ -20,6 +20,9 @@
 #include "trading/Market.class.h"
 #include "boost/shared_ptr.hpp"
 #include "core/SimulationObject.class.h"
+#include "rng/rng.hpp"
+
+#include <vector>
 
 namespace GLOOPER_TEST
 {
@@ -31,9 +34,11 @@ namespace GLOOPER_TEST
 
       virtual ~Agent(){}
 
-      Agent(double);
+      Agent(double, const RNG::TypedRandomGenerator<double>&);
 
-      virtual void update_belief(double) = 0;
+      void update_belief();
+
+      void receive_public_information(double);
 
       virtual void place_order() = 0;
 
@@ -63,15 +68,29 @@ namespace GLOOPER_TEST
 
       double belief;
 
+      boost::shared_ptr< RNG::TypedRandomGenerator<double> > private_info_generator;
+
       boost::shared_ptr<Market> spot_mkt;
 
       boost::shared_ptr< timer_signal > timer;
 
       boost::shared_ptr< timer_signal > ro_timer;
 
+      std::vector<double> public_information_record;
+
+      virtual double process_public_information(double) const = 0;
+
+      virtual double combine_public_private_information(
+	    double,double) const = 0;
+
       virtual const char* agent_type_str() const = 0;
 
       virtual Agent* real_clone() const = 0;
+
+   private:
+      
+      const std::string private_info_generator_string;
+
    };
 
    //! Required for Boost Pointer Container library to enable deep copy 

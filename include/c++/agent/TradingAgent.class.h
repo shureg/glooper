@@ -1,6 +1,6 @@
 // =====================================================================================
 // 
-//       Filename:  ClassicAgent.class.h
+//       Filename:  TradingAgent.class.h
 // 
 //    Description:  
 // 
@@ -32,7 +32,7 @@ namespace GLOOPER_TEST
    {
    public:
 
-      TradingAgent(double,
+      TradingAgent(double, const TRG_d&,
 	    double, const TRG_d&);
 
       void place_order();
