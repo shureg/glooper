@@ -29,7 +29,7 @@ TradingAgent::TradingAgent(double _belief, const TRG_d& private_info_generator,
       double _wealth, const TRG_d& spread_generator):
    Agent(_belief,private_info_generator),
    wealth(_wealth), spread_generator( bspTRG_d( spread_generator.clone() ) ),
-   is_bankrupt(false), is_overleveraged(false), force_passive(false),
+   is_bankrupt(false), is_overleveraged(false),
    spread_generator_string( spread_generator.xml_description().string_format("qXML_line") )
 {
 }
@@ -89,7 +89,7 @@ void TradingAgent::position_update(const Order& r)
 
 bool TradingAgent::is_active() const
 {
-   return (!force_passive) && ( 2.*abs(belief-0.5) > 0.75 );
+   return 2.*abs(belief-0.5) > 0.75;
 }
 
 double TradingAgent::spread_fraction() const
@@ -105,77 +105,34 @@ double TradingAgent::bid_ask_spread(double price,bool is_bid) const
       return price*(1.+spread_fraction());
 }
 
-tribool TradingAgent::illiquid_market_order_status(double dip) const
-{
-   const Order* best_ask = spot_mkt->best_order(true);
-   const Order* best_bid = spot_mkt->best_order(false);
-
-   if(best_ask == 0 && best_bid == 0)
-   {
-      force_passive = true;
-      return indeterminate;
-   }
-   else if(best_ask == 0 && best_bid != 0)
-   {
-      if( current_investment_proportion(best_bid->get_price()) > dip )
-	 return false;
-      else
-      {
-	 force_passive = true;
-	 return indeterminate;
-      }
-   }
-   else if(best_ask != 0 && best_bid == 0)
-   {
-      if( current_investment_proportion(best_ask->get_price()) < dip )
-	 return true;
-      else
-      {
-	 force_passive = true;
-	 return indeterminate;
-      }
-   }
-   else
-      return indeterminate;
-}
-
 tribool TradingAgent::order_is_bid() const
 {
-   double dip = desired_investment_proportion();
+   double best_ask = spot_mkt->mark_to_market(true);
+   double best_bid = spot_mkt->mark_to_market(false);
 
-   //tribool preliminary_status = illiquid_market_order_status(dip);
+   if(best_bid > best_ask)
+   {
+      LOG(ERROR, boost::format(
+	       "TradingAgent::order_is_bid - best bid price %.3f "\
+	       "exceeds best ask price %.3f for agent %d, "
+	       "preventing any trading activity")
+	    % best_bid % best_ask % id
+	 );
 
-   //if(!indeterminate(preliminary_status))
-   //   return preliminary_status;
-   //else
-   //{
-      double best_ask = spot_mkt->mark_to_market(true);
-      double best_bid = spot_mkt->mark_to_market(false);
+      return indeterminate;
+   }
+   else
+   {
+      double dq_ask = (double) get_order_quantity(best_ask);
+      double dq_bid = (double) get_order_quantity(best_bid);
 
-      if(best_bid > best_ask)
-      {
-	 LOG(ERROR, boost::format(
-		  "TradingAgent::order_is_bid - best bid price %.3f "\
-		  "exceeds best ask price %.3f for agent %d, "
-		  "preventing any trading activity")
-	       % best_bid % best_ask % id
-	       );
-
-	 return indeterminate;
-      }
+      if(dq_ask > 0)
+	 return true;
+      else if(dq_bid < 0)
+	 return false;
       else
-      {
-	 double dq_ask = (double) get_order_quantity(best_ask);
-	 double dq_bid = (double) get_order_quantity(best_bid);
-
-	 if(dq_ask > 0)
-	    return true;
-	 else if(dq_bid < 0)
-	    return false;
-	 else
-	    return indeterminate;
-      }
-   //}
+	 return indeterminate;
+   }
 }
 
 Position TradingAgent::get_order_quantity(double price) const
@@ -202,8 +159,6 @@ Position TradingAgent::get_order_quantity(double price) const
 
 void TradingAgent::place_order()
 {
-   force_passive = false;
-
    tribool order_status = order_is_bid();
 
    tribool prev_order_status;

@@ -83,13 +83,9 @@ namespace GLOOPER_TEST
 
       bool is_overleveraged;
 
-      mutable bool force_passive;
-
       void determine_overleverage(double iv, double L);
 
    private:
-
-      boost::logic::tribool illiquid_market_order_status(double dip) const;
 
       const std::string spread_generator_string;
    };
