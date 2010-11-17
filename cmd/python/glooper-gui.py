@@ -14,6 +14,8 @@ ListSuperFrame = Frame(root)
 InputListFrame = Frame(ListSuperFrame)
 ExchangeFrame = Frame(ListSuperFrame)
 OutputListFrame = Frame(ListSuperFrame)
+ManageFrame = Frame(ControlFrame)
+LaunchFrame = Frame(ControlFrame)
 
 #List creation
 
@@ -116,7 +118,7 @@ def confirm_window(cfgs):
    def run_launch_script():
       confirmWindow.destroy()
       root.destroy()
-      os.system("nohup ./g_looper.py %s &" % " ".join(cfgs) )
+      os.system("MALLOC_CHECK_=0 nohup ./g_looper.py %s &" % " ".join(cfgs) )
 
    okButton = Button(buttonFrame, text="Launch", command = run_launch_script)
    cancelButton = Button(buttonFrame, text="Cancel", command = confirmWindow.destroy)
@@ -130,16 +132,17 @@ def launch_sim():
 
 #Button creation
 
-browseButton = Button(ControlFrame, text="Browse For Config Files", command = browse_for_cfg_files)
-saveButton = Button(ControlFrame, text="Save Currently Staged Set", command = save_staged)
-loadButton = Button(ControlFrame, text="Load Configuration Set", command = load_cfg)
+configButton = Button(ManageFrame, text="Launch Config Manager", command = lambda : os.system("python glooper-cfg-manage.py &"))
+browseButton = Button(ManageFrame, text="Browse For Config Files", command = browse_for_cfg_files)
+saveButton = Button(ManageFrame, text="Save Currently Staged Set", command = save_staged)
+loadButton = Button(ManageFrame, text="Load Configuration Set", command = load_cfg)
 
 stageButton = Button(ExchangeFrame, text = "Stage Selected", command = stage_file)
 unstageButton = Button(ExchangeFrame, text = "Unstage Selected", command = unstage_file)
 clearInputButton = Button(ExchangeFrame, text = "Clear Input Files", command = clear_input)
 clearStagedButton = Button(ExchangeFrame, text = "Clear Staged Files", command = clear_staged)
 
-simulationLaunchButton = Button(ControlFrame, text = "Launch Simulation", command = launch_sim)
+simulationLaunchButton = Button(LaunchFrame, text = "Launch Simulation", command = launch_sim)
 
 #Object packing
 
@@ -154,14 +157,18 @@ unstageButton.pack(side=LEFT)
 clearInputButton.pack(side=LEFT)
 clearStagedButton.pack(side=LEFT)
 
-browseButton.pack(side=TOP)
-saveButton.pack(side=TOP)
-loadButton.pack(side=TOP)
-simulationLaunchButton.pack(side=BOTTOM)
+configButton.grid(sticky = W+E)
+browseButton.grid(sticky = W+E)
+saveButton.grid(sticky = W+E)
+loadButton.grid(sticky = W+E)
+simulationLaunchButton.grid(sticky = W+E)
 
 InputListFrame.pack(side=TOP,fill=BOTH,expand=1)
 ExchangeFrame.pack(fill=X)
 OutputListFrame.pack(side=BOTTOM,fill=BOTH,expand=1)
+
+ManageFrame.pack(side=TOP, fill = Y)
+LaunchFrame.pack(side=BOTTOM)
 
 ListSuperFrame.pack(side=LEFT,fill=BOTH,expand=1)
 ControlFrame.pack(side=RIGHT,fill=Y)

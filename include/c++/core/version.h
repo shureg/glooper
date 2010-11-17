@@ -17,7 +17,7 @@
 #ifndef  VERSION_INC
 #define  VERSION_INC
 
-#define LIB_VERSION 17.0.0
+#define LIB_VERSION 18.0.10
 
 #define LIB_VERSION_STR TO_STR(LIB_VERSION)
 

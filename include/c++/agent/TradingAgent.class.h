@@ -67,6 +67,8 @@ namespace GLOOPER_TEST
 
       Position get_order_quantity(double) const;
 
+      void check_wealth();
+
       void check_liquidity();
 
       void check_leverage();
@@ -74,6 +76,8 @@ namespace GLOOPER_TEST
       void reset_orders();
 
       boost::logic::tribool order_is_bid() const;
+
+      bool negative_wealth;
 
       bool is_bankrupt;
 

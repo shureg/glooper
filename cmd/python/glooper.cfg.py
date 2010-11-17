@@ -84,7 +84,7 @@ csv_datadir = os.path.join(DATA_PATH,version_string,str(simid),"csv")
 os.system("mkdir -pv %s" % root_datadir)
 os.system("mkdir -pv %s" % csv_datadir)
 
-query_labels = ['agt','trd','inf','ord','lob']
+query_labels = ['agt','trd','inf','ord','lob','crd']
 
 for ql in query_labels:
    os.system("mkdir -pv %s" % os.path.join(DATA_PATH,version_string,str(simid),"csv",ql))

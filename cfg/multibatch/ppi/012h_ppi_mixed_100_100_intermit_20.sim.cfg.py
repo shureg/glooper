@@ -1,6 +1,6 @@
 execfile(os.path.join(cwd,"common.cfg.py"))
 
-sim_comment = "public-private information - mixed(100,100) with triangular/triangular"
+sim_comment = "public-private information - mixed(100,100) with intermittent tri/tri"
 
 info = glooper.SimpleIntermittentInfoGenerator( rng.TriangularGenerator(0,1,0.5), 0.05 )
 

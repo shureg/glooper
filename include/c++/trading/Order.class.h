@@ -21,6 +21,7 @@
 #include "boost/logic/tribool.hpp"
 #include "callback_log/LOG.h"
 #include <stdexcept>
+#include <string>
 #include "core/SimulationObject.class.h"
 #include "trading/Trade.class.h"
 
@@ -44,11 +45,23 @@ namespace GLOOPER_TEST
 
       //! Limit order constructor
       Order(Agent&,
-	    double, unsigned long, bool, unsigned long);
+	    double, unsigned long, bool, unsigned long,
+	    const std::string& comment = "");
 
       //! Market order constructor
       Order(Agent&,
-	    unsigned long, bool, unsigned long);
+	    unsigned long, bool, unsigned long,
+	    const std::string& comment = "");
+
+      /*! Need an explicit copy constructor to make
+       *  sure signals are reconnected properly
+       */
+      Order(const Order&);
+
+      /*! Need an explicit assignment operator to make
+       *  sure signals are reconnected properly
+       */
+      Order& operator = (const Order&);
 
       ~Order();
 
@@ -94,17 +107,19 @@ namespace GLOOPER_TEST
 
       static thread_wrap<unsigned long> instance_ctr;
 
-      Agent& owner;
+      Agent* owner;
 
-      const double price;
+      double price;
       
       mutable unsigned long quantity;
       
-      const bool bid;
+      bool bid;
 
-      const bool market;
+      bool market;
 
-      const unsigned long order_time;
+      unsigned long order_time;
+
+      std::string comment;
 
       //! A pointer to a trade-processing signal constructed elsewhere
       boost::shared_ptr<trade_signal> owner_signal;

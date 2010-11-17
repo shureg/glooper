@@ -90,6 +90,8 @@ namespace GLOOPER_TEST
 
       XmlField short_description() const;
 
+      void print(std::ostream&) const;
+
    protected:
 
       const bool is_crossing_limit_order(const Order&) const;

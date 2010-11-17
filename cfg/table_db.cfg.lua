@@ -67,6 +67,7 @@ ord =
 	 'is_crossing',
 	 'order_time',
 	 'owner_id',
+	 'comment',
 	 'bid0_price',
 	 'bid0_quantity',
 	 'ask0_price',
@@ -102,8 +103,18 @@ lob =
 	 'quantity',
 	 'is_market',
 	 'order_time',
-	 'owner_id'
+	 'owner_id',
+	 'comment'
       }
    }
 
-tables = {agt,trd,ord,inf,lob}
+crd = 
+   {
+      table_id = "crd",
+      field_name = "Cancelled.Order",
+      headers = {
+	 {'order_id','id'}
+      }
+   }
+
+tables = {agt,trd,ord,inf,lob,crd}

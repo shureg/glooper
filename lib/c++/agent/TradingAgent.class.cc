@@ -143,34 +143,39 @@ tribool TradingAgent::order_is_bid() const
 {
    double dip = desired_investment_proportion();
 
-   tribool preliminary_status = illiquid_market_order_status(dip);
+   //tribool preliminary_status = illiquid_market_order_status(dip);
 
-   if(!indeterminate(preliminary_status))
-      return preliminary_status;
-   else
-   {
-      double cip_a = current_investment_proportion( spot_mkt->mark_to_market(true) );
-      double cip_b = current_investment_proportion( spot_mkt->mark_to_market(false) );
+   //if(!indeterminate(preliminary_status))
+   //   return preliminary_status;
+   //else
+   //{
+      double best_ask = spot_mkt->mark_to_market(true);
+      double best_bid = spot_mkt->mark_to_market(false);
 
-      if(pos.is_long)
+      if(best_bid > best_ask)
       {
-	 if(dip > cip_a) return true;
-	 else if(dip < cip_b) return false;
-	 else return indeterminate;
-      }
-      else if(!pos.is_long)
-      {
-	 if(dip > cip_b) return true;
-	 else if(dip < cip_a) return false;
-	 else return indeterminate;
+	 LOG(ERROR, boost::format(
+		  "TradingAgent::order_is_bid - best bid price %.3f "\
+		  "exceeds best ask price %.3f for agent %d, "
+		  "preventing any trading activity")
+	       % best_bid % best_ask % id
+	       );
+
+	 return indeterminate;
       }
       else
       {
-	 if(dip > 0) return true;
-	 else if(dip < 0) return false;
-	 else return indeterminate;
+	 double dq_ask = (double) get_order_quantity(best_ask);
+	 double dq_bid = (double) get_order_quantity(best_bid);
+
+	 if(dq_ask > 0)
+	    return true;
+	 else if(dq_bid < 0)
+	    return false;
+	 else
+	    return indeterminate;
       }
-   }
+   //}
 }
 
 Position TradingAgent::get_order_quantity(double price) const
@@ -179,9 +184,11 @@ Position TradingAgent::get_order_quantity(double price) const
    double omega = desired_investment_proportion();
    double dq = (omega/price)*(q*price + wealth) - q;
 
-   LOG(TRACE,boost::format("Agent %d: with cip= %.4f, dip=%.4f, W=%.0f, Q=%.0f, "
+   LOG(TRACE,boost::format(
+	    "Agent %d: with cip= %.4f, dip=%.4f, W=%.0f, Q=%.0f, "\
 	    "m=%.3f, the requisite raw order quantity is found to be %f\n")
-	 % id % current_investment_proportion(price) % desired_investment_proportion() 
+	 % id % current_investment_proportion(price) 
+	 % desired_investment_proportion() 
 	 % wealth % (double) pos % price % dq
 	 );
 
@@ -203,97 +210,84 @@ void TradingAgent::place_order()
 
    if( !indeterminate(order_status) )
    {
+      //SimulationObject::db_signal()(*this);
+
       reset_orders();
 
       Position dq;
 
       bool bid = (bool) order_status;
 
-      if( is_active() )
+      // Active order
+      if( is_active() && spot_mkt->best_order(bid) != 0 )
       {
-	 double mtm = spot_mkt->mark_to_market( bid );
-
-	 dq = get_order_quantity(mtm);
-
-	 LOG(TRACE,boost::format("Agent %d: Preparing to execute an active order "\
-		  "for %.0f units\n")
-	       % id % dq
-	       );
-
-	 unsigned long ctr = 0;
-
+	 unsigned long amount = 0;
+	 double volume = 0;
 	 bool stop = false;
+	 double vwap;
+	 double p_;
+	 unsigned long q_;
 
-	 const Order* best = spot_mkt->best_order( bid );
-
-	 if(best == 0)
-	    LOG(TRACE, boost::format(
-		     "Agent %d: with order flag (%d) there is "\
-		     "no best opposing order\n")
-		  % id % bid
-		  );
-	 else
-	    LOG(TRACE, boost::format(
-		     "Agent %d: with order flag (%d) the best opposing"
-		     "price is %.2f\n")
-		  % id % bid % ( best->get_price() )
-		  );
-
-	 while (best != 0 && dq != 0 && !stop)
+	 if(bid)
 	 {
-	    Order act(
-		  *this, best->get_price(), dq.q, (bool) dq.is_long,
-		  *(*timer)() );
-	    
-	    LOG(TRACE, boost::format(
-		     "Agent %d: beginning pass %d of order-matching sequence "\
-		     "for order (%d) of %d units @ %.3f\n")
-		  % id % ctr++ % act.is_bid() % act.get_quantity() % act.get_price()
-		  );
+	    const set<Order, buyers_pick>& opp = spot_mkt->get_ask_orders();
 
-	    spot_mkt->process_order(act);
+	    set<Order, buyers_pick>::const_iterator ord = opp.begin();
 
-	    prev_order_status = order_status;
-
-	    order_status = order_is_bid();
-
-	    if( !indeterminate(order_status) && order_status == !prev_order_status )
-	       order_status = indeterminate;
-
-	    if(!indeterminate(order_status))
+	    while(!stop && ord != opp.end())
 	    {
-	       best = spot_mkt->best_order( (bool) order_status );
+	       q_ = ord->get_quantity();
+	       p_ = ord->get_price();
+	       amount += q_;
+	       volume += p_*q_;
+	       vwap = volume/((double) amount);
 
-	       // if there are any opposing limit orders remaining, continue
-	       if(best != 0)
-	       {
-		  dq = get_order_quantity( best->get_price() );
-		  if( (bool) order_status == !act.is_bid() && (dq.q != 0))
-		     LOG(EXCEPTION, boost::format("Agent %d: order direction has been "\
-			      "reversed in the middle of executing an active order, "\
-			      "most recent order parameters: (%d) %d @ %.3f\n")
-			   % id % dq.is_long % dq.q % best->get_price()
-			   );
-		  //there is no way this statement should be here. this must be a mistake
-		  //stop = true;
-	       }
-	       else
-	       {
-		  if(act.get_quantity() != 0)
-		  {
-		     LOG(TRACE, boost::format("Agent %d: active order has not been fully "\
-			      "executed, sending the remainder to the market: "\
-			      "(%d) %.0f @ %.3f\n")
-			   % id % act.is_bid() % act.get_quantity() % act.get_price()
-			   );
-		     spot_mkt->process_order(act);
-		  }
-		  stop = true;
-	       }
+	       dq = get_order_quantity(vwap);
+
+	       stop = (dq.q <= amount);
+
+	       ++ord;
 	    }
-	    else stop = true;
 	 }
+	 else
+	 {
+	    const set<Order, sellers_pick>& opp = spot_mkt->get_bid_orders();
+
+	    set<Order, sellers_pick>::const_iterator ord = opp.begin();
+
+	    while(!stop && ord != opp.end())
+	    {
+	       q_ = ord->get_quantity();
+	       p_ = ord->get_price();
+	       amount += q_;
+	       volume += p_*q_;
+	       vwap = volume/((double) amount);
+
+	       dq = get_order_quantity(vwap);
+
+	       stop = (dq.q <= amount);
+
+	       ++ord;
+	    }
+	 }
+
+	 Order act(*this, dq.q, bid, *(*timer)(),"active");
+
+	 spot_mkt->process_order(act);
+
+	 // Run out of opposing side orders and didn't fully execute
+	 // Send a limit order for the remaining quantity
+	 if(!stop)
+	 {
+	    Position dq_rem = get_order_quantity(p_);
+
+	    if(dq_rem.q != 0)
+	       Order rem(*this, p_, dq_rem.q, bid, 
+		     *(*timer)(),"active_remainder");
+	 }
+
       }
+      // Passive order
       else
       {
 	 double p_ref = spot_mkt->mark_to_market(bid);
@@ -316,7 +310,7 @@ void TradingAgent::place_order()
 		  % id % dq % p_ord
 		  );
 	    Order pass(*this, p_ord, dq.q, (bool) dq.is_long, 
-		  *(*timer)() );
+		  *(*timer)(), "passive");
 
 	    spot_mkt->process_order(pass);
 	 }
@@ -359,9 +353,28 @@ double TradingAgent::mark_to_market() const
 
 bool TradingAgent::can_trade()
 {
-   check_liquidity();
-   check_leverage();
-   return !(is_bankrupt || is_overleveraged);
+   check_wealth();
+   if(negative_wealth)
+   {
+      LOG(WARNING, boost::format(
+	       "Agent %d - the cash account is negative at %.2f. "\
+	       "Although there are safeguards to make sure this does not cause strange "\
+	       "behaviour, they are not universal, and this should not be happening in "\
+	       "any case\n") % id % wealth
+	    );
+   }
+   else
+   {
+      check_leverage();
+      check_liquidity();
+   }
+
+   return !(negative_wealth || is_bankrupt || is_overleveraged);
+}
+
+void TradingAgent::check_wealth()
+{
+   negative_wealth = (wealth < 0);
 }
 
 void TradingAgent::check_liquidity()
@@ -372,42 +385,12 @@ void TradingAgent::check_liquidity()
 	    % id
 	    );
 
-      double cash_req = spot_mkt->cash_requirement(
-				    wealth+investment_value( mark_to_market() )
-				    );
+      is_bankrupt = (wealth + investment_value( mark_to_market() ) )  < 0;
 
-      LOG(TRACE, boost::format("Agent %d: with W=%.0f, Q=%.0f, m=%.3f the market "\
-	       "cash requirement is %.0f\n")
-	    % id % wealth % (double) pos % mark_to_market() % cash_req
+      LOG(TRACE, 
+	    boost::format("Agent %d: the bankrupcy flag value is now %d\n")
+	    % id % is_bankrupt
 	 );
-
-      if(cash_req>0)
-      {
-	 LOG(TRACE, boost::format("Agent %d: a cash injection of size %.2f "\
-		  "is needed in order to stay solvent\n")
-	       % id % cash_req
-	       );
-	 unsigned long rq(0);
-
-	 if(pos.is_long)
-	    rq = spot_mkt->raise_cash(cash_req);
-	 else
-	    rq = spot_mkt->raise_cash(min(cash_req,wealth));
-
-	 if(rq>0)
-	 {
-	    Order r(*this,rq,(bool)!pos.is_long,*(*timer)());
-	    spot_mkt->process_order(r);
-	 }
-
-	 is_bankrupt = (spot_mkt->cash_requirement(
-				    wealth+investment_value( mark_to_market() )
-				    ) > 0);
-	 LOG(TRACE, 
-	       boost::format("Agent %d: the bankrupcy flag value is now %d\n")
-	       % id % is_bankrupt
-	       );
-      }
 
    }
 }
@@ -436,7 +419,8 @@ void TradingAgent::check_leverage()
       {
 	 if(pos.is_long)
 	 {
-	    Order close_long(*this, spot_mkt->gauge_market_depth(true,pos.q),false,*(*timer)());
+	    Order close_long(*this, spot_mkt->gauge_market_depth(true,pos.q),false,*(*timer)(),
+		  "deleverage_long");
 	    spot_mkt->process_order(close_long);
 	 }
 	 else

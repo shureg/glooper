@@ -103,8 +103,12 @@ const bool Market::process_order(Order& r)
 
 	 set<Order,buyers_pick>::iterator
 	    i = ask_orders.begin();
+
+	 set<Order,buyers_pick>::const_iterator
+	    match_end = 
+	    (r.is_market())?(ask_orders.end()):(ask_orders.upper_bound(r)); 
 	 
-	 while( !r.is_cleared() and i!=ask_orders.end() )
+	 while( !r.is_cleared() and i!=match_end )
 	 {
 	    r.match(*i);
 	    ++i;
@@ -128,8 +132,12 @@ const bool Market::process_order(Order& r)
 
 	 set<Order,sellers_pick>::iterator
 	    i = bid_orders.begin();
+
+	 set<Order,sellers_pick>::const_iterator
+	    match_end = 
+	    (r.is_market())?(bid_orders.end()):(bid_orders.upper_bound(r));
 	 
-	 while( !r.is_cleared() and i!=bid_orders.end() )
+	 while( !r.is_cleared() and i!=match_end )
 	 {
 	    r.match(*i);
 	    ++i;
@@ -368,9 +376,12 @@ void Market::record_trade(const Trade& tr)
 
 double Market::mark_to_market(bool _bid) const
 {
-   const Order* tmp = best_order(_bid);
-   if( tmp != 0 )
-      return tmp->get_price();
+   const Order* tmp0 = best_order(_bid);
+   const Order* tmp1 = best_order(!_bid);
+   if( tmp0 != 0 )
+      return tmp0->get_price();
+   else if(tmp0 == 0 && tmp1 != 0)
+      return tmp1->get_price();
    else
       return last_traded_price();
 }
@@ -431,7 +442,8 @@ unsigned long Market::raise_cash(const double& _cash) const
    return q_m;
 }
 
-void Market::close_out_short(Agent& agt, unsigned long short_size, double cash_available, unsigned long agent_timer)
+void Market::close_out_short(Agent& agt, 
+      unsigned long short_size, double cash_available, unsigned long agent_timer)
 {
    if(cash_available > 0 && !ask_orders.empty())
    {
@@ -461,7 +473,7 @@ void Market::close_out_short(Agent& agt, unsigned long short_size, double cash_a
 	 ++current_ask;
       }
 
-      Order close_short(agt,q,true,agent_timer);
+      Order close_short(agt,q,true,agent_timer,"deleverage_short");
 
       process_order(close_short);
    }
@@ -586,4 +598,29 @@ XmlField Market::xml_description() const
    }
 
    return tmp;
+}
+
+void Market::print(std::ostream& os) const
+{
+   os << "MARKET" << std::endl;
+
+   if(!ask_orders.empty())
+   {
+      for(set<Order, buyers_pick>::const_reverse_iterator 
+	    a = ask_orders.rbegin(); a !=  ask_orders.rend(); ++a)
+      {
+	 os << "\t\t" << a->get_quantity() << '\t' << a->get_price() << std::endl;
+      }
+   }
+
+   if(!bid_orders.empty())
+   {
+      for(set<Order, sellers_pick>::const_iterator 
+	    b = bid_orders.begin(); b !=  bid_orders.end(); ++b)
+      {
+	 os << "\t\t\t" << b->get_price() << '\t' << b->get_quantity() << std::endl;
+      }
+   }
+
+   os << std::endl;
 }

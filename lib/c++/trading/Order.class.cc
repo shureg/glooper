@@ -18,6 +18,7 @@
 #include <algorithm>
 #include "agent/Agent.class.h"
 #include "boost/bind.hpp"
+#include "boost/make_shared.hpp"
 
 using namespace GLOOPER_TEST;
 using boost::logic::tribool;
@@ -33,16 +34,18 @@ void Order::reset_instance_ctr()
 
 Order::Order(Agent& _owner,
       double _price, unsigned long _quantity, bool _bid,
-      unsigned long _order_time):
+      unsigned long _order_time,
+      const std::string& comment):
    SimulationObject(++instance_ctr),
-   owner(_owner),
+   owner(&_owner),
    price(_price), quantity(_quantity), bid(_bid),
    market(false), order_time(_order_time),
+   comment(comment),
    owner_signal(new trade_signal),
    trade_registration_signal(new detailed_trade_signal)
 {
    owner_connection = owner_signal->connect(
-	 boost::bind( &Agent::position_update, &owner ,_1 )
+	 boost::bind( &Agent::position_update, owner ,_1 )
 	 );
 
    trade_registration_connection = trade_registration_signal->connect(
@@ -56,21 +59,67 @@ Order::Order(Agent& _owner,
 
 Order::Order(Agent& _owner,
       unsigned long _quantity, bool _bid,
-      unsigned long _order_time):
+      unsigned long _order_time,
+      const std::string& comment):
    SimulationObject(++instance_ctr),
-   owner(_owner),
+   owner(&_owner),
    price(-1.), quantity(_quantity), bid(_bid),
    market(true), order_time(_order_time),
+   comment(comment),
    owner_signal(new trade_signal),
    trade_registration_signal(new detailed_trade_signal)
 {
    owner_connection = owner_signal->connect(
-	 boost::bind( &Agent::position_update,&owner,_1 )
+	 boost::bind( &Agent::position_update,owner,_1 )
 	 );
 
    trade_registration_connection = trade_registration_signal->connect(
 	 boost::bind( &Order::record_trade, this, _1 )
 	 );
+}
+
+Order::Order(const Order& r): SimulationObject(r.id),
+   owner(r.owner), price(r.price), quantity(r.quantity),
+   bid(r.bid), market(r.market), order_time(r.order_time),
+   comment(r.comment),
+   owner_signal( boost::make_shared<trade_signal>() ),
+   trade_registration_signal( boost::make_shared<detailed_trade_signal>() )
+{
+   owner_connection = owner_signal->connect(
+	 boost::bind( &Agent::position_update,owner,_1 )
+	 );
+
+   trade_registration_connection = trade_registration_signal->connect(
+	 boost::bind( &Order::record_trade, this, _1 )
+	 );
+}
+
+Order& Order::operator = (const Order& r)
+{
+   if(this != &r)
+   {
+      owner_connection.disconnect();
+      trade_registration_connection.disconnect();
+
+      owner = r.owner;
+      price = r.price;
+      quantity = r.quantity;
+      bid = r.bid;
+      market = r.market;
+      order_time = r.order_time;
+      comment = r.comment;
+
+      owner_connection = owner_signal->connect(
+	    boost::bind( &Agent::position_update,owner,_1 )
+	    );
+
+      trade_registration_connection = trade_registration_signal->connect(
+	    boost::bind( &Order::record_trade, this, _1 )
+	    );
+
+   }
+
+   return *this;
 }
 
 Order::~Order()
@@ -103,8 +152,10 @@ void Order::match(const Order& r) const
       LOG(TRACE,boost::format("Order (%d) for %d @ %.3f: executing %d @ %.3f\n")
 	    % bid % quantity % price % mutual_quantity % r.get_price() 
 	    );
+      
       execute(mutual_quantity,r.get_price(),order_time);
       r.execute(mutual_quantity,r.get_price(),order_time);
+      
       Trade tmp(mutual_quantity, r.get_price(),
 	    get_id(), r.get_id());
       LOG(TRACE,boost::format("Preparing to register trade object at %0x "\
@@ -129,7 +180,7 @@ void Order::execute(
 {
    quantity -= executed_quantity;
    (*owner_signal)(Order(
-	    owner,execution_price,executed_quantity,bid,execution_time));
+	    *owner,execution_price,executed_quantity,bid,execution_time));
 }
 
 const bool Order::is_acceptable(const Order& r) const
@@ -178,12 +229,12 @@ const unsigned long Order::get_order_time() const
 
 Agent* Order::get_owner() const
 {
-   return &owner;
+   return owner;
 }
 
 bool Order::is_owner(const Agent& _owner) const
 {
-   return &_owner == &owner;
+   return &_owner == owner;
 }
 
 
@@ -212,7 +263,8 @@ XmlField Order::xml_description() const
    tmp("is_bid") = bid;
    tmp("is_market") = market;
    tmp("order_time") = order_time;
-   tmp("owner_id") = owner.get_id();
+   tmp("owner_id") = owner->get_id();
+   tmp("comment") = comment;
 
    return tmp;
 }

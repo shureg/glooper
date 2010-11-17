@@ -11,7 +11,7 @@ glooper = glooper_lua_swig_wrap
 rng = rng_lua_swig_wrap
 agt_gen = agent_generator
 
-agt_gen.agent_ctor = glooper.LuaComplexAgent
+agt_gen.agent_ctor = glooper.StandardComplexAgent
 
 agt_gen.generator_args = {
    belief = rng.UniformGenerator(),

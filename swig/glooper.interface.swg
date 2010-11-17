@@ -32,17 +32,6 @@
 
 namespace GLOOPER_TEST
 {
-   class SednaDBInterface
-   {
-   public:
-      SednaDBInterface(const std::string&, 
-	    const std::string&, const std::string&,
-	    const std::string& = "",
-	    const bool = true);
-      
-      void set_autocommit(const bool);
-   };
-
    class TableDBInterface
    {
    public:
@@ -138,5 +127,5 @@ namespace GLOOPER_TEST
       unsigned long get_total_step_count() const;
 
    };
-
+   
 }
