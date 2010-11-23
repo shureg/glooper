@@ -1,0 +1,5 @@
+020a   -   Uniform with 50 NA(Uniform)(1,0) agents   -   /simulation_data/glooper/cfg/multibatch/new_cfg/agents/020a_uni_50na.sim.cfg.py
+001a   -   Uniform with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/001a_uniform_base.sim.cfg.py
+020c   -   Uniform with 200 NA(Uniform)(1,0) agents   -   /simulation_data/glooper/cfg/multibatch/new_cfg/agents/020c_uni_200na.sim.cfg.py
+020d   -   Uniform with 500 NA(Uniform)(1,0) agents   -   /simulation_data/glooper/cfg/multibatch/new_cfg/agents/020d_uni_500na.sim.cfg.py
+020e   -   Uniform with 1000 NA(Uniform)(1,0) agents   -   /simulation_data/glooper/cfg/multibatch/new_cfg/agents/020e_uni_1000na.sim.cfg.py

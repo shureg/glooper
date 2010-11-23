@@ -1,0 +1,5 @@
+001a   -   Uniform with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/001a_uniform_base.sim.cfg.py
+001b   -   Triangular with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/001b_tri_base.sim.cfg.py
+001c   -   Beta(1.5) with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/001c_beta1_5_base.sim.cfg.py
+001d   -   Beta(2.5) with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/001d_beta_2_5_base.sim.cfg.py
+001e   -   Beta(0.5) with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/001e_beta_0_5_base.sim.cfg.py

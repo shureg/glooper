@@ -1,0 +1,4 @@
+002b   -   Uniform with 100 NA(Uniform)(0,1) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/002b_pure_private.sim.cfg.py
+002c   -   Uniform with 100 NA(Uniform)(1,1) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/002c_mixed_pp.sim.cfg.py
+002d   -   Intermittent(0.1) Uniform with 100 NA(Uniform)(1,1) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/002d_mixed_intermit_010.sim.cfg.py
+002e   -   Intermittent(0.1) Uniform with 100 NA(Uniform)(1,0) agents    -   /simulation_data/glooper/cfg/multibatch/new_cfg/info/002e_pub_intermit_010.sim.cfg.py
