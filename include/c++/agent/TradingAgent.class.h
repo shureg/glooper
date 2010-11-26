@@ -65,8 +65,11 @@ namespace GLOOPER_TEST
 
       double mark_to_market() const;
 
-      Position get_order_quantity(double) const;
+      Position get_order_quantity(double price) const;
 
+      Position get_order_quantity(double price, 
+	    Position pos_, double c) const;
+      
       void check_wealth();
 
       void check_liquidity();

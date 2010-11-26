@@ -146,7 +146,30 @@ Position TradingAgent::get_order_quantity(double price) const
 	    "m=%.3f, the requisite raw order quantity is found to be %f\n")
 	 % id % current_investment_proportion(price) 
 	 % desired_investment_proportion() 
-	 % wealth % (double) pos % price % dq
+	 % wealth % q % price % dq
+	 );
+
+   if( dq > 0 )
+      return Position(floor(dq));
+   else if( dq < 0 )
+      return Position(ceil(dq));
+   else
+      return Position(0.);
+}
+
+Position TradingAgent::get_order_quantity(double price, 
+      Position pos_, double c) const
+{
+   double q = pos_;
+   double omega = desired_investment_proportion();
+   double dq = (omega/price)*(q*price + c) - q;
+
+   LOG(TRACE,boost::format(
+	    "Agent %d: with cip= %.4f, dip=%.4f, W=%.0f, Q=%.0f, "\
+	    "m=%.3f, the requisite raw order quantity is found to be %f\n")
+	 % id % current_investment_proportion(price) 
+	 % desired_investment_proportion() 
+	 % c % q % price % dq
 	 );
 
    if( dq > 0 )
@@ -176,12 +199,12 @@ void TradingAgent::place_order()
       // Active order
       if( is_active() && spot_mkt->best_order(bid) != 0 )
       {
-	 unsigned long amount = 0;
-	 double volume = 0;
 	 bool stop = false;
-	 double vwap;
-	 double p_;
-	 unsigned long q_;
+	 Position q_ = pos;
+	 double c_ = wealth;
+	 unsigned long dq_, dq_exec, dq_agg = 0ul;
+	 double p_ord;
+	 unsigned long q_ord;
 
 	 if(bid)
 	 {
@@ -191,15 +214,18 @@ void TradingAgent::place_order()
 
 	    while(!stop && ord != opp.end())
 	    {
-	       q_ = ord->get_quantity();
-	       p_ = ord->get_price();
-	       amount += q_;
-	       volume += p_*q_;
-	       vwap = volume/((double) amount);
+	       p_ord = ord->get_price();
+	       q_ord = ord->get_quantity();
 
-	       dq = get_order_quantity(vwap);
+	       dq_ = get_order_quantity(p_ord,q_,c_).q;
 
-	       stop = (dq.q <= amount);
+	       dq_exec = std::min(dq_,q_ord);
+
+	       dq_agg += dq_exec;
+	       q_ += dq_exec;
+	       c_ -= dq_exec*p_ord;
+
+	       stop = (dq_ <= q_ord);
 
 	       ++ord;
 	    }
@@ -212,21 +238,24 @@ void TradingAgent::place_order()
 
 	    while(!stop && ord != opp.end())
 	    {
-	       q_ = ord->get_quantity();
-	       p_ = ord->get_price();
-	       amount += q_;
-	       volume += p_*q_;
-	       vwap = volume/((double) amount);
+	       p_ord = ord->get_price();
+	       q_ord = ord->get_quantity();
 
-	       dq = get_order_quantity(vwap);
+	       dq_ = get_order_quantity(p_ord,q_,c_).q;
 
-	       stop = (dq.q <= amount);
+	       dq_exec = std::min(dq_,q_ord);
+
+	       dq_agg += dq_exec;
+	       q_ -= dq_exec;
+	       c_ += dq_exec*p_ord;
+
+	       stop = (dq_ <= q_ord);
 
 	       ++ord;
 	    }
 	 }
 
-	 Order act(*this, dq.q, bid, *(*timer)(),"active");
+	 Order act(*this, dq_agg, bid, *(*timer)(),"active");
 
 	 spot_mkt->process_order(act);
 
@@ -234,10 +263,10 @@ void TradingAgent::place_order()
 	 // Send a limit order for the remaining quantity
 	 if(!stop)
 	 {
-	    Position dq_rem = get_order_quantity(p_);
+	    Position dq_rem = get_order_quantity(p_ord);
 
 	    if(dq_rem.q != 0)
-	       Order rem(*this, p_, dq_rem.q, bid, 
+	       Order rem(*this, p_ord, dq_rem.q, bid, 
 		     *(*timer)(),"active_remainder");
 	 }
 
