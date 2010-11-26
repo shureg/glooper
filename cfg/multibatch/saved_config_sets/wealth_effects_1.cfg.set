@@ -1,0 +1,4 @@
+040a   -   Uniform with 100 NA(Uniform)(1,0) agents; Pareto(1.0) wealth   -   /simulation_data/glooper/cfg/multibatch/new_cfg/wealth/040a_pareto_10.sim.cfg.py
+040c   -   Uniform with 100 NA(Uniform)(1,0) agents; Pareto(2.0) wealth   -   /simulation_data/glooper/cfg/multibatch/new_cfg/wealth/040c_pareto_20.sim.cfg.py
+040d   -   Uniform with 100 NA(Uniform)(1,0) agents; Uniform(10k,60k) wealth   -   /simulation_data/glooper/cfg/multibatch/new_cfg/wealth/040d_uni_10_60.sim.cfg.py
+040e   -   Uniform with 100 NA(Uniform)(1,0) agents; Uniform(10k,200k) wealth   -   /simulation_data/glooper/cfg/multibatch/new_cfg/wealth/040e_uni_10_200.sim.cfg.py

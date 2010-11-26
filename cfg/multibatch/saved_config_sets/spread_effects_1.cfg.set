@@ -1,0 +1,5 @@
+050b   -   Uniform with 100 NA(Uniform)(1,0) agents; Uniform(0.001, 0.05) spread   -   /simulation_data/glooper/cfg/multibatch/new_cfg/spread/050b_spread_uni05.sim.cfg.py
+050c   -   Uniform with 100 NA(Uniform)(1,0) agents; Uniform(0.001, 0.1)    -   /simulation_data/glooper/cfg/multibatch/new_cfg/spread/050c_spread_uni10.sim.cfg.py
+050d   -   Uniform with 100 NA(Uniform)(1,0) agents; Exp(1/0.0055)   -   /simulation_data/glooper/cfg/multibatch/new_cfg/spread/050d_spread_exp01.sim.cfg.py
+050e   -   Uniform with 100 NA(Uniform)(1,0) agents; Exp(1/0.0255)   -   /simulation_data/glooper/cfg/multibatch/new_cfg/spread/050e_spread_exp05.sim.cfg.py
+050f   -   Uniform with 100 NA(Uniform)(1,0) agents; Exp(1/0.0505)   -   /simulation_data/glooper/cfg/multibatch/new_cfg/spread/050f_spread_exp10.sim.cfg.py
