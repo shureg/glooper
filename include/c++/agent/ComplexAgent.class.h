@@ -37,12 +37,15 @@ namespace GLOOPER_TEST
 {
    struct price_change
    {
+      bool set;
       double p0,p1;
       double ratio;
       std::multiset<double>::iterator where;
 
+      price_change(): set(false){}
+
       price_change(double _p0, double _p1):
-	 p0(_p0),p1(_p1),ratio(p1/p0)
+	 set(true),p0(_p0),p1(_p1),ratio(p1/p0)
       {}
    };
 
@@ -88,8 +91,13 @@ namespace GLOOPER_TEST
       //multiset_index& distr_byvalue;
       //list_index& distr_bytime;
       
-      std::multiset<double> distr_byvalue;
-      std::deque<price_change> distr_bytime;
+      std::multiset<double> distr_byvalue_pos;
+      std::deque<price_change> distr_bytime_pos;
+      
+      std::multiset<double> distr_byvalue_neg;
+      std::deque<price_change> distr_bytime_neg;
+
+      price_change last_price_change;
 
       boost::logic::tribool mean_reverter;
 
@@ -105,7 +113,8 @@ namespace GLOOPER_TEST
        */
       double ecdf(double ratio) const;
 
-      virtual const bool history_significant() const;
+      virtual const bool history_significant(
+	    const std::deque<price_change>&) const;
 
       virtual void adjust_belief(double p_more_extreme) = 0;
 

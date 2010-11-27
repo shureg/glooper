@@ -51,7 +51,7 @@ double StandardComplexAgent::combine_public_private_information(double public_xi
 
 void StandardComplexAgent::adjust_belief(double p_more_extreme)
 {
-   bool last_move_up = (distr_bytime.back().ratio > 1.);
+   bool last_move_up = (last_price_change.ratio > 1.);
 
    bool mr = (bool) mean_reverter;
 
@@ -69,7 +69,7 @@ void StandardComplexAgent::adjust_belief(double p_more_extreme)
 	 K = 0.;
    }
 
-   belief += (1-p_more_extreme)*(K-belief); 
+   belief += (1-p_more_extreme)*(K-belief)*U(); 
 }
 
 const boost::logic::tribool StandardComplexAgent::next_mode() const

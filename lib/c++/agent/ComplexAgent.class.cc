@@ -59,7 +59,8 @@ ComplexAgent::~ComplexAgent()
    market_broadcast_conn.disconnect();
 }
 
-const bool ComplexAgent::history_significant() const
+const bool ComplexAgent::history_significant(
+      const deque<price_change>& distr_bytime) const
 {
    return (distr_bytime.size() >= significance_threshold);
 }
@@ -72,8 +73,9 @@ void ComplexAgent::add_return(const Trade& trd)
 	 );
 
    double last_price;
-   if ( !distr_bytime.empty() )
-      last_price = distr_bytime.back().p1;
+
+   if ( last_price_change.set )
+      last_price = last_price_change.p1;
    else
       last_price = spot_mkt->last_traded_price();
 
@@ -85,52 +87,67 @@ void ComplexAgent::add_return(const Trade& trd)
 
    price_change dp(last_price, trd.p);
 
-   dp.where =
-      distr_byvalue.insert( dp.ratio );
-
-   distr_bytime.push_back( 
-	 price_change( dp ) );
-
    LOG(TRACE, boost::format(
 	    "ComplexAgent::price changed recorded "\
 	    "(agent %d at %0x\n)")
 	 % id % this
-	 );
-   
-   if( max_memory > 0 && distr_bytime.size() > max_memory )
+      );
+
+   double last_ratio = dp.ratio;
+
+   last_price_change = dp;
+
+   if(last_ratio != 1)
    {
-      distr_byvalue.erase(distr_bytime.front().where);
-      distr_bytime.pop_front();
-   }
+      deque<price_change>& distr_bytime =
+	 (last_ratio > 1)?(distr_bytime_pos):(distr_bytime_neg);
+      
+      multiset<double>& distr_byvalue =
+	 (last_ratio > 1)?(distr_byvalue_pos):(distr_byvalue_neg);
 
-   mean_reverter = next_mode();
+      dp.where =
+	 distr_byvalue.insert( dp.ratio );
 
-   if(!indeterminate(mean_reverter) && belief != 0.5)
-   {
-      double last_ratio = distr_bytime.back().ratio;
+      distr_bytime.push_back( 
+	    price_change( dp ) );
 
-      LOG(TRACE, boost::format(
-	       "[TREND]: Agent %d - Last available price ratio determined to be %.4f\n")
-	    % id % last_ratio
+      if( max_memory > 0 && distr_bytime.size() > max_memory )
+      {
+	 distr_byvalue.erase(distr_bytime.front().where);
+	 distr_bytime.pop_front();
+      }
+
+      mean_reverter = next_mode();
+
+      if(!indeterminate(mean_reverter) && belief != 0.5)
+      {
+	 LOG(TRACE, boost::format(
+		  "[TREND]: Agent %d - Last available price ratio determined to be %.4f\n")
+	       % id % last_ratio
 	    );
 
-      if( history_significant() && last_ratio != 1.)
-      {
-	 double b0 = belief;
-	 adjust_belief( 
-	       (last_ratio > 1.) ? (1. - ecdf(last_ratio)) : (ecdf(last_ratio))
+	 if( history_significant(distr_bytime) )
+	 {
+	    double b0 = belief;
+	    adjust_belief( 
+		  (last_ratio > 1.) ? (1. - ecdf(last_ratio)) : (ecdf(last_ratio))
+		  );
+	    LOG(TRACE, boost::format(
+		     "[TREND]: Agent %d - belief change "\
+		     "after adjustment is %.8f\n")
+		  % id % (belief - b0)
 	       );
-	 LOG(TRACE, boost::format(
-		  "[TREND]: Agent %d - belief change "\
-		  "after adjustment is %.8f\n")
-	       % id % (belief - b0)
-	       );
+	 }
       }
+
    }
 }
 
 double ComplexAgent::ecdf(double ratio) const
 {
+   const multiset<double>& distr_byvalue =
+      (ratio > 1)?(distr_byvalue_pos):(distr_byvalue_neg);
+
    multiset<double>::iterator 
       lb = distr_byvalue.lower_bound(ratio);
 
