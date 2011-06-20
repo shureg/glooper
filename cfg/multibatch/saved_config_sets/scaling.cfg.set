@@ -1,0 +1,6 @@
+101a   -   Uniform with 100 NA(Uniform)(1,0) agents - 50 runs   -   /simulation_data/glooper/cfg/multibatch/new_cfg/run_num/101a_runs_50.sim.cfg.py
+101c   -   Uniform with 100 NA(Uniform)(1,0) agents - 200 runs   -   /simulation_data/glooper/cfg/multibatch/new_cfg/run_num/101c_runs_200.sim.cfg.py
+101d   -   Uniform with 100 NA(Uniform)(1,0) agents - 500 runs   -   /simulation_data/glooper/cfg/multibatch/new_cfg/run_num/101d_runs_500.sim.cfg.py
+102a   -   Uniform with 100 NA(Uniform)(1,0) agents - 500 steps   -   /simulation_data/glooper/cfg/multibatch/new_cfg/run_num/102a_steps_500.sim.cfg.py
+102c   -   Uniform with 100 NA(Uniform)(1,0) agents - 1500 steps   -   /simulation_data/glooper/cfg/multibatch/new_cfg/run_num/102c_steps_1500.sim.cfg.py
+102d   -   Uniform with 100 NA(Uniform)(1,0) agents - 2000 steps   -   /simulation_data/glooper/cfg/multibatch/new_cfg/run_num/102d_steps_2000.sim.cfg.py
